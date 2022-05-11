@@ -9,22 +9,22 @@
   <head>
     <meta charset="utf-8">
 
-<!-- begin _includes/seo.html --><title>Site Title</title>
-<meta name="description" content="An amazing website.">
+<!-- begin _includes/seo.html --><title>YOUNGHYUN's Blog</title>
+<meta name="description" content="노력하는 흔적 남기기">
 
 
-  <meta name="author" content="Your Name">
+  <meta name="author" content="Younghyun Park">
   
 
 
 <meta property="og:type" content="website">
-<meta property="og:locale" content="en_US">
-<meta property="og:site_name" content="Site Title">
-<meta property="og:title" content="Site Title">
+<meta property="og:locale" content="en_KR">
+<meta property="og:site_name" content="YOUNGHYUN's Blog">
+<meta property="og:title" content="YOUNGHYUN’s Blog">
 <meta property="og:url" content="http://localhost:4000/">
 
 
-  <meta property="og:description" content="An amazing website.">
+  <meta property="og:description" content="노력하는 흔적 남기기">
 
 
 
@@ -45,15 +45,13 @@
 
 
 
-  <link rel="next" href="http://localhost:4000/page2/">
-
 
 <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     
       "@type": "Person",
-      "name": "Your Name",
+      "name": "Younghyun Park",
       "url": "http://localhost:4000/"
     
   }
@@ -69,7 +67,7 @@
 
 
 
-  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Site Title Feed">
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="YOUNGHYUN's Blog Feed">
 
 
 <!-- https://t.co/dKP3o1e -->
@@ -87,7 +85,13 @@
 
 
     <!-- start custom head snippets -->
-
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/logo.ico/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/logo.ico/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/logo.ico/favicon-16x16.png">
+<link rel="manifest" herf="/assets/logo.ico/site.webmanifest">
+<link rel="mask-icon" herf="/assets/logo.ico/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
 <!-- insert favicons. use https://realfavicongenerator.net/ -->
 
 <!-- end custom head snippets -->
@@ -114,8 +118,10 @@
     <div class="masthead__menu">
       <nav id="site-nav" class="greedy-nav">
         
+          <a class="site-logo" href="/"><img src="/assets/images/main.jpg" alt="YOUNGHYUN's Blog"></a>
+        
         <a class="site-title" href="/">
-          Site Title
+          YOUNGHYUN's Blog
           
         </a>
         <ul class="visible-links"><li class="masthead__menu-item">
@@ -147,14 +153,20 @@
 <div itemscope itemtype="https://schema.org/Person" class="h-card">
 
   
+    <div class="author__avatar">
+      <a href="http://localhost:4000/">
+        <img src="/assets/images/main.jpg" alt="Younghyun Park" itemprop="image" class="u-photo">
+      </a>
+    </div>
+  
 
   <div class="author__content">
     <h3 class="author__name p-name" itemprop="name">
-      <a class="u-url" rel="me" href="http://localhost:4000/" itemprop="url">Your Name</a>
+      <a class="u-url" rel="me" href="http://localhost:4000/" itemprop="url">Younghyun Park</a>
     </h3>
     
       <div class="author__bio p-note" itemprop="description">
-        <p>I am an <strong>amazing</strong> person.</p>
+        <p><strong>노력하는 개발자</strong><br /><em>열정적인 개발자</em></p>
 
       </div>
     
@@ -165,20 +177,26 @@
     <ul class="author__urls social-icons">
       
         <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
-          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name" class="p-locality">Somewhere</span>
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name" class="p-locality">Republic of Korea</span>
         </li>
       
 
       
         
           
+            <li><a href="mailto:yhp2205@gmail.com" rel="nofollow noopener noreferrer me"><i class="fas fa-fw fa-envelope-square" aria-hidden="true"></i><span class="label">Email</span></a></li>
+          
         
+          
+            <li><a href="https://yhp2205.github.io" rel="nofollow noopener noreferrer me"><i class="fas fa-fw fa-link" aria-hidden="true"></i><span class="label">Website</span></a></li>
           
         
           
         
           
         
+          
+            <li><a href="https://github.com/yhp2205" rel="nofollow noopener noreferrer me"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
           
         
           
@@ -254,7 +272,7 @@
     
     
 
-<h3 class="archive__subtitle">Recent posts</h3>
+<h3 class="archive__subtitle">Recent Posts</h3>
 
 
 
@@ -461,51 +479,288 @@
 </div>
 
   
+    
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/blog/coments/" rel="permalink">[Github Blog] 깃헙 블로그에 giscus 적용하기
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          1 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">깃허브 블로그에 giscus를 이용하여 댓글 사용하기
+</p>
+  </article>
 </div>
 
-
-<nav class="pagination">
   
-  <ul>
-    
-    
-    <li><a href="#" class="disabled"><span aria-hidden="true">Previous</span></a></li>
     
 
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
     
-    
-      <li><a href="#" class="disabled current">1</a></li>
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/blog/GA-post/" rel="permalink">[Github Blog] google analytics 적용하기
+</a>
+      
+    </h2>
     
 
-    
+  <p class="page__meta">
     
 
-    
-    
     
 
     
       
-        
-        
-        
-        <li><a href="/page2/">2</a></li>
       
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          less than 1 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">깃허브 블로그에 GA를 설정하여 사용자 통계 확인하기
+</p>
+  </article>
+</div>
+
+  
+    
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/blog/SEO-set/" rel="permalink">[Github Blog] google에서 검색되도록 설정하기
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
     
 
     
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          2 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">깃허브 블로그 글이 포털사이트에서 검색될 수 있도록 설정하기
+</p>
+  </article>
+</div>
+
+  
+    
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/study/HG2-2/" rel="permalink">[혼공머신러닝] Ch 2. 데이터 다루기(2)
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
     
 
     
-      <li><a href="/page3/">3</a></li>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          3 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">2-2 데이터 전처리
+</p>
+  </article>
+</div>
+
+  
+    
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/blog/Blogfavi/" rel="permalink">[Github Blog] favicon 적용하기
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
     
 
     
+
     
-      <li><a href="/page2/">Next</a></li>
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          less than 1 minute read
+        
+      </span>
     
-  </ul>
-</nav>
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">깃허브 블로그 탭에 이미지 넣기
+</p>
+  </article>
+</div>
+
+  
+    
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/study/HG2-1/" rel="permalink">[혼공머신러닝] Ch 2. 데이터 다루기(1)
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          2 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">2-1 훈련 세트와 테스트 세트
+</p>
+  </article>
+</div>
+
+  
+    
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/blog/First-post/" rel="permalink">github.io 블로그 첫 포스팅입니다
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          less than 1 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">Github Blog글을 처음 써보며
+</p>
+  </article>
+</div>
+
+  
+</div>
+
 
 
 
@@ -522,8 +777,6 @@
 <!-- end custom footer snippets -->
         <div class="page__footer-follow">
   <ul class="social-icons">
-    
-      <li><strong>Follow:</strong></li>
     
 
     
@@ -548,7 +801,7 @@
   </ul>
 </div>
 
-<div class="page__footer-copyright">&copy; 2022 Your Name. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+<div class="page__footer-copyright">&copy; 2022 Younghyun Park. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
 
       </footer>
     </div>
