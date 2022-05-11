@@ -1,0 +1,53 @@
+I"[<p>github blog에 google analytics를 적용해보겠습니다.<br />
+저는 github blog에 jekyll minimal-mistakes 테마를 적용하고 있습니다.</p>
+
+<h3 id="1-google-analytics-계정-생성하기">1. google analytics 계정 생성하기</h3>
+<p>우선 <a href="https://analytics.google.com/analytics/web/provision/?hl=ko&amp;pli=1#/provision">google analytics</a> 페이지에 접속해서 계정을 생성합니다.<br />
+  <br />
+  <img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA1.png?raw=true" alt="GA1" /><br />
+  <br />
+  google analytics 페이지에서 측정 시작을 눌러줍니다.<br />
+  <br />
+  <img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA2.png?raw=true" alt="GA2" /><br />
+  <br />
+  계정 이름을 입력하고 다음으로 넘어갑니다.<br />
+  <br />
+  <img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA3.png?raw=true" alt="GA3" /><br />
+  <br />
+  속성 이름을 입력하고, 보고 시간대와 통화를 지정해줍니다.<br />
+  저는 속성 이름에 Github blog를, 시간대와 통화를 모두 대한민국으로 지정했습니다.<br />
+  <br />
+  <img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA4.png?raw=true" alt="GA4" /> <br />
+  <br />
+  비즈니스 정보를 입력합니다. 업종은 지정하지 않아도 됩니다.<br />
+  비즈니스 규모와 사용 계획은 본인의 사이트와 맞게 입력해줍니다.<br />
+  <br />
+  <img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA5.png?raw=true" alt="GA5" /><br />
+  <br />
+  마지막으로 만들기를 누르고, 약관에 동의하면 계정 만들기가 완료 되었습니다.</p>
+
+<h3 id="2-데이터-스트림-설정하기">2. 데이터 스트림 설정하기</h3>
+<p>이제 생성한 GA 계정을 이용하여 데이터 스트림을 설정하겠습니다.<br />
+<br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA6.png?raw=true" alt="GA6" /><br />
+<br />
+다음 화면에서 우리는 github blog에 만들 것이기 때문에 웹을 선택해줍니다.<br />
+<br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA7.png?raw=true" alt="GA7" />
+<br />
+데이터 스트림 설정 창이 뜨면, <code class="language-plaintext highlighter-rouge">http://</code> 를 제외한 깃헙 url을 입력한 후, 스트림 이름을 지정해줍니다.<br />
+저는 github blog로 지정하였습니다.<br />
+그리고 만들기를 눌러 생성합니다. 
+<br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA8.png?raw=true" alt="GA8" /><br />
+<br />
+스트림을 만든 후, 웹 스트림 세부정보에서 측정 ID를 복사합니다.<br />
+이렇게 복사한 측정 ID는 github blog 로컬에 위치해있는 <code class="language-plaintext highlighter-rouge">_config.yml</code> 파일 속 google tracking id 적는 란에 다음과 같이 추가해줍니다.<br />
+<br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA9.png?raw=true" alt="GA9" /></p>
+
+<blockquote>
+  <p>참고한 포스트
+<a href="https://ynkim0.github.io/posts/Jekyll-Chripy-Google-Analytics-%EC%97%B0%EB%8F%99%ED%95%98%EA%B8%B0/">Jekyll Chripy Google Analytics 연동하기</a></p>
+</blockquote>
+:ET

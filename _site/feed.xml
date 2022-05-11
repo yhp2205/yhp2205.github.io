@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-05-12T04:46:42+09:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">YOUNGHYUN’s Blog</title><subtitle>노력하는 흔적 남기기</subtitle><author><name>Younghyun Park</name></author><entry><title type="html">[혼공머신러닝] Ch 4. 다양한 분류 알고리즘(2)</title><link href="http://localhost:4000/ml/HG4-2/" rel="alternate" type="text/html" title="[혼공머신러닝] Ch 4. 다양한 분류 알고리즘(2)" /><published>2022-05-05T00:00:00+09:00</published><updated>2022-05-05T00:00:00+09:00</updated><id>http://localhost:4000/ml/HG4-2</id><content type="html" xml:base="http://localhost:4000/ml/HG4-2/"><![CDATA[<h2 id="확률적-경사-하강법">확률적 경사 하강법</h2>]]></content><author><name>Younghyun Park</name></author><category term="ML" /><category term="Blog" /><category term="Machine learning" /><category term="Data mining" /><category term="혼공머신러닝" /><summary type="html"><![CDATA[4-2 확률적 경사 하강법]]></summary></entry><entry><title type="html">[혼공머신러닝] Ch 4. 다양한 분류 알고리즘</title><link href="http://localhost:4000/ml/HG4-1/" rel="alternate" type="text/html" title="[혼공머신러닝] Ch 4. 다양한 분류 알고리즘" /><published>2022-05-04T00:00:00+09:00</published><updated>2022-05-04T00:00:00+09:00</updated><id>http://localhost:4000/ml/HG4-1</id><content type="html" xml:base="http://localhost:4000/ml/HG4-1/"><![CDATA[<h2 id="로지스틱-회귀">로지스틱 회귀</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-05-12T05:21:43+09:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">YOUNGHYUN’s Blog</title><subtitle>노력하는 흔적 남기기</subtitle><author><name>Younghyun Park</name></author><entry><title type="html">[혼공머신러닝] Ch 4. 다양한 분류 알고리즘(2)</title><link href="http://localhost:4000/ml/HG4-2/" rel="alternate" type="text/html" title="[혼공머신러닝] Ch 4. 다양한 분류 알고리즘(2)" /><published>2022-05-05T00:00:00+09:00</published><updated>2022-05-05T00:00:00+09:00</updated><id>http://localhost:4000/ml/HG4-2</id><content type="html" xml:base="http://localhost:4000/ml/HG4-2/"><![CDATA[<h2 id="확률적-경사-하강법">확률적 경사 하강법</h2>]]></content><author><name>Younghyun Park</name></author><category term="ML" /><category term="Blog" /><category term="Machine learning" /><category term="Data mining" /><category term="혼공머신러닝" /><summary type="html"><![CDATA[4-2 확률적 경사 하강법]]></summary></entry><entry><title type="html">[혼공머신러닝] Ch 4. 다양한 분류 알고리즘</title><link href="http://localhost:4000/ml/HG4-1/" rel="alternate" type="text/html" title="[혼공머신러닝] Ch 4. 다양한 분류 알고리즘" /><published>2022-05-04T00:00:00+09:00</published><updated>2022-05-04T00:00:00+09:00</updated><id>http://localhost:4000/ml/HG4-1</id><content type="html" xml:base="http://localhost:4000/ml/HG4-1/"><![CDATA[<h2 id="로지스틱-회귀">로지스틱 회귀</h2>
 
 <p>랜덤하게 담긴 생선의 확률을 알아보려고 합니다.<br />
 우선 앞서 배웠던 k-최근접 이웃 분류기를 사용하여 구한 이웃 클래스를 토대로 타깃 생선의 확률을 계산해보겠습니다.<br />
@@ -474,7 +474,7 @@ alpha값이 크면 규제의 강도가 세기 때문에 과소적합될 가능�
 <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'R^2'</span><span class="p">)</span>
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
-<p><img src="../assets/images/HG03-1/HG3-3-1.png" alt="HG3-3-1" /><br />
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG03-1/HG3-3-1.png?raw=true" alt="HG3-3-1" /><br />
 <br />
 다음 그래프를 확인해보면, 적절한 alpha 값이 -1, 즉 0.1 이라는 것을 알 수 있습니다.<br />
 alpha 값을 0.1로 지정하여 모델을 훈련하겠습니다.</p>
@@ -511,7 +511,7 @@ alpha 값을 0.1로 지정하여 모델을 훈련하겠습니다.</p>
 <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'R^2'</span><span class="p">)</span>
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
-<p><img src="../assets/images/HG03-1/HG3-3-2.png" alt="HG3-3-2" /><br />
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG03-1/HG3-3-2.png?raw=true" alt="HG3-3-2" /><br />
 <br />
 위 그래프를 확인했을 때 올바른 alpha값은 1이라는것을 알 수 있습니다.<br />
 이 값으로 lasso 모델을 훈련합니다.</p>
@@ -598,7 +598,7 @@ alpha 값을 0.1로 지정하여 모델을 훈련하겠습니다.</p>
 <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'weight'</span><span class="p">)</span>
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
-<p><img src="../assets/images/HG03-1/HG3-2-1.png" alt="HG3-2-1" /><br />
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG03-1/HG3-2-1.png?raw=true" alt="HG3-2-1" /><br />
 <br />
 산점도를 보면 어떤 문제인지 알 수 있습니다.<br />
 샘플에 비해 이웃 샘플들의 평균한 무게가 너무 적었던 것입니다.<br />
@@ -642,7 +642,7 @@ alpha 값을 0.1로 지정하여 모델을 훈련하겠습니다.</p>
 <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'weight'</span><span class="p">)</span>
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
-<p><img src="../assets/images/HG03-1/HG3-2-2.png" alt="HG3-2-2" /><br />
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG03-1/HG3-2-2.png?raw=true" alt="HG3-2-2" /><br />
 이제 결정계수를 출력해보겠습니다.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
@@ -714,7 +714,7 @@ alpha 값을 0.1로 지정하여 모델을 훈련하겠습니다.</p>
 <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'weight'</span><span class="p">)</span>
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
-<p><img src="../assets/images/HG03-1/HG3-2-3.png" alt="HG3-2-3" /><br />
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG03-1/HG3-2-3.png?raw=true" alt="HG3-2-3" /><br />
 <br />
 앞서 만들었던 선형 회귀 모형보다 더 나은 그래프가 그려진 것이 보입니다.<br />
 이제 결정계수를 출력해보겠습니다.</p>
@@ -762,7 +762,7 @@ k-최근접 이웃 회귀는 예측하려는 샘플에 가장 가까운 샘플 k
 <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'weight'</span><span class="p">)</span>
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
-<p><img src="../assets/images/HG03-1/HG3-1-1.png" alt="HG3-1-1" /><br />
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG03-1/HG3-1-1.png?raw=true" alt="HG3-1-1" /><br />
 <br />
 다음과 같이 우상향하는 그래프가 출력되었습니다.<br />
 농어 길이가 늘어날 수록 무게도 늘어나는 것은 확인했습니다.<br />
@@ -852,11 +852,11 @@ train set과 점수 차이도 많이 나지 않아 과대적합도 아닙니다.
 <h3 id="1-giscus-설치하기">1. giscus 설치하기</h3>
 <p>다음 <a href="https://giscus.app/ko">giscus</a> 사이트에 접속합니다.<br />
 <br />
-<img src="../assets/images/giscus/gc1.png" alt="gc1" /><br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/giscus/gc1.png?raw=true" alt="gc1" /><br />
 <br />
 다음 giscus를 눌러 giscus 댓글창을 사용할 레포지토리에 install 합니다.<br />
 <br />
-<img src="../assets/images/giscus/gc2.jpg" alt="gc2" /><br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/giscus/gc2.png?raw=true" alt="gc2" /><br />
 <br />
 저는 이미 설치했기 때문에 configure이라고 뜨지만, 파란 install 버튼을 눌러줍니다.<br />
 install 버튼을 누르면, <code class="language-plaintext highlighter-rouge">all repositories</code>와 <code class="language-plaintext highlighter-rouge">only select repositories</code> 둘 중 선택하는 옵션이 있는데, <code class="language-plaintext highlighter-rouge">only select repositories &gt; 댓글창 적용할 repositories</code>선택하여 설치합니다.</p>
@@ -864,44 +864,44 @@ install 버튼을 누르면, <code class="language-plaintext highlighter-rouge">
 <h3 id="2-repository-discussion-기능-활성화">2. repository discussion 기능 활성화</h3>
 <p>이제 giscus를 다운받은 repo의 discussion 기능을 활성화 시켜줘야 합니다.<br />
 <br />
-<img src="../assets/images/giscus/gc3.png" alt="gc3" /><br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/giscus/gc3.png?raw=true" alt="gc3" /><br />
 <br />
 giscus를 다운받은 repo의 settings로 들어갑니다.<br />
 <br />
-<img src="../assets/images/giscus/gc4.png" alt="gc4" /><br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/giscus/gc4.png?raw=true" alt="gc4" /><br />
 <br />
 스크롤을 내려 <code class="language-plaintext highlighter-rouge">Features/Discussions</code> 를 활성화 시켜줍니다.</p>
 
 <h3 id="3-giscus-코드-copy하기">3. giscus 코드 copy하기</h3>
 <p><br />
-<img src="../assets/images/giscus/gc5.png" alt="gc5" /><br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/giscus/gc5.png?raw=true" alt="gc5" /><br />
 <br />
 이제 다시 giscus 사이트로 돌아가 언어를 지정하고, giscus를 설치하고 discussions 기능을 활성화해준 repo의 이름을 적어줍니다.<br />
 지금까지 정상적으로 진행되었다면 repo 입력란 주위에 통과했다는 메세지가 뜹니다.<br />
 그리고 페이지와 discussion 간의 연결을 선택해줍니다.<br />
 보통 title과 url보다 바뀔 가능성이 적은 경로로 연결하기 때문에 저도 그렇게 지정했습니다.<br />
 <br />
-<img src="../assets/images/giscus/gc6.png" alt="gc6" /><br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/giscus/gc6.png?raw=true" alt="gc6" /><br />
 <br />
 이제 discussion 카테고리를 지정해주고, 본인이 원하는 기능을 선택한 후에 쓰고있는 테마를 선택합니다.<br />
 그럼 이제 giscus 활성화 아래 코드가 나타나는데, 코드를 copy하고 <code class="language-plaintext highlighter-rouge">_layouts/posts.html</code> 파일 마지막 부분에 붙여넣습니다.<br />
 <br />
-<img src="../assets/images/giscus/gc7.jpg" alt="gc7" /></p>
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/giscus/gc7.png?raw=true" alt="gc7" /></p>
 
 <h3 id="4-config-파일에서-적용하기">4. config 파일에서 적용하기</h3>
 <p>제가 사용하는 minimal-mistakes 테마가 giscus를 지원하기 때문에 블로그의 _config.yml 파일에 comments를 지정하는 곳에 “giscus”를 입력하고 아래 giscus창에 앞선 코드를 참고하여 붙여넣어줍니다.<br />
 <br />
-<img src="../assets/images/giscus/gc8.png" alt="gc8" /><br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/giscus/gc8.png?raw=true" alt="gc8" /><br />
 <br />
 보통 이 정도의 과정을 거치면 댓글창이 적용이 되지만, 확인해보니 아직 적용이 되지 않은 것을 볼 수 있습니다.<br />
 <br />
-<img src="../assets/images/giscus/gis1.png" alt="gis1" /><br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/giscus/gis1.png?raw=true" alt="gis1" /><br />
 <br />
 이럴 때는 다음과 같이 각 포스트의 title 과 tag 등을 지정하는 곳에 <code class="language-plaintext highlighter-rouge">comments : "giscus"</code>를 지정해주고 push 해줍니다.<br />
 <br />
-<img src="../assets/images/giscus/gis2.png" alt="gis2" /><br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/giscus/gis2.png?raw=true" alt="gis2" /><br />
 <br />
-<img src="../assets/images/giscus/gis3.png" alt="gis3" /><br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/giscus/gis3.png?raw=true" alt="gis3" /><br />
 <br />
 그리고 다시 확인해보면 위와 같이 comments 창이 제대로 뜨는 것을 확인할 수 있습니다.</p>]]></content><author><name>Younghyun Park</name></author><category term="Blog" /><category term="Blog" /><category term="giscus" /><category term="Github blog" /><category term="blog custom" /><summary type="html"><![CDATA[깃허브 블로그에 giscus를 이용하여 댓글 사용하기]]></summary></entry><entry><title type="html">[Github Blog] google analytics 적용하기</title><link href="http://localhost:4000/blog/GA-post/" rel="alternate" type="text/html" title="[Github Blog] google analytics 적용하기" /><published>2022-04-27T00:00:00+09:00</published><updated>2022-04-27T00:00:00+09:00</updated><id>http://localhost:4000/blog/GA%20post</id><content type="html" xml:base="http://localhost:4000/blog/GA-post/"><![CDATA[<p>github blog에 google analytics를 적용해보겠습니다.<br />
 저는 github blog에 jekyll minimal-mistakes 테마를 적용하고 있습니다.</p>
@@ -909,47 +909,47 @@ giscus를 다운받은 repo의 settings로 들어갑니다.<br />
 <h3 id="1-google-analytics-계정-생성하기">1. google analytics 계정 생성하기</h3>
 <p>우선 <a href="https://analytics.google.com/analytics/web/provision/?hl=ko&amp;pli=1#/provision">google analytics</a> 페이지에 접속해서 계정을 생성합니다.<br />
   <br />
-  <img src="../assets/images/GA/GA1.png" alt="GA1" /><br />
+  <img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA1.png?raw=true" alt="GA1" /><br />
   <br />
   google analytics 페이지에서 측정 시작을 눌러줍니다.<br />
   <br />
-  <img src="../assets/images/GA/GA2.png" alt="GA2" /><br />
+  <img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA2.png?raw=true" alt="GA2" /><br />
   <br />
   계정 이름을 입력하고 다음으로 넘어갑니다.<br />
   <br />
-  <img src="../assets/images/GA/GA3.png" alt="GA3" /><br />
+  <img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA3.png?raw=true" alt="GA3" /><br />
   <br />
   속성 이름을 입력하고, 보고 시간대와 통화를 지정해줍니다.<br />
   저는 속성 이름에 Github blog를, 시간대와 통화를 모두 대한민국으로 지정했습니다.<br />
   <br />
-  <img src="../assets/images/GA/GA4.png" alt="GA4" /> <br />
+  <img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA4.png?raw=true" alt="GA4" /> <br />
   <br />
   비즈니스 정보를 입력합니다. 업종은 지정하지 않아도 됩니다.<br />
   비즈니스 규모와 사용 계획은 본인의 사이트와 맞게 입력해줍니다.<br />
   <br />
-  <img src="../assets/images/GA/GA5.png" alt="GA5" /><br />
+  <img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA5.png?raw=true" alt="GA5" /><br />
   <br />
   마지막으로 만들기를 누르고, 약관에 동의하면 계정 만들기가 완료 되었습니다.</p>
 
 <h3 id="2-데이터-스트림-설정하기">2. 데이터 스트림 설정하기</h3>
 <p>이제 생성한 GA 계정을 이용하여 데이터 스트림을 설정하겠습니다.<br />
 <br />
-<img src="../assets/images/GA/GA6.png" alt="GA6" /><br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA6.png?raw=true" alt="GA6" /><br />
 <br />
 다음 화면에서 우리는 github blog에 만들 것이기 때문에 웹을 선택해줍니다.<br />
 <br />
-<img src="../assets/images/GA/GA7.png" alt="GA7" />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA7.png?raw=true" alt="GA7" />
 <br />
 데이터 스트림 설정 창이 뜨면, <code class="language-plaintext highlighter-rouge">http://</code> 를 제외한 깃헙 url을 입력한 후, 스트림 이름을 지정해줍니다.<br />
 저는 github blog로 지정하였습니다.<br />
 그리고 만들기를 눌러 생성합니다. 
 <br />
-<img src="../assets/images/GA/GA8.png" alt="GA8" /><br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA8.png?raw=true" alt="GA8" /><br />
 <br />
 스트림을 만든 후, 웹 스트림 세부정보에서 측정 ID를 복사합니다.<br />
 이렇게 복사한 측정 ID는 github blog 로컬에 위치해있는 <code class="language-plaintext highlighter-rouge">_config.yml</code> 파일 속 google tracking id 적는 란에 다음과 같이 추가해줍니다.<br />
 <br />
-<img src="../assets/images/GA/GA9.png" alt="GA9" /></p>
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA9.png?raw=true" alt="GA9" /></p>
 
 <blockquote>
   <p>참고한 포스트
@@ -996,7 +996,7 @@ layout: null
 </code></pre></div></div>
 <p>다음 파일을 git commit으로 push 후에 <code class="language-plaintext highlighter-rouge">"blog_url"/sitemap.xml</code> 로 접속했을 때 아래와 같은 화면이 나와야 정상적으로 sitemap이 등록된 것입니다.</p>
 
-<p><img src="../assets/images/gooser/gooser1.png" alt="gooser1" /><br />
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/gooser/gooser1.png?raw=truehttps://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/gooser/gooser1.png?raw=true" alt="gooser1" /><br />
 sitemap에서는 해당 글의 정보들이 설정이 되는데 이것은 각 포스트의 맨 윗 부분에 다음과 같이 sitemap 옵션을 추가해줌으로서 추가적으로 설정할 수 있습니다.</p>
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>---
 layout: post
@@ -1010,12 +1010,12 @@ sitemap :
 </code></pre></div></div>
 <p>포스트의 시작 부분에 다음과 같이 sitemap 코드를 적용해보겠습니다.</p>
 
-<p><img src="../assets/images/gooser/gooser3.png" alt="gooser3" /></p>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/gooser/gooser3.png?raw=true" alt="gooser3" /></p>
 
 <p>git push 한 후에 다시 <code class="language-plaintext highlighter-rouge">"blog_url"/sitemap.xml</code>로 접속하여 확인해보겠습니다.<br />
-<img src="../assets/images/gooser/gooser2.png" alt="gooser2" /></p>
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/gooser/gooser2.png?raw=true" alt="gooser2" /></p>
 
-<p><img src="../assets/images/gooser/gooser4.png" alt="gooser4" /><br />
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/gooser/gooser4.png?raw=true" alt="gooser4" /><br />
 위 사진이 <code class="language-plaintext highlighter-rouge">sitemap</code> 지정 전, 아래 사진이 지정 후 사진입니다.<br />
 <span style="background-color: #ffdce0">sitemap을 설정해준 부분</span>은 <code class="language-plaintext highlighter-rouge">changefreq</code>가 daily로 바뀌고, <code class="language-plaintext highlighter-rouge">priority</code>는 1.0으로 잘 바뀌었습니다. 
 반면 <span style="background-color: #f1f8ff">sitemap을 설정 안 한 포스트</span>는 default값 그대로임을 확인할 수 있습니다.</p>
@@ -1033,7 +1033,7 @@ Sitemap: http://"blog_url".github.io/sitemap.xml
 <p>google search console에 등록을 해야 최종적으로 검색 엔진에 블로그 포스트가 뜨게 됩니다.<br />
 <a href="https://developers.google.com/search#?modal_active=none">google search console site</a>에 접속한 후 시작하기 버튼을 누릅니다.</p>
 
-<p><img src="../assets/images/gooser/gooser5.png" alt="gooser5" /></p>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/gooser/gooser5.png?raw=true" alt="gooser5" /></p>
 
 <p>위 화면에서 <code class="language-plaintext highlighter-rouge">URL prefix</code>에 블로그 url을 붙여넣습니다. 
 여기서 Domain, URL prefix 등록의 차이점은 도메인 속성은 DNS 레코드만을 사용해서 verify할 수 있으나 모든 하위 도메인의 데이터를 포함한 웹사이트의 정보를 모두 얻을 수 있습니다.<br />
@@ -1042,18 +1042,18 @@ http://yhp2205.github.io는 포함이 되지 않습니다. 대신 DNS와 달리 
 저는 URL prefix를 이용하여 등록해보겠습니다.<br />
 <code class="language-plaintext highlighter-rouge">Other verification methods</code>에서 HTML tag를 눌러 메타 태그를 copy합니다.</p>
 
-<p><img src="../assets/images/gooser/gooser6.png" alt="gooser6" /></p>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/gooser/gooser6.png?raw=true" alt="gooser6" /></p>
 
 <p>이제 github blog의 root에 존재하는 <code class="language-plaintext highlighter-rouge">_includes/head/custom.html</code> 파일 맨 상단에 copy한 메타 태그를 붙여넣어 github에 push 해주었습니다.<br />
 그리고 HTML tag를 copy한 페이지에서 verify를 눌러줍니다.</p>
 
-<p><img src="../assets/images/gooser/gooser8.png" alt="gooser8" /></p>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/gooser/gooser8.png?raw=true" alt="gooser8" /></p>
 
 <p>그럼 <code class="language-plaintext highlighter-rouge">Ownership verified</code> 라는 문구가 뜨며 등록이 완료됩니다. 그럼 이제 마지막으로 sitemap을 올리기 위해 <code class="language-plaintext highlighter-rouge">GO TO PROPERTY</code>를 누릅니다.</p>
 
-<p><img src="../assets/images/gooser/gooser7.png" alt="gooser7" /></p>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/gooser/gooser7.png?raw=true" alt="gooser7" /></p>
 
-<p><img src="../assets/images/gooser/gooser9.png" alt="gooser9" /></p>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/gooser/gooser9.png?raw=true" alt="gooser9" /></p>
 
 <p>마지막으로 google search console 창에서 sitemaps 카테고리를 눌러 <code class="language-plaintext highlighter-rouge">sitemap.xml</code>을 submit 해주면 끝입니다.</p>
 
@@ -1131,7 +1131,7 @@ http://yhp2205.github.io는 포함이 되지 않습니다. 대신 DNS와 달리 
 <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'weight'</span><span class="p">)</span>
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
-<p><img src="../assets/images/HG02-2/HG02-2-1.png" alt="HG02-2-1" /><br />
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG02-2/HG02-2-1.png?raw=true" alt="HG02-2-1" /><br />
 샘플의 위치를 보면 도미에 가깝습니다.
 이를 빙어로 판단한 원인은 KNeighborsClassifier 클래스에 있습니다.
 KNeighborsClassifier 클래스는 주어진 샘플에서 가장 가까운 이웃 5개 중 다수인 클래스를 예측으로 사용합니다.
@@ -1144,7 +1144,7 @@ indexes 배열을 사용하여 이웃 샘플을 구분해 산점도를 그려보
 <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'weight'</span><span class="p">)</span>
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
-<p><img src="../assets/images/HG02-2/HG02-2-2.png" alt="HG02-2-2" /><br />
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG02-2/HG02-2-2.png?raw=true" alt="HG02-2-2" /><br />
 산점도로 확인해보니 5개중 하나만 도미고, 4개의 데이터가 빙어입니다.</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">train_input</span><span class="p">[</span><span class="n">indexes</span><span class="p">])</span>
 <span class="k">print</span><span class="p">(</span><span class="n">train_target</span><span class="p">[</span><span class="n">indexes</span><span class="p">])</span>
@@ -1163,7 +1163,7 @@ x축의 scale을 조정하여 범위를 동일하게 맞추고 산점도를 다�
 <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'weight'</span><span class="p">)</span>
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
-<p><img src="../assets/images/HG02-2/HG02-2-3.png" alt="HG02-2-3" /><br />
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG02-2/HG02-2-3.png?raw=true" alt="HG02-2-3" /><br />
 x축의 scale을 조정하여 범위를 동일하게 맞추면, 다음과 같이 산점도가 나오게 됩니다.
 이러한 데이터라면 length는 weight에 비해 크게 영향을 미치지 못하게 됩니다.
 따라서 두 특성의 범위가 다른 것을 고려하여, 특성값을 일정한 기준으로 맞춰주어야 하고 이런 작업을 데이터를 전처리한다고 말합니다.<br />
@@ -1183,7 +1183,7 @@ x축의 scale을 조정하여 범위를 동일하게 맞추면, 다음과 같이
 <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'weight'</span><span class="p">)</span>
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
-<p><img src="../assets/images/HG02-2/HG02-2-4.png" alt="HG02-2-4" /><br />
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG02-2/HG02-2-4.png?raw=true" alt="HG02-2-4" /><br />
 다시 산점도를 그려봤을 때 이런 결과가 나온 것은 데이터는 전부 표준점수화 시켜두고 25, 150의 샘플은 그대로 입력했기 때문입니다.<br />
 샘플 데이터인 25, 150도 mean과 std를 사용하여 변환해줍니다.</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">new</span> <span class="o">=</span> <span class="p">([</span><span class="mi">25</span><span class="p">,</span> <span class="mi">150</span><span class="p">]</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span><span class="o">/</span><span class="n">std</span>
@@ -1193,7 +1193,7 @@ x축의 scale을 조정하여 범위를 동일하게 맞추면, 다음과 같이
 <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'weight'</span><span class="p">)</span>
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
-<p><img src="../assets/images/HG02-2/HG02-2-5.png" alt="HG02-2-5" /><br />
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG02-2/HG02-2-5.png?raw=true" alt="HG02-2-5" /><br />
 산점도도 잘 그려지고 범위도 표준점수화 된 것을 확인했으니 모델을 다시 훈련합니다.</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">kn</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
 <span class="n">test_scaled</span> <span class="o">=</span> <span class="p">(</span><span class="n">test_input</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span><span class="o">/</span><span class="n">std</span> <span class="c1">#test dataset도 표준점수화하기
@@ -1212,11 +1212,11 @@ x축의 scale을 조정하여 범위를 동일하게 맞추면, 다음과 같이
 <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'weight'</span><span class="p">)</span>
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
-<p><img src="../assets/images/HG02-2/HG02-2-6.png" alt="HG02-2-6" /><br />
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG02-2/HG02-2-6.png?raw=true" alt="HG02-2-6" /><br />
 이제 샘플에서 가까운 점들은 모두 도미로 옳게 출력이 된 것을 확인할 수 있습니다.</p>]]></content><author><name>Younghyun Park</name></author><category term="[&quot;ML&quot;]" /><category term="Blog" /><category term="Machine learning" /><category term="Data mining" /><category term="혼공머신러닝" /><summary type="html"><![CDATA[2-2 데이터 전처리]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="http://localhost:4000/assets/images/HGML.png" /><media:content medium="image" url="http://localhost:4000/assets/images/HGML.png" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">[Github Blog] favicon 적용하기</title><link href="http://localhost:4000/blog/Blogfavi/" rel="alternate" type="text/html" title="[Github Blog] favicon 적용하기" /><published>2022-04-20T00:00:00+09:00</published><updated>2022-04-20T00:00:00+09:00</updated><id>http://localhost:4000/blog/Blogfavi</id><content type="html" xml:base="http://localhost:4000/blog/Blogfavi/"><![CDATA[<h2 id="github-blog에-favicon-적용하기">Github blog에 favicon 적용하기</h2>
 
 <p>favicon은 브라우저의 탭에 위치해있는 이미지를 의미합니다. 
-<img src="../assets/images/favi/favi1.png" alt="favi1" /></p>
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/favi/favi1.png?raw=true" alt="favi1" /></p>
 
 <p>favicon을 특별히 지정하지 않으면, 다음과 같이 지구본 모양을 띄게 됩니다.<br />
 favicon을 바꾸는 방법에 대해 알아보도록 하겠습니다.</p>
@@ -1229,32 +1229,32 @@ favicon을 바꾸는 방법에 대해 알아보도록 하겠습니다.</p>
 <p><a href="https://realfavicongenerator.net">realfavicongenerator</a> 사이트에 접속하여<br />
   Select your Favicon image를 누르고 파일을 업로드 합니다.<br />
   <br />
-  <img src="../assets/images/favi/favi2.png" alt="favi2" /></p>
+  <img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/favi/favi2.png?raw=true" alt="favi2" /></p>
 
 <p>다음 페이지에서는 원하는 이미지가 favicon으로 적용됐을 때 어떻게 보이는지 알려줍니다.</p>
 
 <p><br />
-  <img src="../assets/images/favi/favi3.png" alt="favi3" /></p>
+  <img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/favi/favi3.png?raw=true" alt="favi3" /></p>
 <h2> 3. 가공된 이미지 파일 다운받기 </h2>
 <p><br />
-  <img src="../assets/images/favi/favi4.png" alt="favi4" />
+  <img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/favi/favi4.png?raw=true" alt="favi4" />
   페이지 하단에 위치한 Generate your Favicons and HTML code를 누르고 다음 페이지의 Favicon package를 눌러 zip 파일을 다운로드 합니다.<br />
   <br />
-  <img src="../assets/images/favi/favi5.png" alt="favi5" /></p>
+  <img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/favi/favi5.png?raw=true" alt="favi5" /></p>
 <h2> 4. asset 폴더 내에 logo 폴더 만들어서 붙여넣기 </h2>
-<p><img src="../assets/images/favi/favi6.png" alt="favi6" /><br />
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/favi/favi6.png?raw=true" alt="favi6" /><br />
   <br />
   다운로드한 파일 속에 있는 이미지들을 전부 복사하여<br />
   github.io 속 asset 폴더에 새로 logo.ico 폴더를 생성하고 붙여넣기 해줍니다.<br />
   <br />
-  <img src="../assets/images/favi/favi7.png" alt="favi7" /></p>
+  <img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/favi/favi7.png?raw=true" alt="favi7" /></p>
 <h2> 5. _includes 폴더 속 head.html 파일 수정하기 </h2>
-<p><img src="../assets/images/favi/favi9.png" alt="favi9" /><br />
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/favi/favi9.png?raw=true" alt="favi9" /><br />
   <br />
   사이트 마지막에 있었던 코드들을 _includes -&gt; head -&gt; custom.html 파일에 복사 붙여넣기 합니다.<br />
   이 때 주의할 점이 {{site.baseurl}}/assets/logo.ico<br />
    다음 코드를 반드시 href=” 뒤에 붙여주어야 합니다.<br />
-  <img src="../assets/images/favi/favi10.png" alt="favi10" /><br />
+  <img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/favi/favi10.png?raw=true" alt="favi10" /><br />
   수정이 끝난 후 push를 해주었더니 다음과 같이 적용된 것을 확인할 수 있습니다.<br />
   <br />
-  <img src="../assets/images/favi/favi8.png" alt="favi8" /></p>]]></content><author><name>Younghyun Park</name></author><category term="Blog" /><category term="Blog" /><category term="favicon" /><category term="Github blog" /><category term="blog custom" /><summary type="html"><![CDATA[깃허브 블로그 탭에 이미지 넣기]]></summary></entry></feed>
+  <img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/favi/favi8.png?raw=true" alt="favi8" /></p>]]></content><author><name>Younghyun Park</name></author><category term="Blog" /><category term="Blog" /><category term="favicon" /><category term="Github blog" /><category term="blog custom" /><summary type="html"><![CDATA[깃허브 블로그 탭에 이미지 넣기]]></summary></entry></feed>

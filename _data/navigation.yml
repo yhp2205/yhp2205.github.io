@@ -21,9 +21,12 @@ docs:
       - title: "Machine Learning"
         url: ML/
         category: "ML"
-  - title: Blog
+  - title: Git
     children:
       - title: "Blog"
         url: Blog_page/
         category: "Blog"
+      - title: "Github"
+        url: Github/
+        category: "Github"
 

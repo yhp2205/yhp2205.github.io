@@ -7,6 +7,8 @@ categories :
 tags :
     - Blog
 comments : "giscus"
+sidebar : 
+  nav: "docs"
 ---
 
 새로 블로그를 운영해보도록 하겠습니다.
