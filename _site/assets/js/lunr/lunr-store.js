@@ -6,9 +6,9 @@ var store = [{
         "teaser": "/assets/images/main.jpg"
       },{
         "title": "[혼공머신러닝] Ch 2. 데이터 다루기(1)",
-        "excerpt":"훈련 세트와 테스트 세트 머신러닝 알고리즘 지도학습 : 훈련하기 위한 데이터, 정답이 필요 비지도학습 지도학습에서 데이터를 입력, 정답(결과)을 타깃이라고 하고 입력과 타깃을 합쳐 훈련 데이터라고 하고, 입력 데이터에서 타깃을 결정짓는 것을 특성이라고 합니다. 데이터를 나누어 일부는 머신러닝 알고리즘을 만드는 데에 사용하고, 나머지는 만들어진 알고리즘의 성능을 평가하는 데에 쓰인다는 것은 알고...","categories": ["Study"],
+        "excerpt":"훈련 세트와 테스트 세트 머신러닝 알고리즘 지도학습 : 훈련하기 위한 데이터, 정답이 필요 비지도학습 지도학습에서 데이터를 입력, 정답(결과)을 타깃이라고 하고 입력과 타깃을 합쳐 훈련 데이터라고 하고, 입력 데이터에서 타깃을 결정짓는 것을 특성이라고 합니다. 데이터를 나누어 일부는 머신러닝 알고리즘을 만드는 데에 사용하고, 나머지는 만들어진 알고리즘의 성능을 평가하는 데에 쓰인다는 것은 알고...","categories": ["ML"],
         "tags": ["Blog","Machine learning","Data mining","혼공머신러닝"],
-        "url": "/study/HG2-1/",
+        "url": "/ml/HG2-1/",
         "teaser": "/assets/images/main.jpg"
       },{
         "title": "[Github Blog] favicon 적용하기",
@@ -18,9 +18,9 @@ var store = [{
         "teaser": "/assets/images/main.jpg"
       },{
         "title": "[혼공머신러닝] Ch 2. 데이터 다루기(2)",
-        "excerpt":"앞선 머신러닝 알고리즘에서 길이 25센치에 무게 150g의 도미를 빙어로 예측한다는 이상한 결과가 나왔습니다. 이를 보완하기 위해 우선 앞선 데이터를 다시 불러오겠습니다. #fish의 길이와 무게에 대한 데이터 fish_length = [25.4, 26.3, 26.5, 29.0, 29.0, 29.7, 29.7, 30.0, 30.0, 30.7, 31.0, 31.0, 31.5, 32.0, 32.0, 32.0, 33.0, 33.0, 33.5, 33.5, 34.0, 34.0,...","categories": ["Study"],
+        "excerpt":"앞선 머신러닝 알고리즘에서 길이 25센치에 무게 150g의 도미를 빙어로 예측한다는 이상한 결과가 나왔습니다. 이를 보완하기 위해 우선 앞선 데이터를 다시 불러오겠습니다. #fish의 길이와 무게에 대한 데이터 fish_length = [25.4, 26.3, 26.5, 29.0, 29.0, 29.7, 29.7, 30.0, 30.0, 30.7, 31.0, 31.0, 31.5, 32.0, 32.0, 32.0, 33.0, 33.0, 33.5, 33.5, 34.0, 34.0,...","categories": ["ML"],
         "tags": ["Blog","Machine learning","Data mining","혼공머신러닝"],
-        "url": "/study/HG2-2/",
+        "url": "/ml/HG2-2/",
         "teaser": "/assets/images/main.jpg"
       },{
         "title": "[Github Blog] google에서 검색되도록 설정하기",
@@ -42,32 +42,32 @@ var store = [{
         "teaser": "/assets/images/main.jpg"
       },{
         "title": "[혼공머신러닝] Ch 3. 회귀 알고리즘과 모델 규제(1)",
-        "excerpt":"지도학습 알고리즘은 분류와 회귀로 나눌 수 있습니다. 분류는 앞서 2장에서 했던 것처럼 클래스 중 하나로 분류하는 것이고, 회귀는 임의의 어떤 숫자를 예측하는 것입니다. k-최근접 이웃 분류는 앞서 진행했고, 이번에는 k-최근접 이웃 회귀를 알아보겠습니다. k-최근접 이웃 회귀는 예측하려는 샘플에 가장 가까운 샘플 k개를 선택하여 이웃 수치들의 평균을 구하는 방식입니다. 회귀분석에 쓰일...","categories": ["Study"],
+        "excerpt":"지도학습 알고리즘은 분류와 회귀로 나눌 수 있습니다. 분류는 앞서 2장에서 했던 것처럼 클래스 중 하나로 분류하는 것이고, 회귀는 임의의 어떤 숫자를 예측하는 것입니다. k-최근접 이웃 분류는 앞서 진행했고, 이번에는 k-최근접 이웃 회귀를 알아보겠습니다. k-최근접 이웃 회귀는 예측하려는 샘플에 가장 가까운 샘플 k개를 선택하여 이웃 수치들의 평균을 구하는 방식입니다. 회귀분석에 쓰일...","categories": ["ML"],
         "tags": ["Blog","Machine learning","Data mining","혼공머신러닝"],
-        "url": "/study/HG3-1/",
+        "url": "/ml/HG3-1/",
         "teaser": "/assets/images/main.jpg"
       },{
         "title": "[혼공머신러닝] Ch 3. 회귀 알고리즘과 모델 규제(2)",
-        "excerpt":"앞서 만든 k-최근접 이웃 회귀 모델로 길이 50cm 농어의 무게를 예측해보도록 하겠습니다. #Data load import numpy as np perch_length = np.array([8.4, 13.7, 15.0, 16.2, 17.4, 18.0, 18.7, 19.0, 19.6, 20.0, 21.0, 21.0, 21.0, 21.3, 22.0, 22.0, 22.0, 22.0, 22.0, 22.5, 22.5, 22.7, 23.0, 23.5, 24.0, 24.0, 24.6, 25.0, 25.6, 26.5,...","categories": ["Study"],
+        "excerpt":"앞서 만든 k-최근접 이웃 회귀 모델로 길이 50cm 농어의 무게를 예측해보도록 하겠습니다. #Data load import numpy as np perch_length = np.array([8.4, 13.7, 15.0, 16.2, 17.4, 18.0, 18.7, 19.0, 19.6, 20.0, 21.0, 21.0, 21.0, 21.3, 22.0, 22.0, 22.0, 22.0, 22.0, 22.5, 22.5, 22.7, 23.0, 23.5, 24.0, 24.0, 24.6, 25.0, 25.6, 26.5,...","categories": ["ML"],
         "tags": ["Blog","Machine learning","Data mining","혼공머신러닝"],
-        "url": "/study/HG3-2/",
+        "url": "/ml/HG3-2/",
         "teaser": "/assets/images/main.jpg"
       },{
         "title": "[혼공머신러닝] Ch 3. 회귀 알고리즘과 모델 규제(3)",
-        "excerpt":"앞서 훈련했던 모델에서 훈련 세트보다 테스트 세트가 더 점수가 높게 나왔습니다. 이 문제를 해결하기 위해 농어의 길이 뿐만 아니라 농어의 높이와 두께 등의 여러 특성들을 추가로 사용해보겠습니다. 또한 이전에 사용했던 방법인 각 항을 제곱하여 데이터에 추가하는 것과 각 특성을 서로 곱해 새로운 특성을 만드는 방식을 사용합니다. # data load import...","categories": ["Study"],
+        "excerpt":"앞서 훈련했던 모델에서 훈련 세트보다 테스트 세트가 더 점수가 높게 나왔습니다. 이 문제를 해결하기 위해 농어의 길이 뿐만 아니라 농어의 높이와 두께 등의 여러 특성들을 추가로 사용해보겠습니다. 또한 이전에 사용했던 방법인 각 항을 제곱하여 데이터에 추가하는 것과 각 특성을 서로 곱해 새로운 특성을 만드는 방식을 사용합니다. # data load import...","categories": ["ML"],
         "tags": ["Blog","Machine learning","Data mining","혼공머신러닝"],
-        "url": "/study/HG3-3/",
+        "url": "/ml/HG3-3/",
         "teaser": "/assets/images/main.jpg"
       },{
         "title": "[혼공머신러닝] Ch 4. 다양한 분류 알고리즘",
-        "excerpt":"로지스틱 회귀 랜덤하게 담긴 생선의 확률을 알아보려고 합니다. 우선 앞서 배웠던 k-최근접 이웃 분류기를 사용하여 구한 이웃 클래스를 토대로 타깃 생선의 확률을 계산해보겠습니다. 먼저 데이터를 준비합니다. import pandas as pd fish = pd.read_csv('https://bit.ly/fish_csv') fish.head() 그리고 target 데이터가 될 Species 열에 어떤 종류가 있는지 판다스의 unique 함수를 사용해서 확인합니다. print(pd.unique(fish['Species'])) [‘Bream’...","categories": ["Study"],
+        "excerpt":"로지스틱 회귀 랜덤하게 담긴 생선의 확률을 알아보려고 합니다. 우선 앞서 배웠던 k-최근접 이웃 분류기를 사용하여 구한 이웃 클래스를 토대로 타깃 생선의 확률을 계산해보겠습니다. 먼저 데이터를 준비합니다. import pandas as pd fish = pd.read_csv('https://bit.ly/fish_csv') fish.head() 그리고 target 데이터가 될 Species 열에 어떤 종류가 있는지 판다스의 unique 함수를 사용해서 확인합니다. print(pd.unique(fish['Species'])) [‘Bream’...","categories": ["ML"],
         "tags": ["Blog","Machine learning","Data mining","혼공머신러닝"],
-        "url": "/study/HG4-1/",
+        "url": "/ml/HG4-1/",
         "teaser": "/assets/images/main.jpg"
       },{
         "title": "[혼공머신러닝] Ch 4. 다양한 분류 알고리즘(2)",
-        "excerpt":"확률적 경사 하강법  ","categories": ["Study"],
+        "excerpt":"확률적 경사 하강법  ","categories": ["ML"],
         "tags": ["Blog","Machine learning","Data mining","혼공머신러닝"],
-        "url": "/study/HG4-2/",
+        "url": "/ml/HG4-2/",
         "teaser": "/assets/images/main.jpg"
       }]

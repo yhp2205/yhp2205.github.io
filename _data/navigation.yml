@@ -18,9 +18,9 @@ main:
 docs:
   - title: Study
     children:
-      - title: "혼자공부하는머신러닝"
-        url: Study/
-        category: "Study"
+      - title: "Machine Learning"
+        url: ML/
+        category: "ML"
   - title: Blog
     children:
       - title: "Blog"

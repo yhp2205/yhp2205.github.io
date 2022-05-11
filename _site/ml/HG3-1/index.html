@@ -23,7 +23,7 @@
 <meta property="og:locale" content="en_KR">
 <meta property="og:site_name" content="YOUNGHYUN's Blog">
 <meta property="og:title" content="[혼공머신러닝] Ch 3. 회귀 알고리즘과 모델 규제(1)">
-<meta property="og:url" content="http://localhost:4000/study/HG3-1/">
+<meta property="og:url" content="http://localhost:4000/ml/HG3-1/">
 
 
   <meta property="og:description" content="3-1 k-최근접 이웃 회귀">
@@ -45,7 +45,7 @@
   
 
 
-<link rel="canonical" href="http://localhost:4000/study/HG3-1/">
+<link rel="canonical" href="http://localhost:4000/ml/HG3-1/">
 
 
 
@@ -268,8 +268,70 @@
   </div>
 </div>
   
+    
+      
+      
+      
+      
+    
+    
+      
+
+<nav class="nav__list">
+  
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc">Toggle Menu</label>
+  <ul class="nav__items">
+    
+      <li>
+        
+          <span class="nav__sub-title">Study</span>
+        
+
+        
+        <ul>
+          
+          
+            <li><a href="/ML/">Machine Learning(7)</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">Blog</span>
+        
+
+        
+        <ul>
+          
+          
+            <li><a href="/Blog_page/">Blog(5)</a></li>
+          
+        </ul>
+        
+      </li>
+    
+  </ul>
+</nav>
+
+    
+  
   </div>
 
+
+
+
+
+<nav class="nav__list">
+  
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc">Toggle Menu</label>
+  <ul class="nav__items">
+    
+  </ul>
+</nav>
 
 
 
@@ -284,7 +346,7 @@
       
         <header>
           <h1 id="page-title" class="page__title p-name" itemprop="headline">
-            <a href="http://localhost:4000/study/HG3-1/" class="u-url" itemprop="url">[혼공머신러닝] Ch 3. 회귀 알고리즘과 모델 규제(1)
+            <a href="http://localhost:4000/ml/HG3-1/" class="u-url" itemprop="url">[혼공머신러닝] Ch 3. 회귀 알고리즘과 모델 규제(1)
 </a>
           </h1>
           
@@ -470,7 +532,7 @@ train set과 점수 차이도 많이 나지 않아 과대적합도 아닙니다.
     <strong><i class="fas fa-fw fa-folder-open" aria-hidden="true"></i> Categories: </strong>
     <span itemprop="keywords">
     
-      <a href="/categories/#study" class="page__taxonomy-item p-category" rel="tag">Study</a>
+      <a href="/categories/#ml" class="page__taxonomy-item p-category" rel="tag">ML</a>
     
     </span>
   </p>
@@ -485,11 +547,11 @@ train set과 점수 차이도 많이 나지 않아 과대적합도 아닙니다.
       <section class="page__share">
   
 
-  <a href="https://twitter.com/intent/tweet?text=%5B%ED%98%BC%EA%B3%B5%EB%A8%B8%EC%8B%A0%EB%9F%AC%EB%8B%9D%5D+Ch+3.+%ED%9A%8C%EA%B7%80+%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98%EA%B3%BC+%EB%AA%A8%EB%8D%B8+%EA%B7%9C%EC%A0%9C%281%29%20http%3A%2F%2Flocalhost%3A4000%2Fstudy%2FHG3-1%2F" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+  <a href="https://twitter.com/intent/tweet?text=%5B%ED%98%BC%EA%B3%B5%EB%A8%B8%EC%8B%A0%EB%9F%AC%EB%8B%9D%5D+Ch+3.+%ED%9A%8C%EA%B7%80+%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98%EA%B3%BC+%EB%AA%A8%EB%8D%B8+%EA%B7%9C%EC%A0%9C%281%29%20http%3A%2F%2Flocalhost%3A4000%2Fml%2FHG3-1%2F" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
 
-  <a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Flocalhost%3A4000%2Fstudy%2FHG3-1%2F" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Flocalhost%3A4000%2Fml%2FHG3-1%2F" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
 
-  <a href="https://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Flocalhost%3A4000%2Fstudy%2FHG3-1%2F" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Flocalhost%3A4000%2Fml%2FHG3-1%2F" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
 </section>
 
 
@@ -500,7 +562,7 @@ train set과 점수 차이도 많이 나지 않아 과대적합도 아닙니다.
 ">Previous</a>
     
     
-      <a href="/study/HG3-2/" class="pagination--pager" title="[혼공머신러닝] Ch 3. 회귀 알고리즘과 모델 규제(2)
+      <a href="/ml/HG3-2/" class="pagination--pager" title="[혼공머신러닝] Ch 3. 회귀 알고리즘과 모델 규제(2)
 ">Next</a>
     
   </nav>
@@ -529,7 +591,7 @@ train set과 점수 차이도 많이 나지 않아 과대적합도 아닙니다.
     
     <h2 class="archive__item-title no_toc" itemprop="headline">
       
-        <a href="/study/HG4-2/" rel="permalink">[혼공머신러닝] Ch 4. 다양한 분류 알고리즘(2)
+        <a href="/ml/HG4-2/" rel="permalink">[혼공머신러닝] Ch 4. 다양한 분류 알고리즘(2)
 </a>
       
     </h2>
@@ -573,7 +635,7 @@ train set과 점수 차이도 많이 나지 않아 과대적합도 아닙니다.
     
     <h2 class="archive__item-title no_toc" itemprop="headline">
       
-        <a href="/study/HG4-1/" rel="permalink">[혼공머신러닝] Ch 4. 다양한 분류 알고리즘
+        <a href="/ml/HG4-1/" rel="permalink">[혼공머신러닝] Ch 4. 다양한 분류 알고리즘
 </a>
       
     </h2>
@@ -617,7 +679,7 @@ train set과 점수 차이도 많이 나지 않아 과대적합도 아닙니다.
     
     <h2 class="archive__item-title no_toc" itemprop="headline">
       
-        <a href="/study/HG3-3/" rel="permalink">[혼공머신러닝] Ch 3. 회귀 알고리즘과 모델 규제(3)
+        <a href="/ml/HG3-3/" rel="permalink">[혼공머신러닝] Ch 3. 회귀 알고리즘과 모델 규제(3)
 </a>
       
     </h2>
@@ -661,7 +723,7 @@ train set과 점수 차이도 많이 나지 않아 과대적합도 아닙니다.
     
     <h2 class="archive__item-title no_toc" itemprop="headline">
       
-        <a href="/study/HG3-2/" rel="permalink">[혼공머신러닝] Ch 3. 회귀 알고리즘과 모델 규제(2)
+        <a href="/ml/HG3-2/" rel="permalink">[혼공머신러닝] Ch 3. 회귀 알고리즘과 모델 규제(2)
 </a>
       
     </h2>

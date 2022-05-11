@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
     <url>
-      <loc>http://localhost:4000/study/HG4-2/</loc>
+      <loc>http://localhost:4000/ml/HG4-2/</loc>
       
         <lastmod>2022-05-05T00:00:00+09:00</lastmod>
       
@@ -18,7 +18,7 @@
     </url>
   
     <url>
-      <loc>http://localhost:4000/study/HG4-1/</loc>
+      <loc>http://localhost:4000/ml/HG4-1/</loc>
       
         <lastmod>2022-05-04T00:00:00+09:00</lastmod>
       
@@ -34,7 +34,7 @@
     </url>
   
     <url>
-      <loc>http://localhost:4000/study/HG3-3/</loc>
+      <loc>http://localhost:4000/ml/HG3-3/</loc>
       
         <lastmod>2022-05-03T00:00:00+09:00</lastmod>
       
@@ -50,7 +50,7 @@
     </url>
   
     <url>
-      <loc>http://localhost:4000/study/HG3-2/</loc>
+      <loc>http://localhost:4000/ml/HG3-2/</loc>
       
         <lastmod>2022-05-02T00:00:00+09:00</lastmod>
       
@@ -66,7 +66,7 @@
     </url>
   
     <url>
-      <loc>http://localhost:4000/study/HG3-1/</loc>
+      <loc>http://localhost:4000/ml/HG3-1/</loc>
       
         <lastmod>2022-05-02T00:00:00+09:00</lastmod>
       
@@ -130,7 +130,7 @@
     </url>
   
     <url>
-      <loc>http://localhost:4000/study/HG2-2/</loc>
+      <loc>http://localhost:4000/ml/HG2-2/</loc>
       
         <lastmod>2022-04-21T00:00:00+09:00</lastmod>
       
@@ -162,7 +162,7 @@
     </url>
   
     <url>
-      <loc>http://localhost:4000/study/HG2-1/</loc>
+      <loc>http://localhost:4000/ml/HG2-1/</loc>
       
         <lastmod>2022-04-19T00:00:00+09:00</lastmod>
       
