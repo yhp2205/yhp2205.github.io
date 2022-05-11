@@ -1,11 +1,11 @@
 ---
 layout: archive
-permalink: Blog_page
+permalink: /Blog_page/
 title: "Blog"
 
 author_profile: true
 sidebar:
-  nav: "Blog"
+  nav: "docs"
 ---
 
 {% assign posts = site.categories.Blog %}
