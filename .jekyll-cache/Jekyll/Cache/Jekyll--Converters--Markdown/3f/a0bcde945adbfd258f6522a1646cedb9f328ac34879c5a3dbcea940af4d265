@@ -1,0 +1,310 @@
+I"�m<h2 id="로지스틱-회귀">로지스틱 회귀</h2>
+
+<p>랜덤하게 담긴 생선의 확률을 알아보려고 합니다.<br />
+우선 앞서 배웠던 k-최근접 이웃 분류기를 사용하여 구한 이웃 클래스를 토대로 타깃 생선의 확률을 계산해보겠습니다.<br />
+먼저 데이터를 준비합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="n">fish</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'https://bit.ly/fish_csv'</span><span class="p">)</span>
+<span class="n">fish</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG4/HG4-1-1.png?raw=true" alt="HG4-1-1" /><br />
+<br />
+그리고 target 데이터가 될 Species 열에 어떤 종류가 있는지 판다스의 unique 함수를 사용해서 확인합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">pd</span><span class="p">.</span><span class="n">unique</span><span class="p">(</span><span class="n">fish</span><span class="p">[</span><span class="s">'Species'</span><span class="p">]))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[‘Bream’ ‘Roach’ ‘Whitefish’ ‘Parkki’ ‘Perch’ ‘Pike’ ‘Smelt’]</p>
+</blockquote>
+
+<p>Species 에 들어있는 종들을 확인했으니 fish 데이터에서 Species 열을 제외하고 나머지 5개의 열을 입력 데이터로 선택합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fish_input</span> <span class="o">=</span> <span class="n">fish</span><span class="p">[[</span><span class="s">'Weight'</span><span class="p">,</span> <span class="s">'Length'</span><span class="p">,</span> <span class="s">'Diagonal'</span><span class="p">,</span> <span class="s">'Height'</span><span class="p">,</span> <span class="s">'Width'</span><span class="p">]].</span><span class="n">to_numpy</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">fish_input</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[[242.      25.4     30.      11.52     4.02  ]<br />
+ [290.      26.3     31.2     12.48     4.3056]<br />
+ [340.      26.5     31.1     12.3778   4.6961]<br />
+ [363.      29.      33.5     12.73     4.4555]<br />
+ [430.      29.      34.      12.444    5.134 ]]</p>
+</blockquote>
+
+<p>입력 데이터가 잘 생성된 것을 확인했습니다.<br />
+ 동일한 방식으로 target 데이터도 만듭니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fish_target</span> <span class="o">=</span> <span class="n">fish</span><span class="p">[</span><span class="s">'Species'</span><span class="p">].</span><span class="n">to_numpy</span><span class="p">()</span>
+</code></pre></div></div>
+<p>이제 train set와 test set로 나눕니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="n">train_input</span><span class="p">,</span> <span class="n">test_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">,</span> <span class="n">test_target</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">fish_input</span><span class="p">,</span> <span class="n">fish_target</span><span class="p">)</span>
+</code></pre></div></div>
+<p>train 세트와 test를 준비했으니 데이터를 표준화 전처리를 해줍니다.<br />
+사이킷런의 StandardScaler을 이용합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#훈련 테스트 세트 표준화 전처리
+</span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="n">ss</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
+<span class="n">ss</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_input</span><span class="p">)</span>
+<span class="n">train_scaled</span> <span class="o">=</span> <span class="n">ss</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">train_input</span><span class="p">)</span>
+<span class="n">test_scaled</span> <span class="o">=</span> <span class="n">ss</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">test_input</span><span class="p">)</span>
+</code></pre></div></div>
+<p>사이킷런의 KNeighborsClassifier 클래스 객체를 만들고 훈련세트와 테스트세트의 각 점수를 확인해보겠습니다.<br />
+최근접 이웃의 개수인 k는 3으로 지정합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#최근접 이웃 분류기의 확률 예측
+</span><span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">KNeighborsClassifier</span>
+<span class="n">kn</span> <span class="o">=</span> <span class="n">KNeighborsClassifier</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">kn</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">kn</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">kn</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.8739495798319328<br />
+0.75</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">kn</span><span class="p">.</span><span class="n">classes_</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[‘Bream’ ‘Parkki’ ‘Perch’ ‘Pike’ ‘Roach’ ‘Smelt’ ‘Whitefish’]</p>
+</blockquote>
+
+<p>알파벳 순서로 매겨진 것을 확인했습니다.<br />
+이제 predict 메서드를 사용하여 test set에 있는 처음 5개의 샘플의 타깃값을 예측합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">kn</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">[:</span><span class="mi">5</span><span class="p">]))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[‘Parkki’ ‘Perch’ ‘Roach’ ‘Perch’ ‘Perch’]</p>
+</blockquote>
+
+<p>predict 예측 값이 어떻게 나왔는지 predict_proba() 메서드를 사용하면 클래스별 확률 값을 확인할 수 있습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="n">proba</span> <span class="o">=</span> <span class="n">kn</span><span class="p">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">round</span><span class="p">(</span><span class="n">proba</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>  <span class="c1">#소숫점 넷째자리까지 표기(다섯번째에서 반올림)
+</span></code></pre></div></div>
+<blockquote>
+  <p>[[0.     0.6667 0.3333 0.     0.     0.     0.    ]<br />
+ [0.     0.     1.     0.     0.     0.     0.    ]<br />
+ [0.     0.     0.3333 0.     0.6667 0.     0.    ]<br />
+ [0.     0.     1.     0.     0.     0.     0.    ]<br />
+ [0.     0.     0.3333 0.     0.3333 0.3333 0.    ]]</p>
+</blockquote>
+
+<p>첫번째 열이 Bream, 두번째 열이 Parkki, 세번째 열이 Perch, … 에 대한 확률을 나타내고 있습니다.<br />
+ 계산한 비율이 올바른지 확인하기 위해 첫 번째 샘플의 최근접 이웃들을 출력해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">distances</span><span class="p">,</span> <span class="n">indexes</span> <span class="o">=</span> <span class="n">kn</span><span class="p">.</span><span class="n">kneighbors</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">train_target</span><span class="p">[</span><span class="n">indexes</span><span class="p">])</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[[‘Parkki’ ‘Parkki’ ‘Perch’]]</p>
+</blockquote>
+
+<p>첫 번째 샘플의 이웃은 Perch가 1개, Parkki가 2개임을 확인합니다.<br />
+여기까지 k-최근접 이웃 분류기를 사용한 확률 예측을 해보았습니다.<br />
+<br />
+이제 본격적으로 로지스틱 회귀를 이용한 예측을 해보도록 하겠습니다.</p>
+
+<p>로지스틱 회귀는 선형회귀와 동일하게 선형 방정식을 학습합니다.<br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG4/HG4-1-2.png?raw=true" alt="HG4-1-2" /><br />
+<br />
+여기서 각 변수 앞에 곱해진 값들은 가중치나 계수의 역할을 합니다.<br />
+z는 어떤 값도 가능하지만, 확률이 되기 위해서는 0과 1 사이의 값을 가져야 합니다.<br />
+z가 큰 음수일때 0이 되고 큰 양수일 때 1이 되도록 하려면 시그모이드 함수를 사용하면 됩니다.</p>
+
+<p><img src="https://mblogthumb-phinf.pstatic.net/MjAxNzA5MjZfMzMg/MDAxNTA2NDIzMjMzNjE5.arSKSXckfkmGqMIEA0dAI1q_e080ntMcpyhXhBx2m4Ig.nofSEy_ifZ6BM7VvFOku71bQbM8d2ngYWwV_sO8oyNEg.PNG.junhyuk7272/%EC%9E%90%EC%97%B0%EC%A7%80%EC%88%98%ED%95%A8%EC%88%98.png?type=w2" alt="HG4-1-32" />
+<br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG4/HG4-1-3.png?raw=true" alt="HG4-1-3" /><br />
+<br /></p>
+
+<p>시그모이드 함수는 다음과 같은 형태를 띕니다.<br />
+넘파이를 사용해서 그래프를 그려보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="n">phi</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">z</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">phi</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'z'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'phi'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG4/HG4-1-4.png?raw=true" alt="HG4-1-4" /><br />
+<br /></p>
+
+<p>이제 로지스틱 회귀를 사용하여 이진분류를 해보겠습니다.<br />
+train 데이터에서 불리언 인덱싱을 사용하여 도미와 빙어만 따로 출력해줍니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#도미(Bream)와 빙어(Smelt)만 출력하기
+</span><span class="n">bream_smelt_indexes</span> <span class="o">=</span> <span class="p">(</span><span class="n">train_target</span> <span class="o">==</span> <span class="s">'Bream'</span><span class="p">)</span><span class="o">|</span><span class="p">(</span><span class="n">train_target</span> <span class="o">==</span> <span class="s">'Smelt'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">bream_smelt_indexes</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[False  True False False False False  True False False  True False  True
+  True False False False  True  True False  True False False  True False
+ False False  True False False False False False False False  True False
+  True  True False  True False False  True False False  True False  True
+ False False  True  True False False False  True  True False False False
+  True  True False False False False False False False  True False  True
+ False False  True False False False False  True False False False False
+  True False  True False False False False False False False  True  True
+ False False False False  True  True False False False False False False
+ False False False False  True  True  True False False  True False]</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">train_bream_smelt</span> <span class="o">=</span> <span class="n">train_scaled</span><span class="p">[</span><span class="n">bream_smelt_indexes</span><span class="p">]</span>
+<span class="n">target_bream_smelt</span> <span class="o">=</span> <span class="n">train_target</span><span class="p">[</span><span class="n">bream_smelt_indexes</span><span class="p">]</span>
+</code></pre></div></div>
+<p>이 데이터를 이용하여 로지스틱 회귀 모델을 훈련하고 그 모델을 사용하여 train_bream_smelt에 있는 처음 5개의 샘플을 출력해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+<span class="n">lr</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">()</span>
+<span class="n">lr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_bream_smelt</span><span class="p">,</span> <span class="n">target_bream_smelt</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">train_bream_smelt</span><span class="p">[:</span><span class="mi">5</span><span class="p">]))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[‘Smelt’ ‘Smelt’ ‘Smelt’ ‘Smelt’ ‘Bream’]</p>
+</blockquote>
+
+<p>다섯 번째를 도미, 나머지를 빙어로 예측했습니다.<br />
+5개 샘플의 확률을 확인합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">train_bream_smelt</span><span class="p">[:</span><span class="mi">5</span><span class="p">]))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[[0.03391154 0.96608846]<br />
+ [0.03603855 0.96396145]<br />
+ [0.03582089 0.96417911]<br />
+ [0.02900509 0.97099491]<br />
+ [0.99410165 0.00589835]]</p>
+</blockquote>
+
+<p>두 개의 열 중에 어떤 것이 도미이고 빙어인지 헷갈린다면 classes_ 를 사용하여 알 수 있습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">classes_</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[‘Bream’ ‘Smelt’]</p>
+</blockquote>
+
+<p>이제 로지스틱 회귀가 학습한 계수를 확인합니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">coef_</span><span class="p">,</span> <span class="n">lr</span><span class="p">.</span><span class="n">intercept_</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[[-0.42646881 -0.60256452 -0.68252074 -0.99456193 -0.78263044]] [-2.28791769]</p>
+</blockquote>
+
+<p>이를 통해 로지스틱 회귀 모델이 학습한 방정식을 다음과 같이 도출할 수 있습니다. 
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG4/HG4-1-5.png?raw=true" alt="HG4-1-5" /><br />
+<br />
+이제 이 방정식을 이용하여 z 값을 계산해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">decisions</span> <span class="o">=</span> <span class="n">lr</span><span class="p">.</span><span class="n">decision_function</span><span class="p">(</span><span class="n">train_bream_smelt</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">decisions</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[ 3.34950001  3.28646197  3.29274597  3.51084984 -5.12716733]</p>
+</blockquote>
+
+<p>이 z값을 시그모이드 함수에 통과하면 확률을 얻을 수 있습니다.<br />
+scipy에 시그모이드 함수를 제공하는 expit()를 사용해서 확률을 구합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">scipy.special</span> <span class="kn">import</span> <span class="n">expit</span>
+<span class="k">print</span><span class="p">(</span><span class="n">expit</span><span class="p">(</span><span class="n">decisions</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[0.96608846 0.96396145 0.96417911 0.97099491 0.00589835]</p>
+</blockquote>
+
+<p>이제 다중 분류를 수행해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lr</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">C</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">max_iter</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">lr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.9411764705882353<br />
+0.85</p>
+</blockquote>
+
+<p>test 세트의 처음 5개 샘플에 대한 예측을 출력해봅니다.<br />
+그리고 그 예측에 대한 확률을 출력해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#test set의 처음 5개 샘플에 대한 예측
+</span><span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">[:</span><span class="mi">5</span><span class="p">]))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[‘Parkki’ ‘Perch’ ‘Roach’ ‘Perch’ ‘Perch’]</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#test set의 처음 5개에 대한 예측 확률
+</span><span class="n">proba</span> <span class="o">=</span> <span class="n">lr</span><span class="p">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">round</span><span class="p">(</span><span class="n">proba</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span> <span class="c1">#소수점 세번째자리까지 표기
+</span></code></pre></div></div>
+<blockquote>
+  <p>[[0.01  0.73  0.006 0.    0.223 0.    0.03 ]<br />
+ [0.01  0.    0.898 0.002 0.    0.    0.089]<br />
+ [0.001 0.018 0.28  0.002 0.661 0.    0.038]<br />
+ [0.002 0.    0.953 0.001 0.    0.    0.044]<br />
+ [0.    0.012 0.816 0.    0.119 0.051 0.002]]</p>
+</blockquote>
+
+<p>5개 샘플과 7개의 클래스가 있기 때문에 5개의 행과 7개의 열로 출력이 되었습니다.<br />
+각 열이 의미하는 것이 어떤 생선에 대한 확률인지 확인합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#classes_속성으로 클래스 정보 확인
+</span><span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">classes_</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[‘Bream’ ‘Parkki’ ‘Perch’ ‘Pike’ ‘Roach’ ‘Smelt’ ‘Whitefish’]</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">coef_</span><span class="p">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">lr</span><span class="p">.</span><span class="n">intercept_</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>(7, 5) (7,)</p>
+</blockquote>
+
+<p>coef_ 배열이 7행에 5열의 형태를 띄고 있고 intercept_도 7개가 있는 것을 확인할 수 있습니다.<br />
+7개의 클래스가 있기 때문에 클래스마다 z값을 계산하여 총 7개의 z값이 나온다는 말과 같습니다.</p>
+
+<p>이와 같이 7개의 z값들을 확률로 바꾸기 위해 소프트맥스 함수를 사용합니다.<br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG4/HG4-1-6.png?raw=true" alt="HG4-1-6" /><br />
+<br />
+7개의 z값을 소프트맥스 함수를 이용하여 확률로 바꾸면 0과 1사이의 값을 가진 확률이 출력됩니다.<br />
+그럼 7개의 z값을 구한 후에 소프트맥스 함수를 사용하여 확률로 바꾸어보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#z1부터 z7까지의 값 구하고 확률로 바꾸기
+</span><span class="n">decision</span> <span class="o">=</span> <span class="n">lr</span><span class="p">.</span><span class="n">decision_function</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">round</span><span class="p">(</span><span class="n">decision</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span> <span class="c1">#소수점 둘째자리까지 표기
+</span></code></pre></div></div>
+<blockquote>
+  <p>[[ -0.17   4.13  -0.67  -3.44   2.95  -3.75   0.96]<br />
+ [  4.31  -5.68   8.79   2.78   0.69 -17.37   6.48]<br />
+ [ -2.69   0.28   3.04  -2.01   3.9   -3.56   1.05]<br />
+ [  3.78  -6.28   9.85   2.82   0.69 -17.63   6.78]<br />
+ [ -8.63   1.35   5.59  -4.1    3.66   2.82  -0.7 ]]</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">scipy.special</span> <span class="kn">import</span> <span class="n">softmax</span>
+<span class="n">proba</span> <span class="o">=</span> <span class="n">softmax</span><span class="p">(</span><span class="n">decision</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">round</span><span class="p">(</span><span class="n">proba</span><span class="p">,</span> <span class="n">decimals</span> <span class="o">=</span> <span class="mi">3</span><span class="p">))</span> <span class="c1">#소수점 셋째자리까지 표시
+</span></code></pre></div></div>
+<blockquote>
+  <p>[[0.01  0.73  0.006 0.    0.223 0.    0.03 ]<br />
+ [0.01  0.    0.898 0.002 0.    0.    0.089]<br />
+ [0.001 0.018 0.28  0.002 0.661 0.    0.038]<br />
+ [0.002 0.    0.953 0.001 0.    0.    0.044]<br />
+ [0.    0.012 0.816 0.    0.119 0.051 0.002]]</p>
+</blockquote>
+
+<p>이렇게 로지스틱 회귀를 사용하여 7개의 클래스에 대한 확률을 예측하는 모델을 만들었습니다.<br />
+다음에는 확률적 경사 하강법에 대해 배워보도록 하겠습니다.</p>
+
+:ET

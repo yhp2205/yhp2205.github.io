@@ -1,0 +1,1260 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-05-12T01:40:39+09:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Site Title</title><subtitle>An amazing website.</subtitle><author><name>Your Name</name></author><entry><title type="html">[혼공머신러닝] Ch 4. 다양한 분류 알고리즘(2)</title><link href="http://localhost:4000/study/HG4-2/" rel="alternate" type="text/html" title="[혼공머신러닝] Ch 4. 다양한 분류 알고리즘(2)" /><published>2022-05-05T00:00:00+09:00</published><updated>2022-05-05T00:00:00+09:00</updated><id>http://localhost:4000/study/HG4-2</id><content type="html" xml:base="http://localhost:4000/study/HG4-2/"><![CDATA[<h2 id="확률적-경사-하강법">확률적 경사 하강법</h2>]]></content><author><name>Your Name</name></author><category term="Study" /><category term="Blog" /><category term="Machine learning" /><category term="Data mining" /><category term="혼공머신러닝" /><summary type="html"><![CDATA[4-2 확률적 경사 하강법]]></summary></entry><entry><title type="html">[혼공머신러닝] Ch 4. 다양한 분류 알고리즘</title><link href="http://localhost:4000/study/HG4-1/" rel="alternate" type="text/html" title="[혼공머신러닝] Ch 4. 다양한 분류 알고리즘" /><published>2022-05-04T00:00:00+09:00</published><updated>2022-05-04T00:00:00+09:00</updated><id>http://localhost:4000/study/HG4-1</id><content type="html" xml:base="http://localhost:4000/study/HG4-1/"><![CDATA[<h2 id="로지스틱-회귀">로지스틱 회귀</h2>
+
+<p>랜덤하게 담긴 생선의 확률을 알아보려고 합니다.<br />
+우선 앞서 배웠던 k-최근접 이웃 분류기를 사용하여 구한 이웃 클래스를 토대로 타깃 생선의 확률을 계산해보겠습니다.<br />
+먼저 데이터를 준비합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="n">fish</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'https://bit.ly/fish_csv'</span><span class="p">)</span>
+<span class="n">fish</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG4/HG4-1-1.png?raw=true" alt="HG4-1-1" /><br />
+<br />
+그리고 target 데이터가 될 Species 열에 어떤 종류가 있는지 판다스의 unique 함수를 사용해서 확인합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">pd</span><span class="p">.</span><span class="n">unique</span><span class="p">(</span><span class="n">fish</span><span class="p">[</span><span class="s">'Species'</span><span class="p">]))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[‘Bream’ ‘Roach’ ‘Whitefish’ ‘Parkki’ ‘Perch’ ‘Pike’ ‘Smelt’]</p>
+</blockquote>
+
+<p>Species 에 들어있는 종들을 확인했으니 fish 데이터에서 Species 열을 제외하고 나머지 5개의 열을 입력 데이터로 선택합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fish_input</span> <span class="o">=</span> <span class="n">fish</span><span class="p">[[</span><span class="s">'Weight'</span><span class="p">,</span> <span class="s">'Length'</span><span class="p">,</span> <span class="s">'Diagonal'</span><span class="p">,</span> <span class="s">'Height'</span><span class="p">,</span> <span class="s">'Width'</span><span class="p">]].</span><span class="n">to_numpy</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">fish_input</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[[242.      25.4     30.      11.52     4.02  ]<br />
+ [290.      26.3     31.2     12.48     4.3056]<br />
+ [340.      26.5     31.1     12.3778   4.6961]<br />
+ [363.      29.      33.5     12.73     4.4555]<br />
+ [430.      29.      34.      12.444    5.134 ]]</p>
+</blockquote>
+
+<p>입력 데이터가 잘 생성된 것을 확인했습니다.<br />
+ 동일한 방식으로 target 데이터도 만듭니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fish_target</span> <span class="o">=</span> <span class="n">fish</span><span class="p">[</span><span class="s">'Species'</span><span class="p">].</span><span class="n">to_numpy</span><span class="p">()</span>
+</code></pre></div></div>
+<p>이제 train set와 test set로 나눕니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="n">train_input</span><span class="p">,</span> <span class="n">test_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">,</span> <span class="n">test_target</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">fish_input</span><span class="p">,</span> <span class="n">fish_target</span><span class="p">)</span>
+</code></pre></div></div>
+<p>train 세트와 test를 준비했으니 데이터를 표준화 전처리를 해줍니다.<br />
+사이킷런의 StandardScaler을 이용합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#훈련 테스트 세트 표준화 전처리
+</span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="n">ss</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
+<span class="n">ss</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_input</span><span class="p">)</span>
+<span class="n">train_scaled</span> <span class="o">=</span> <span class="n">ss</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">train_input</span><span class="p">)</span>
+<span class="n">test_scaled</span> <span class="o">=</span> <span class="n">ss</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">test_input</span><span class="p">)</span>
+</code></pre></div></div>
+<p>사이킷런의 KNeighborsClassifier 클래스 객체를 만들고 훈련세트와 테스트세트의 각 점수를 확인해보겠습니다.<br />
+최근접 이웃의 개수인 k는 3으로 지정합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#최근접 이웃 분류기의 확률 예측
+</span><span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">KNeighborsClassifier</span>
+<span class="n">kn</span> <span class="o">=</span> <span class="n">KNeighborsClassifier</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">kn</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">kn</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">kn</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.8739495798319328<br />
+0.75</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">kn</span><span class="p">.</span><span class="n">classes_</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[‘Bream’ ‘Parkki’ ‘Perch’ ‘Pike’ ‘Roach’ ‘Smelt’ ‘Whitefish’]</p>
+</blockquote>
+
+<p>알파벳 순서로 매겨진 것을 확인했습니다.<br />
+이제 predict 메서드를 사용하여 test set에 있는 처음 5개의 샘플의 타깃값을 예측합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">kn</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">[:</span><span class="mi">5</span><span class="p">]))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[‘Parkki’ ‘Perch’ ‘Roach’ ‘Perch’ ‘Perch’]</p>
+</blockquote>
+
+<p>predict 예측 값이 어떻게 나왔는지 predict_proba() 메서드를 사용하면 클래스별 확률 값을 확인할 수 있습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="n">proba</span> <span class="o">=</span> <span class="n">kn</span><span class="p">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">round</span><span class="p">(</span><span class="n">proba</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>  <span class="c1">#소숫점 넷째자리까지 표기(다섯번째에서 반올림)
+</span></code></pre></div></div>
+<blockquote>
+  <p>[[0.     0.6667 0.3333 0.     0.     0.     0.    ]<br />
+ [0.     0.     1.     0.     0.     0.     0.    ]<br />
+ [0.     0.     0.3333 0.     0.6667 0.     0.    ]<br />
+ [0.     0.     1.     0.     0.     0.     0.    ]<br />
+ [0.     0.     0.3333 0.     0.3333 0.3333 0.    ]]</p>
+</blockquote>
+
+<p>첫번째 열이 Bream, 두번째 열이 Parkki, 세번째 열이 Perch, … 에 대한 확률을 나타내고 있습니다.<br />
+ 계산한 비율이 올바른지 확인하기 위해 첫 번째 샘플의 최근접 이웃들을 출력해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">distances</span><span class="p">,</span> <span class="n">indexes</span> <span class="o">=</span> <span class="n">kn</span><span class="p">.</span><span class="n">kneighbors</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">train_target</span><span class="p">[</span><span class="n">indexes</span><span class="p">])</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[[‘Parkki’ ‘Parkki’ ‘Perch’]]</p>
+</blockquote>
+
+<p>첫 번째 샘플의 이웃은 Perch가 1개, Parkki가 2개임을 확인합니다.<br />
+여기까지 k-최근접 이웃 분류기를 사용한 확률 예측을 해보았습니다.<br />
+<br />
+이제 본격적으로 로지스틱 회귀를 이용한 예측을 해보도록 하겠습니다.</p>
+
+<p>로지스틱 회귀는 선형회귀와 동일하게 선형 방정식을 학습합니다.<br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG4/HG4-1-2.png?raw=true" alt="HG4-1-2" /><br />
+<br />
+여기서 각 변수 앞에 곱해진 값들은 가중치나 계수의 역할을 합니다.<br />
+z는 어떤 값도 가능하지만, 확률이 되기 위해서는 0과 1 사이의 값을 가져야 합니다.<br />
+z가 큰 음수일때 0이 되고 큰 양수일 때 1이 되도록 하려면 시그모이드 함수를 사용하면 됩니다.</p>
+
+<p><img src="https://mblogthumb-phinf.pstatic.net/MjAxNzA5MjZfMzMg/MDAxNTA2NDIzMjMzNjE5.arSKSXckfkmGqMIEA0dAI1q_e080ntMcpyhXhBx2m4Ig.nofSEy_ifZ6BM7VvFOku71bQbM8d2ngYWwV_sO8oyNEg.PNG.junhyuk7272/%EC%9E%90%EC%97%B0%EC%A7%80%EC%88%98%ED%95%A8%EC%88%98.png?type=w2" alt="HG4-1-32" />
+<br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG4/HG4-1-3.png?raw=true" alt="HG4-1-3" /><br />
+<br /></p>
+
+<p>시그모이드 함수는 다음과 같은 형태를 띕니다.<br />
+넘파이를 사용해서 그래프를 그려보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="n">phi</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">z</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">phi</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'z'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'phi'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG4/HG4-1-4.png?raw=true" alt="HG4-1-4" /><br />
+<br /></p>
+
+<p>이제 로지스틱 회귀를 사용하여 이진분류를 해보겠습니다.<br />
+train 데이터에서 불리언 인덱싱을 사용하여 도미와 빙어만 따로 출력해줍니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#도미(Bream)와 빙어(Smelt)만 출력하기
+</span><span class="n">bream_smelt_indexes</span> <span class="o">=</span> <span class="p">(</span><span class="n">train_target</span> <span class="o">==</span> <span class="s">'Bream'</span><span class="p">)</span><span class="o">|</span><span class="p">(</span><span class="n">train_target</span> <span class="o">==</span> <span class="s">'Smelt'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">bream_smelt_indexes</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[False  True False False False False  True False False  True False  True
+  True False False False  True  True False  True False False  True False
+ False False  True False False False False False False False  True False
+  True  True False  True False False  True False False  True False  True
+ False False  True  True False False False  True  True False False False
+  True  True False False False False False False False  True False  True
+ False False  True False False False False  True False False False False
+  True False  True False False False False False False False  True  True
+ False False False False  True  True False False False False False False
+ False False False False  True  True  True False False  True False]</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">train_bream_smelt</span> <span class="o">=</span> <span class="n">train_scaled</span><span class="p">[</span><span class="n">bream_smelt_indexes</span><span class="p">]</span>
+<span class="n">target_bream_smelt</span> <span class="o">=</span> <span class="n">train_target</span><span class="p">[</span><span class="n">bream_smelt_indexes</span><span class="p">]</span>
+</code></pre></div></div>
+<p>이 데이터를 이용하여 로지스틱 회귀 모델을 훈련하고 그 모델을 사용하여 train_bream_smelt에 있는 처음 5개의 샘플을 출력해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+<span class="n">lr</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">()</span>
+<span class="n">lr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_bream_smelt</span><span class="p">,</span> <span class="n">target_bream_smelt</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">train_bream_smelt</span><span class="p">[:</span><span class="mi">5</span><span class="p">]))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[‘Smelt’ ‘Smelt’ ‘Smelt’ ‘Smelt’ ‘Bream’]</p>
+</blockquote>
+
+<p>다섯 번째를 도미, 나머지를 빙어로 예측했습니다.<br />
+5개 샘플의 확률을 확인합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">train_bream_smelt</span><span class="p">[:</span><span class="mi">5</span><span class="p">]))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[[0.03391154 0.96608846]<br />
+ [0.03603855 0.96396145]<br />
+ [0.03582089 0.96417911]<br />
+ [0.02900509 0.97099491]<br />
+ [0.99410165 0.00589835]]</p>
+</blockquote>
+
+<p>두 개의 열 중에 어떤 것이 도미이고 빙어인지 헷갈린다면 classes_ 를 사용하여 알 수 있습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">classes_</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[‘Bream’ ‘Smelt’]</p>
+</blockquote>
+
+<p>이제 로지스틱 회귀가 학습한 계수를 확인합니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">coef_</span><span class="p">,</span> <span class="n">lr</span><span class="p">.</span><span class="n">intercept_</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[[-0.42646881 -0.60256452 -0.68252074 -0.99456193 -0.78263044]] [-2.28791769]</p>
+</blockquote>
+
+<p>이를 통해 로지스틱 회귀 모델이 학습한 방정식을 다음과 같이 도출할 수 있습니다. 
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG4/HG4-1-5.png?raw=true" alt="HG4-1-5" /><br />
+<br />
+이제 이 방정식을 이용하여 z 값을 계산해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">decisions</span> <span class="o">=</span> <span class="n">lr</span><span class="p">.</span><span class="n">decision_function</span><span class="p">(</span><span class="n">train_bream_smelt</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">decisions</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[ 3.34950001  3.28646197  3.29274597  3.51084984 -5.12716733]</p>
+</blockquote>
+
+<p>이 z값을 시그모이드 함수에 통과하면 확률을 얻을 수 있습니다.<br />
+scipy에 시그모이드 함수를 제공하는 expit()를 사용해서 확률을 구합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">scipy.special</span> <span class="kn">import</span> <span class="n">expit</span>
+<span class="k">print</span><span class="p">(</span><span class="n">expit</span><span class="p">(</span><span class="n">decisions</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[0.96608846 0.96396145 0.96417911 0.97099491 0.00589835]</p>
+</blockquote>
+
+<p>이제 다중 분류를 수행해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lr</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">C</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">max_iter</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">lr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.9411764705882353<br />
+0.85</p>
+</blockquote>
+
+<p>test 세트의 처음 5개 샘플에 대한 예측을 출력해봅니다.<br />
+그리고 그 예측에 대한 확률을 출력해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#test set의 처음 5개 샘플에 대한 예측
+</span><span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">[:</span><span class="mi">5</span><span class="p">]))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[‘Parkki’ ‘Perch’ ‘Roach’ ‘Perch’ ‘Perch’]</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#test set의 처음 5개에 대한 예측 확률
+</span><span class="n">proba</span> <span class="o">=</span> <span class="n">lr</span><span class="p">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">round</span><span class="p">(</span><span class="n">proba</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span> <span class="c1">#소수점 세번째자리까지 표기
+</span></code></pre></div></div>
+<blockquote>
+  <p>[[0.01  0.73  0.006 0.    0.223 0.    0.03 ]<br />
+ [0.01  0.    0.898 0.002 0.    0.    0.089]<br />
+ [0.001 0.018 0.28  0.002 0.661 0.    0.038]<br />
+ [0.002 0.    0.953 0.001 0.    0.    0.044]<br />
+ [0.    0.012 0.816 0.    0.119 0.051 0.002]]</p>
+</blockquote>
+
+<p>5개 샘플과 7개의 클래스가 있기 때문에 5개의 행과 7개의 열로 출력이 되었습니다.<br />
+각 열이 의미하는 것이 어떤 생선에 대한 확률인지 확인합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#classes_속성으로 클래스 정보 확인
+</span><span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">classes_</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[‘Bream’ ‘Parkki’ ‘Perch’ ‘Pike’ ‘Roach’ ‘Smelt’ ‘Whitefish’]</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">coef_</span><span class="p">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">lr</span><span class="p">.</span><span class="n">intercept_</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>(7, 5) (7,)</p>
+</blockquote>
+
+<p>coef_ 배열이 7행에 5열의 형태를 띄고 있고 intercept_도 7개가 있는 것을 확인할 수 있습니다.<br />
+7개의 클래스가 있기 때문에 클래스마다 z값을 계산하여 총 7개의 z값이 나온다는 말과 같습니다.</p>
+
+<p>이와 같이 7개의 z값들을 확률로 바꾸기 위해 소프트맥스 함수를 사용합니다.<br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG4/HG4-1-6.png?raw=true" alt="HG4-1-6" /><br />
+<br />
+7개의 z값을 소프트맥스 함수를 이용하여 확률로 바꾸면 0과 1사이의 값을 가진 확률이 출력됩니다.<br />
+그럼 7개의 z값을 구한 후에 소프트맥스 함수를 사용하여 확률로 바꾸어보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#z1부터 z7까지의 값 구하고 확률로 바꾸기
+</span><span class="n">decision</span> <span class="o">=</span> <span class="n">lr</span><span class="p">.</span><span class="n">decision_function</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">round</span><span class="p">(</span><span class="n">decision</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span> <span class="c1">#소수점 둘째자리까지 표기
+</span></code></pre></div></div>
+<blockquote>
+  <p>[[ -0.17   4.13  -0.67  -3.44   2.95  -3.75   0.96]<br />
+ [  4.31  -5.68   8.79   2.78   0.69 -17.37   6.48]<br />
+ [ -2.69   0.28   3.04  -2.01   3.9   -3.56   1.05]<br />
+ [  3.78  -6.28   9.85   2.82   0.69 -17.63   6.78]<br />
+ [ -8.63   1.35   5.59  -4.1    3.66   2.82  -0.7 ]]</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">scipy.special</span> <span class="kn">import</span> <span class="n">softmax</span>
+<span class="n">proba</span> <span class="o">=</span> <span class="n">softmax</span><span class="p">(</span><span class="n">decision</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">round</span><span class="p">(</span><span class="n">proba</span><span class="p">,</span> <span class="n">decimals</span> <span class="o">=</span> <span class="mi">3</span><span class="p">))</span> <span class="c1">#소수점 셋째자리까지 표시
+</span></code></pre></div></div>
+<blockquote>
+  <p>[[0.01  0.73  0.006 0.    0.223 0.    0.03 ]<br />
+ [0.01  0.    0.898 0.002 0.    0.    0.089]<br />
+ [0.001 0.018 0.28  0.002 0.661 0.    0.038]<br />
+ [0.002 0.    0.953 0.001 0.    0.    0.044]<br />
+ [0.    0.012 0.816 0.    0.119 0.051 0.002]]</p>
+</blockquote>
+
+<p>이렇게 로지스틱 회귀를 사용하여 7개의 클래스에 대한 확률을 예측하는 모델을 만들었습니다.<br />
+다음에는 확률적 경사 하강법에 대해 배워보도록 하겠습니다.</p>]]></content><author><name>Your Name</name></author><category term="Study" /><category term="Blog" /><category term="Machine learning" /><category term="Data mining" /><category term="혼공머신러닝" /><summary type="html"><![CDATA[4-1 로지스틱 회귀]]></summary></entry><entry><title type="html">[혼공머신러닝] Ch 3. 회귀 알고리즘과 모델 규제(3)</title><link href="http://localhost:4000/study/HG3-3/" rel="alternate" type="text/html" title="[혼공머신러닝] Ch 3. 회귀 알고리즘과 모델 규제(3)" /><published>2022-05-03T00:00:00+09:00</published><updated>2022-05-03T00:00:00+09:00</updated><id>http://localhost:4000/study/HG3-3</id><content type="html" xml:base="http://localhost:4000/study/HG3-3/"><![CDATA[<p>앞서 훈련했던 모델에서 훈련 세트보다 테스트 세트가 더 점수가 높게 나왔습니다.<br />
+이 문제를 해결하기 위해 농어의 길이 뿐만 아니라 농어의 높이와 두께 등의 여러 특성들을 추가로 사용해보겠습니다.<br />
+또한 이전에 사용했던 방법인 각 항을 제곱하여 데이터에 추가하는 것과 각 특성을 서로 곱해 새로운 특성을 만드는 방식을 사용합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># data load
+</span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'https://bit.ly/perch_csv'</span><span class="p">)</span>
+<span class="n">perch_full</span> <span class="o">=</span> <span class="n">df</span><span class="p">.</span><span class="n">to_numpy</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">perch_full</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[[ 8.4   2.11  1.41]<br />
+ [13.7   3.53  2.  ]<br />
+ [15.    3.82  2.43]<br />
+ [16.2   4.59  2.63]<br />
+ [17.4   4.59  2.94]<br />
+ [18.    5.22  3.32]<br />
+…</p>
+</blockquote>
+
+<p>이번에는 데이터가 여러 특성이 있음을 고려하여 pandas를 이용해 직접 csv 데이터를 불러오는 방식을 사용했습니다.<br />
+이제 이전과 동일한 방식으로 타깃 데이터를 준비하고, perch_full과 perch_weight를 훈련 세트와 테스트 세트로 나눕니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="n">perch_weight</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="mf">5.9</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="mf">51.5</span><span class="p">,</span> <span class="mf">70.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">,</span> <span class="mf">78.0</span><span class="p">,</span> <span class="mf">80.0</span><span class="p">,</span> <span class="mf">85.0</span><span class="p">,</span> <span class="mf">85.0</span><span class="p">,</span> <span class="mf">110.0</span><span class="p">,</span>
+       <span class="mf">115.0</span><span class="p">,</span> <span class="mf">125.0</span><span class="p">,</span> <span class="mf">130.0</span><span class="p">,</span> <span class="mf">120.0</span><span class="p">,</span> <span class="mf">120.0</span><span class="p">,</span> <span class="mf">130.0</span><span class="p">,</span> <span class="mf">135.0</span><span class="p">,</span> <span class="mf">110.0</span><span class="p">,</span> <span class="mf">130.0</span><span class="p">,</span>
+       <span class="mf">150.0</span><span class="p">,</span> <span class="mf">145.0</span><span class="p">,</span> <span class="mf">150.0</span><span class="p">,</span> <span class="mf">170.0</span><span class="p">,</span> <span class="mf">225.0</span><span class="p">,</span> <span class="mf">145.0</span><span class="p">,</span> <span class="mf">188.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="mf">197.0</span><span class="p">,</span>
+       <span class="mf">218.0</span><span class="p">,</span> <span class="mf">300.0</span><span class="p">,</span> <span class="mf">260.0</span><span class="p">,</span> <span class="mf">265.0</span><span class="p">,</span> <span class="mf">250.0</span><span class="p">,</span> <span class="mf">250.0</span><span class="p">,</span> <span class="mf">300.0</span><span class="p">,</span> <span class="mf">320.0</span><span class="p">,</span> <span class="mf">514.0</span><span class="p">,</span>
+       <span class="mf">556.0</span><span class="p">,</span> <span class="mf">840.0</span><span class="p">,</span> <span class="mf">685.0</span><span class="p">,</span> <span class="mf">700.0</span><span class="p">,</span> <span class="mf">700.0</span><span class="p">,</span> <span class="mf">690.0</span><span class="p">,</span> <span class="mf">900.0</span><span class="p">,</span> <span class="mf">650.0</span><span class="p">,</span> <span class="mf">820.0</span><span class="p">,</span>
+       <span class="mf">850.0</span><span class="p">,</span> <span class="mf">900.0</span><span class="p">,</span> <span class="mf">1015.0</span><span class="p">,</span> <span class="mf">820.0</span><span class="p">,</span> <span class="mf">1100.0</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">,</span> <span class="mf">1100.0</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">,</span>
+       <span class="mf">1000.0</span><span class="p">])</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="n">train_input</span><span class="p">,</span> <span class="n">test_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">,</span> <span class="n">test_target</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">perch_full</span><span class="p">,</span> <span class="n">perch_weight</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">42</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>사이킷런의 sklearn.preprocessing 패키지의 PolynomialFeatures 클래스를 사용해서 새로운 특성을 만들어 보겠습니다.<br />
+PolynomialFeatures 클래스는 기본적으로 각 특성을 제곱한 항을 추가하고 특성끼리 서로 곱한 항을 추가합니다.<br />
+이때 기본적으로 1을 추가하여 각 특성에 곱함으로써 절편을 만드는데, 사이킷런 선형 모델은 자동으로 절편이 들어가있기 때문에 include_bias=False 인자를 추가함으로서 절편을 위한 항을 제거할 수 있습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">PolynomialFeatures</span>
+
+<span class="c1"># train_input을 변환하여 train_poly 만들기
+</span><span class="n">poly</span> <span class="o">=</span> <span class="n">PolynomialFeatures</span><span class="p">(</span><span class="n">include_bias</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">poly</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_input</span><span class="p">)</span>
+<span class="n">train_poly</span> <span class="o">=</span> <span class="n">poly</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">train_input</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">train_poly</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>(42, 9)</p>
+</blockquote>
+
+<p>PolynomialFeatures 클래스는 9개의 특성이 어떻게 반영되어있는지 확인하는 방법을 제공합니다.<br />
+get_feature_names() 메서드를 사용하여 알 수 있습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">poly</span><span class="p">.</span><span class="n">get_feature_names</span><span class="p">()</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[‘x0’, ‘x1’, ‘x2’, ‘x0^2’, ‘x0 x1’, ‘x0 x2’, ‘x1^2’, ‘x1 x2’, ‘x2^2’]</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#test set 변환하기
+</span><span class="n">test_poly</span> <span class="o">=</span> <span class="n">poly</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">test_input</span><span class="p">)</span>
+
+<span class="c1">#다중회귀 모델 훈련하기
+</span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
+<span class="n">lr</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
+<span class="n">lr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_poly</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_poly</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.9903183436982124</p>
+</blockquote>
+
+<p>train set을 이용하여 점수를 내보았으니 test set도 점수를 출력해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#test set 점수도 확인하기
+</span><span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_poly</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.9714559911594134</p>
+</blockquote>
+
+<p>테스트 세트 점수와 훈련세트 점수 모두 높게 나오면서 train 세트가 더 점수가 높게 나온 것을 확인할 수 있습니다.<br />
+이제 특성을 더 많이 추가해보겠습니다.<br />
+PolynomialFeatures 클래스의 degree 변수를 사용하면 고차항의 최대 차수를 지정할 수 있습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">poly</span> <span class="o">=</span> <span class="n">PolynomialFeatures</span><span class="p">(</span><span class="n">degree</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">include_bias</span> <span class="o">=</span> <span class="bp">False</span><span class="p">)</span>
+<span class="n">poly</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_input</span><span class="p">)</span>
+<span class="n">train_poly</span> <span class="o">=</span> <span class="n">poly</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">train_input</span><span class="p">)</span>
+<span class="n">test_poly</span> <span class="o">=</span> <span class="n">poly</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">test_input</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">train_poly</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>(42, 55)</p>
+</blockquote>
+
+<p>만들어진 특성의 개수가 55개인 것을 확인할 수 있습니다.<br />
+train_poly 배열의 열의 개수가 특성의 개수라고 생각하면 됩니다.<br />
+이제 transform을 마쳤으니 이 데이터로 다시 훈련해보도록 하겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_poly</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_poly</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_poly</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.9999999999991097<br />
+-144.40579242684848</p>
+</blockquote>
+
+<p>결과를 보면 train set에 대한 점수는 매우 높게 나오고, test set에 대한 점수는 음수가 나왔습니다.<br />
+이는 특성의 개수를 크게 늘렸기 때문에 train set에 대해 과대적합된 결과로 볼 수 있습니다.<br />
+이러한 과대적합을 줄이기 위해서는 선형 회귀 모델의 계수를 규제하여 해결해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="n">ss</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
+<span class="n">ss</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_poly</span><span class="p">)</span>
+<span class="n">train_scaled</span> <span class="o">=</span> <span class="n">ss</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">train_poly</span><span class="p">)</span>
+<span class="n">test_scaled</span> <span class="o">=</span> <span class="n">ss</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">test_poly</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>선형 회귀 모델에 규제를 추가한 모델을 ridge와 lasso라고 부르는데, 릿지는 계수를 제곱한 값을 기준으로 규제를 적용하고, 라쏘는 계수의 절댓값을 기준으로 규제를 적용합니다.<br />
+일반적으로는 릿지를 조금 더 선호하기 때문에 릿지 회귀를 먼저 훈련해보도록 하겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">Ridge</span>
+<span class="n">ridge</span> <span class="o">=</span> <span class="n">Ridge</span><span class="p">()</span>
+<span class="n">ridge</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">ridge</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">ridge</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.9896101671037343<br />
+0.9790693977615397</p>
+</blockquote>
+
+<p>ridge 모델을 사용하여 훈련한 결과 많은 특성을 사용했음에도 불구하고 훈련세트, 테스트 세트 모두에서 좋은 점수가 나왔습니다.<br />
+릿지와 라쏘 모델을 적용할 때 모델 객체 중 alpha 값을 사용함으로써 규제의 정도를 정할 수 있는데,
+alpha값이 크면 규제의 강도가 세기 때문에 과소적합될 가능성이 크고,
+작으면 계수를 줄이는 역할이 줄어들고 선형 회귀 모델과 유사해지기 때문에 과대적합될 가능성이 큽니다.<br />
+적절한 alpha 값을 찾기 위해서는 alpha 값에 대한 결정계수 값을 그려 훈련 세트와 테스트 세트의 점수가 가장 가까운 지점을 최적의 alpha 값으로 생각하면 됩니다.<br />
+그럼 alpha값을 바꿀 때 마다 score 값을 저장할 리스트를 먼저 만들어주겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="n">train_score</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">test_score</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1">#alpha 값 리스트 생성
+</span><span class="n">alpha_list</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">alpha</span> <span class="ow">in</span> <span class="n">alpha_list</span> <span class="p">:</span>
+  <span class="c1">#ridge model 생성
+</span>  <span class="n">ridge</span> <span class="o">=</span> <span class="n">Ridge</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+  <span class="c1">#ridge model 훈련
+</span>  <span class="n">ridge</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+  <span class="c1">#훈련 점수와 테스트 점수 저장
+</span>  <span class="n">train_score</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">ridge</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+  <span class="n">test_score</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">ridge</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+</code></pre></div></div>
+<p>이제 alpha 값에 따른 그래프를 그려 값을 확인해보도록 하겠습니다.<br />
+그냥 그리면 그래프 왼쪽이 너무 촘촘해지기 때문에 로그함수로 바꿔 표현합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">log10</span><span class="p">(</span><span class="n">alpha_list</span><span class="p">),</span> <span class="n">train_score</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">log10</span><span class="p">(</span><span class="n">alpha_list</span><span class="p">),</span> <span class="n">test_score</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'alpha'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'R^2'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="../assets/images/HG03-1/HG3-3-1.png" alt="HG3-3-1" /><br />
+<br />
+다음 그래프를 확인해보면, 적절한 alpha 값이 -1, 즉 0.1 이라는 것을 알 수 있습니다.<br />
+alpha 값을 0.1로 지정하여 모델을 훈련하겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ridge</span> <span class="o">=</span> <span class="n">Ridge</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="n">ridge</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">ridge</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">ridge</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.9903815817570366<br />
+0.9827976465386926</p>
+</blockquote>
+
+<p>train값이 test값보다 높게 나오면서 두 점수 모두 적절한 점수가 나온것을 확인할 수 있습니다.<br />
+이제 lasso 회귀모델을 훈련해보도록 하겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">train_score</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">test_score</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">alpha_list</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">alpha</span> <span class="ow">in</span> <span class="n">alpha_list</span><span class="p">:</span>
+  <span class="c1"># lasso model을 만들기
+</span>  <span class="n">lasso</span> <span class="o">=</span> <span class="n">Lasso</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">max_iter</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">)</span>
+  <span class="c1"># lasso model 훈련하기
+</span>  <span class="n">lasso</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+  <span class="c1"># train set와 test set score을 저장
+</span>  <span class="n">train_score</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">lasso</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+  <span class="n">test_score</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">lasso</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+
+<span class="c1">#x축을 로그스케일로 바꿔 그래프 그리기
+</span><span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">log10</span><span class="p">(</span><span class="n">alpha_list</span><span class="p">),</span> <span class="n">train_score</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">log10</span><span class="p">(</span><span class="n">alpha_list</span><span class="p">),</span> <span class="n">test_score</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'alpha'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'R^2'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="../assets/images/HG03-1/HG3-3-2.png" alt="HG3-3-2" /><br />
+<br />
+위 그래프를 확인했을 때 올바른 alpha값은 1이라는것을 알 수 있습니다.<br />
+이 값으로 lasso 모델을 훈련합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lasso</span> <span class="o">=</span> <span class="n">Lasso</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">lasso</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">lasso</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">lasso</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.9888067471131867<br />
+0.9824470598706695</p>
+</blockquote>
+
+<p>lasso 모델은 계수값을 0으로 만들 수 있습니다.<br />
+라쏘모델의 계수중 0인것의 개수를 출력해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">lasso</span><span class="p">.</span><span class="n">coef_</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>40</p>
+</blockquote>
+
+<p>계수가 0인 항이 40개인 것을 확인할 수 있습니다.<br />
+총 55개의 특성 중 15개만 사용한 것입니다.<br />
+이런 특성이 있기 때문에 라쏘 모델을 유용한 특성을 골라내는 데에 사용하기도 합니다.<br />
+릿지와 라쏘 회귀를 사용하여 최적의 alpha 값을 찾아보고 특성이 많은 데이터를 규제하여 모델의 성능을 확인해봤습니다.</p>]]></content><author><name>Your Name</name></author><category term="Study" /><category term="Blog" /><category term="Machine learning" /><category term="Data mining" /><category term="혼공머신러닝" /><summary type="html"><![CDATA[3-3 특성 공학과 규제]]></summary></entry><entry><title type="html">[혼공머신러닝] Ch 3. 회귀 알고리즘과 모델 규제(2)</title><link href="http://localhost:4000/study/HG3-2/" rel="alternate" type="text/html" title="[혼공머신러닝] Ch 3. 회귀 알고리즘과 모델 규제(2)" /><published>2022-05-02T00:00:00+09:00</published><updated>2022-05-02T00:00:00+09:00</updated><id>http://localhost:4000/study/HG3-2</id><content type="html" xml:base="http://localhost:4000/study/HG3-2/"><![CDATA[<p>앞서 만든 k-최근접 이웃 회귀 모델로 길이 50cm 농어의 무게를 예측해보도록 하겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#Data load
+</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="n">perch_length</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="mf">8.4</span><span class="p">,</span> <span class="mf">13.7</span><span class="p">,</span> <span class="mf">15.0</span><span class="p">,</span> <span class="mf">16.2</span><span class="p">,</span> <span class="mf">17.4</span><span class="p">,</span> <span class="mf">18.0</span><span class="p">,</span> <span class="mf">18.7</span><span class="p">,</span> <span class="mf">19.0</span><span class="p">,</span> <span class="mf">19.6</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">,</span> <span class="mf">21.0</span><span class="p">,</span>
+       <span class="mf">21.0</span><span class="p">,</span> <span class="mf">21.0</span><span class="p">,</span> <span class="mf">21.3</span><span class="p">,</span> <span class="mf">22.0</span><span class="p">,</span> <span class="mf">22.0</span><span class="p">,</span> <span class="mf">22.0</span><span class="p">,</span> <span class="mf">22.0</span><span class="p">,</span> <span class="mf">22.0</span><span class="p">,</span> <span class="mf">22.5</span><span class="p">,</span> <span class="mf">22.5</span><span class="p">,</span> <span class="mf">22.7</span><span class="p">,</span>
+       <span class="mf">23.0</span><span class="p">,</span> <span class="mf">23.5</span><span class="p">,</span> <span class="mf">24.0</span><span class="p">,</span> <span class="mf">24.0</span><span class="p">,</span> <span class="mf">24.6</span><span class="p">,</span> <span class="mf">25.0</span><span class="p">,</span> <span class="mf">25.6</span><span class="p">,</span> <span class="mf">26.5</span><span class="p">,</span> <span class="mf">27.3</span><span class="p">,</span> <span class="mf">27.5</span><span class="p">,</span> <span class="mf">27.5</span><span class="p">,</span>
+       <span class="mf">27.5</span><span class="p">,</span> <span class="mf">28.0</span><span class="p">,</span> <span class="mf">28.7</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">32.8</span><span class="p">,</span> <span class="mf">34.5</span><span class="p">,</span> <span class="mf">35.0</span><span class="p">,</span> <span class="mf">36.5</span><span class="p">,</span> <span class="mf">36.0</span><span class="p">,</span> <span class="mf">37.0</span><span class="p">,</span> <span class="mf">37.0</span><span class="p">,</span>
+       <span class="mf">39.0</span><span class="p">,</span> <span class="mf">39.0</span><span class="p">,</span> <span class="mf">39.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="mf">42.0</span><span class="p">,</span> <span class="mf">43.0</span><span class="p">,</span> <span class="mf">43.0</span><span class="p">,</span> <span class="mf">43.5</span><span class="p">,</span>
+       <span class="mf">44.0</span><span class="p">])</span>
+<span class="n">perch_weight</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="mf">5.9</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="mf">51.5</span><span class="p">,</span> <span class="mf">70.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">,</span> <span class="mf">78.0</span><span class="p">,</span> <span class="mf">80.0</span><span class="p">,</span> <span class="mf">85.0</span><span class="p">,</span> <span class="mf">85.0</span><span class="p">,</span> <span class="mf">110.0</span><span class="p">,</span>
+       <span class="mf">115.0</span><span class="p">,</span> <span class="mf">125.0</span><span class="p">,</span> <span class="mf">130.0</span><span class="p">,</span> <span class="mf">120.0</span><span class="p">,</span> <span class="mf">120.0</span><span class="p">,</span> <span class="mf">130.0</span><span class="p">,</span> <span class="mf">135.0</span><span class="p">,</span> <span class="mf">110.0</span><span class="p">,</span> <span class="mf">130.0</span><span class="p">,</span>
+       <span class="mf">150.0</span><span class="p">,</span> <span class="mf">145.0</span><span class="p">,</span> <span class="mf">150.0</span><span class="p">,</span> <span class="mf">170.0</span><span class="p">,</span> <span class="mf">225.0</span><span class="p">,</span> <span class="mf">145.0</span><span class="p">,</span> <span class="mf">188.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="mf">197.0</span><span class="p">,</span>
+       <span class="mf">218.0</span><span class="p">,</span> <span class="mf">300.0</span><span class="p">,</span> <span class="mf">260.0</span><span class="p">,</span> <span class="mf">265.0</span><span class="p">,</span> <span class="mf">250.0</span><span class="p">,</span> <span class="mf">250.0</span><span class="p">,</span> <span class="mf">300.0</span><span class="p">,</span> <span class="mf">320.0</span><span class="p">,</span> <span class="mf">514.0</span><span class="p">,</span>
+       <span class="mf">556.0</span><span class="p">,</span> <span class="mf">840.0</span><span class="p">,</span> <span class="mf">685.0</span><span class="p">,</span> <span class="mf">700.0</span><span class="p">,</span> <span class="mf">700.0</span><span class="p">,</span> <span class="mf">690.0</span><span class="p">,</span> <span class="mf">900.0</span><span class="p">,</span> <span class="mf">650.0</span><span class="p">,</span> <span class="mf">820.0</span><span class="p">,</span>
+       <span class="mf">850.0</span><span class="p">,</span> <span class="mf">900.0</span><span class="p">,</span> <span class="mf">1015.0</span><span class="p">,</span> <span class="mf">820.0</span><span class="p">,</span> <span class="mf">1100.0</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">,</span> <span class="mf">1100.0</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">,</span>
+       <span class="mf">1000.0</span><span class="p">])</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="n">train_input</span><span class="p">,</span> <span class="n">test_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">,</span> <span class="n">test_target</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">perch_length</span><span class="p">,</span> <span class="n">perch_weight</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">42</span>
+<span class="p">)</span>
+
+<span class="n">train_input</span> <span class="o">=</span> <span class="n">train_input</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test_input</span> <span class="o">=</span> <span class="n">test_input</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">KNeighborsRegressor</span>
+<span class="n">knr</span> <span class="o">=</span> <span class="n">KNeighborsRegressor</span><span class="p">(</span><span class="n">n_neighbors</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+
+<span class="c1">#k-최근접 이웃 회귀모델을 훈련합니다.
+</span><span class="n">knr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+
+<span class="c1">#모델을 사용하여 길이가 50cm인 농어의 무게를 예측합니다.
+</span><span class="k">print</span><span class="p">(</span><span class="n">knr</span><span class="p">.</span><span class="n">predict</span><span class="p">([[</span><span class="mi">50</span><span class="p">]]))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[1033.33333333]</p>
+</blockquote>
+
+<p>최근접 이웃 회귀 모델은 이 농어의 무게를 약 1033g 정도로 예측했지만, 실제 값은 더 많이 나간다고 합니다.
+이를 해결하기 위해 우선 산점도에 표시해 자료를 확인해보도록 하겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1">#타깃 농어 이웃 구하기
+</span><span class="n">distances</span><span class="p">,</span> <span class="n">indexes</span> <span class="o">=</span> <span class="n">knr</span><span class="p">.</span><span class="n">kneighbors</span><span class="p">([[</span><span class="mi">50</span><span class="p">]])</span>
+
+<span class="c1">#훈련 세트 산점도 그리기
+</span><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+
+<span class="c1">#훈련 세트 중 이웃 샘플만 다시 그리기
+</span><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">train_input</span><span class="p">[</span><span class="n">indexes</span><span class="p">],</span> <span class="n">train_target</span><span class="p">[</span><span class="n">indexes</span><span class="p">],</span> <span class="n">marker</span> <span class="o">=</span> <span class="s">'D'</span><span class="p">)</span>
+
+<span class="c1">#타깃 그리기
+</span><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">1033</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="s">'^'</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'length'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'weight'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="../assets/images/HG03-1/HG3-2-1.png" alt="HG3-2-1" /><br />
+<br />
+산점도를 보면 어떤 문제인지 알 수 있습니다.<br />
+샘플에 비해 이웃 샘플들의 평균한 무게가 너무 적었던 것입니다.<br />
+이웃 샘플의 평균을 구하면 수치상으로도 알수 있습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">train_target</span><span class="p">[</span><span class="n">indexes</span><span class="p">]))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>1033.3333333333333</p>
+</blockquote>
+
+<p>예측한 수치와 일치합니다. 길이가 100cm인 농어도 똑같은 값으로 예측합니다. 이를 해결하기 위해 다른 모델을 적용하고자 합니다.<br />
+선형회귀 또한 사이킷런의 LinearRegression 클래스를 이용하여 훈련할 수 있습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
+<span class="n">lr</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
+
+<span class="c1"># 모델 훈련
+</span><span class="n">lr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+
+<span class="c1"># 50cm 농어 예측
+</span><span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">predict</span><span class="p">([[</span><span class="mi">50</span><span class="p">]]))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[1241.83860323]</p>
+</blockquote>
+
+<p>최근접 이웃 회귀모델이 예측한 값보다 훨씬 높은 값을 예측했습니다.<br />
+훈련세트의 산점도와 함께 농어의 길이에 따른 무게를 직선으로 그려보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 훈련세트 산점도
+</span><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+
+<span class="c1"># 15에서 50까지의 1차 방정식 그래프 그리기
+</span><span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">15</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span> <span class="p">[</span><span class="mi">15</span><span class="o">*</span><span class="n">lr</span><span class="p">.</span><span class="n">coef_</span><span class="o">+</span><span class="n">lr</span><span class="p">.</span><span class="n">intercept_</span><span class="p">,</span> <span class="mi">50</span><span class="o">*</span><span class="n">lr</span><span class="p">.</span><span class="n">coef_</span><span class="o">+</span><span class="n">lr</span><span class="p">.</span><span class="n">intercept_</span><span class="p">])</span>
+
+<span class="c1"># 타깃 데이터 그리기
+</span><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mf">1241.8</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="s">'^'</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'length'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'weight'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="../assets/images/HG03-1/HG3-2-2.png" alt="HG3-2-2" /><br />
+이제 결정계수를 출력해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_input</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.939846333997604<br />
+0.8247503123313558</p>
+</blockquote>
+
+<p>점수를 본 결과 전체적으로 높지 않습니다. 또한 그래프에서도 산점도는 곡선의 형태를 띄기 때문에 직선은 데이터를 잘 대변하지 못하는 것 같습니다.<br />
+최적의 곡선을 찾기 위해 길이를 제곱한 항을 훈련 세트에 추가해보겠습니다.<br />
+농어의 길이를 제곱하여 원래 데이터 앞에 붙입니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">train_poly</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">train_input</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">train_input</span><span class="p">))</span>
+<span class="n">test_poly</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">test_input</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">test_input</span><span class="p">))</span>
+
+<span class="c1">#새 데이터셋 크기 확인하기
+</span><span class="k">print</span><span class="p">(</span><span class="n">train_poly</span><span class="p">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">test_poly</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>(42, 2) (14, 2)</p>
+</blockquote>
+
+<p>이제 train_poly() 함수를 사용하여 선형 회귀 모델을 다시 훈련합니다.<br />
+여기서 주의할 점은 2차 방정식 그래프를 찾기 위해 데이터에는 제곱항을 추가했지만 타깃 데이터는 그대로 사용한다는 것입니다.<br />
+이 훈련세트로 모델을 훈련한 후 50cm 농어의 무게를 예측해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lr</span><span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
+<span class="n">lr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_poly</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">predict</span><span class="p">([[</span><span class="mi">50</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="mi">50</span><span class="p">]]))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[1573.98423528]</p>
+</blockquote>
+
+<p>앞서 훈련한 값보다 높은 값을 출력했습니다.<br />
+이 모델이 훈련한 계수와 절편을 확인해봅니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">coef_</span><span class="p">,</span> <span class="n">lr</span><span class="p">.</span><span class="n">intercept_</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[1.01433211 -21.55792498] 116.0502107827827</p>
+</blockquote>
+
+<p>이 모델은</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>무게 = 1.01 * 길이^2 - 21.6 * 길이 + 116.05
+</code></pre></div></div>
+
+<p>다음과 같은 그래프를 학습한 것으로 생각할 수 있습니다.<br />
+이러한 다항식을 사용한 선형 회귀를 다항회귀라고 부릅니다.<br />
+이제 산점도를 다시 그려보겠습니다.<br />
+다항식을 표현할 곡선은 직선을 짧게 이어 그려 표현할 수 있습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#구간별 직선을 그리기 위하여 15부터 49까지 정수 배열 만들기
+</span><span class="n">point</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+
+<span class="c1">#훈련세트 산점도
+</span><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+
+<span class="c1">#15부터 49까지 2차 방정식 그래프 그리기
+</span><span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="mf">1.01</span><span class="o">*</span><span class="n">point</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mf">21.6</span><span class="o">*</span><span class="n">point</span> <span class="o">+</span> <span class="mf">116.05</span><span class="p">)</span>
+
+<span class="c1">#50cm 농어 데이터
+</span><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">1574</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="s">'^'</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'length'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'weight'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="../assets/images/HG03-1/HG3-2-3.png" alt="HG3-2-3" /><br />
+<br />
+앞서 만들었던 선형 회귀 모형보다 더 나은 그래프가 그려진 것이 보입니다.<br />
+이제 결정계수를 출력해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_poly</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_poly</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.9706807451768623<br />
+0.9775935108325122</p>
+</blockquote>
+
+<p>두 점수 모두 좋은 점수가 나왔습니다.<br />
+다만 train 보다 test 점수가 더 높은 것을 보니 과소적합이 조금 남아있는 것 같습니다.<br />
+더 복잡한 모델이 필요한 것 같으니 다음 시간에 알아보도록 하겠습니다.</p>]]></content><author><name>Your Name</name></author><category term="Study" /><category term="Blog" /><category term="Machine learning" /><category term="Data mining" /><category term="혼공머신러닝" /><summary type="html"><![CDATA[3-2 선형 회귀]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="http://localhost:4000/assets/images/HGML.png" /><media:content medium="image" url="http://localhost:4000/assets/images/HGML.png" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">[혼공머신러닝] Ch 3. 회귀 알고리즘과 모델 규제(1)</title><link href="http://localhost:4000/study/HG3-1/" rel="alternate" type="text/html" title="[혼공머신러닝] Ch 3. 회귀 알고리즘과 모델 규제(1)" /><published>2022-05-02T00:00:00+09:00</published><updated>2022-05-02T00:00:00+09:00</updated><id>http://localhost:4000/study/HG3-1</id><content type="html" xml:base="http://localhost:4000/study/HG3-1/"><![CDATA[<p>지도학습 알고리즘은 분류와 회귀로 나눌 수 있습니다.<br />
+분류는 앞서 2장에서 했던 것처럼 클래스 중 하나로 분류하는 것이고, 회귀는 임의의 어떤 숫자를 예측하는 것입니다.</p>
+
+<p>k-최근접 이웃 분류는 앞서 진행했고, 이번에는 k-최근접 이웃 회귀를 알아보겠습니다.<br />
+k-최근접 이웃 회귀는 예측하려는 샘플에 가장 가까운 샘플 k개를 선택하여 이웃 수치들의 평균을 구하는 방식입니다.<br />
+<br /><br />
+회귀분석에 쓰일 데이터를 불러온 후 산점도를 그려보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#numpy import
+</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+<span class="c1">#Data load
+</span><span class="n">perch_length</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="mf">8.4</span><span class="p">,</span> <span class="mf">13.7</span><span class="p">,</span> <span class="mf">15.0</span><span class="p">,</span> <span class="mf">16.2</span><span class="p">,</span> <span class="mf">17.4</span><span class="p">,</span> <span class="mf">18.0</span><span class="p">,</span> <span class="mf">18.7</span><span class="p">,</span> <span class="mf">19.0</span><span class="p">,</span> <span class="mf">19.6</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">,</span> <span class="mf">21.0</span><span class="p">,</span>
+       <span class="mf">21.0</span><span class="p">,</span> <span class="mf">21.0</span><span class="p">,</span> <span class="mf">21.3</span><span class="p">,</span> <span class="mf">22.0</span><span class="p">,</span> <span class="mf">22.0</span><span class="p">,</span> <span class="mf">22.0</span><span class="p">,</span> <span class="mf">22.0</span><span class="p">,</span> <span class="mf">22.0</span><span class="p">,</span> <span class="mf">22.5</span><span class="p">,</span> <span class="mf">22.5</span><span class="p">,</span> <span class="mf">22.7</span><span class="p">,</span>
+       <span class="mf">23.0</span><span class="p">,</span> <span class="mf">23.5</span><span class="p">,</span> <span class="mf">24.0</span><span class="p">,</span> <span class="mf">24.0</span><span class="p">,</span> <span class="mf">24.6</span><span class="p">,</span> <span class="mf">25.0</span><span class="p">,</span> <span class="mf">25.6</span><span class="p">,</span> <span class="mf">26.5</span><span class="p">,</span> <span class="mf">27.3</span><span class="p">,</span> <span class="mf">27.5</span><span class="p">,</span> <span class="mf">27.5</span><span class="p">,</span>
+       <span class="mf">27.5</span><span class="p">,</span> <span class="mf">28.0</span><span class="p">,</span> <span class="mf">28.7</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">32.8</span><span class="p">,</span> <span class="mf">34.5</span><span class="p">,</span> <span class="mf">35.0</span><span class="p">,</span> <span class="mf">36.5</span><span class="p">,</span> <span class="mf">36.0</span><span class="p">,</span> <span class="mf">37.0</span><span class="p">,</span> <span class="mf">37.0</span><span class="p">,</span>
+       <span class="mf">39.0</span><span class="p">,</span> <span class="mf">39.0</span><span class="p">,</span> <span class="mf">39.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="mf">42.0</span><span class="p">,</span> <span class="mf">43.0</span><span class="p">,</span> <span class="mf">43.0</span><span class="p">,</span> <span class="mf">43.5</span><span class="p">,</span>
+       <span class="mf">44.0</span><span class="p">])</span>
+<span class="n">perch_weight</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="mf">5.9</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="mf">51.5</span><span class="p">,</span> <span class="mf">70.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">,</span> <span class="mf">78.0</span><span class="p">,</span> <span class="mf">80.0</span><span class="p">,</span> <span class="mf">85.0</span><span class="p">,</span> <span class="mf">85.0</span><span class="p">,</span> <span class="mf">110.0</span><span class="p">,</span>
+       <span class="mf">115.0</span><span class="p">,</span> <span class="mf">125.0</span><span class="p">,</span> <span class="mf">130.0</span><span class="p">,</span> <span class="mf">120.0</span><span class="p">,</span> <span class="mf">120.0</span><span class="p">,</span> <span class="mf">130.0</span><span class="p">,</span> <span class="mf">135.0</span><span class="p">,</span> <span class="mf">110.0</span><span class="p">,</span> <span class="mf">130.0</span><span class="p">,</span>
+       <span class="mf">150.0</span><span class="p">,</span> <span class="mf">145.0</span><span class="p">,</span> <span class="mf">150.0</span><span class="p">,</span> <span class="mf">170.0</span><span class="p">,</span> <span class="mf">225.0</span><span class="p">,</span> <span class="mf">145.0</span><span class="p">,</span> <span class="mf">188.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="mf">197.0</span><span class="p">,</span>
+       <span class="mf">218.0</span><span class="p">,</span> <span class="mf">300.0</span><span class="p">,</span> <span class="mf">260.0</span><span class="p">,</span> <span class="mf">265.0</span><span class="p">,</span> <span class="mf">250.0</span><span class="p">,</span> <span class="mf">250.0</span><span class="p">,</span> <span class="mf">300.0</span><span class="p">,</span> <span class="mf">320.0</span><span class="p">,</span> <span class="mf">514.0</span><span class="p">,</span>
+       <span class="mf">556.0</span><span class="p">,</span> <span class="mf">840.0</span><span class="p">,</span> <span class="mf">685.0</span><span class="p">,</span> <span class="mf">700.0</span><span class="p">,</span> <span class="mf">700.0</span><span class="p">,</span> <span class="mf">690.0</span><span class="p">,</span> <span class="mf">900.0</span><span class="p">,</span> <span class="mf">650.0</span><span class="p">,</span> <span class="mf">820.0</span><span class="p">,</span>
+       <span class="mf">850.0</span><span class="p">,</span> <span class="mf">900.0</span><span class="p">,</span> <span class="mf">1015.0</span><span class="p">,</span> <span class="mf">820.0</span><span class="p">,</span> <span class="mf">1100.0</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">,</span> <span class="mf">1100.0</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">,</span>
+       <span class="mf">1000.0</span><span class="p">])</span>
+
+<span class="c1">#산점도 그리기
+</span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">perch_length</span><span class="p">,</span> <span class="n">perch_weight</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'length'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'weight'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="../assets/images/HG03-1/HG3-1-1.png" alt="HG3-1-1" /><br />
+<br />
+다음과 같이 우상향하는 그래프가 출력되었습니다.<br />
+농어 길이가 늘어날 수록 무게도 늘어나는 것은 확인했습니다.<br />
+다음으로 데이터를 훈련 세트와 테스트 세트로 나눕니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="n">train_input</span><span class="p">,</span> <span class="n">test_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">,</span> <span class="n">test_target</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">perch_length</span><span class="p">,</span> <span class="n">perch_weight</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">42</span>
+<span class="p">)</span>
+</code></pre></div></div>
+<p>train_test_split 메서드는 총 데이터의 25%를 test 데이터로 떼어냅니다.<br />
+random_state는 책과 동일한 결과가 나올 수 있게 한 것이기 때문에 생략해도 무방합니다.<br />
+사이킷런을 사용해 모델을 훈련할 것이기 때문에 reshape을 사용하여 배열을 2차원으로 바꿔줍니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">train_input</span> <span class="o">=</span> <span class="n">train_input</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test_input</span> <span class="o">=</span> <span class="n">test_input</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">train_input</span><span class="p">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">test_input</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>(42, 1) (14, 1)</p>
+</blockquote>
+
+<p>reshape의 첫 번째 인자를 -1로 지정함으로써 원소의 개수로 채우라는 의미입니다. 배열의 전체 원소의 개수를 외우지 않아도 되기 때문에 편리합니다.<br />
+이제 k-최근접 이웃 알고리즘을 훈련시켜보도록 하겠습니다.
+사이킷런에서 KNeighborsRegressor을 사용하여 회귀 모델을 fit 합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">KNeighborsRegressor</span>
+<span class="n">knr</span> <span class="o">=</span> <span class="n">KNeighborsRegressor</span><span class="p">()</span>
+
+<span class="c1">#k-최근접 이웃 회귀모델을 훈련합니다.
+</span><span class="n">knr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">knr</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_input</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.992809406101064</p>
+</blockquote>
+
+<p>거의 1에 가까운 숫자가 나왔습니다.<br />
+2장에서 분류를 할 때는 정확도라고 불렀던 이 숫자를 회귀에서는 결정계수라고 부릅니다. 결정계수가 1에 가까워지면 예측이 타깃과 비슷하다는 의미가 됩니다.<br />
+아제 타깃과 예측한 값의 차이를 구해보겠습니다. sklearn.metrics 패키지의 mean_absolute_error을 이용하여 둘 사이의 절댓값 오차를 평균을 낸 값을 출력합니다.<br />
+그리고 훈련 세트를 사용하여 score값도 출력해보도록 하겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_absolute_error</span>
+
+<span class="c1">#테스트 세트에 대한 예측
+</span><span class="n">test_prediction</span> <span class="o">=</span> <span class="n">knr</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_input</span><span class="p">)</span>
+
+<span class="c1">#테스트 세트의 평균 절댓값 오차 계산
+</span><span class="n">mae</span> <span class="o">=</span> <span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">test_target</span><span class="p">,</span> <span class="n">test_prediction</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">mae</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">knr</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>19.157142857142862<br />
+0.9698823289099254</p>
+</blockquote>
+
+<p>위 코드를 출력하면 평균적으로 오차가 19g정도 났다는 것을 확인할 수 있습니다.<br />
+또한 훈련을 한 세트로 score을 냈는데도 불구하고 오히려 test set보다 결정계수가 더 낮게 나온 것을 확인할 수 있습니다.<br />
+이처럼 훈련 세트보다 테스트 세트가 점수가 높거나 두 점수 모두 낮은 경우를 과소적합이라고 하고, 반대로 너무 차이나게 훈련 세트가 점수가 높을 경우를 과대적합이라고 합니다. 이번 훈련에서는 과소적합이 된 것입니다.  그렇다면 모델을 더 복잡하게 만듦으로써 이를 해결해보도록 하겠습니다.<br />
+모델을 복잡하게 만들기 위해 k를 3으로 줄입니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 이웃의 개수를 3으로 설정
+</span><span class="n">knr</span><span class="p">.</span><span class="n">n_neighbors</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="c1"># 모델 훈련
+</span><span class="n">knr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">knr</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.9804899950518966</p>
+</blockquote>
+
+<p>k값을 낮췄더니 결정계수의 값이 올라갔습니다. 이번엔 test 세트를 적용해봅니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">knr</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_input</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.9746459963987609</p>
+</blockquote>
+
+<p>test set 또한 너무 낮지 않은 점수로 잘 나왔습니다.<br />
+train set과 점수 차이도 많이 나지 않아 과대적합도 아닙니다. 이처럼 과소적합 시 모델을 더 복잡하게 (k값을 줄여서) 만들어야 하고, 과대적합 시 모델을 덜 복잡하게 (k값을 늘려서) 만듦으로써 해결할 수 있습니다.</p>]]></content><author><name>Your Name</name></author><category term="Study" /><category term="Blog" /><category term="Machine learning" /><category term="Data mining" /><category term="혼공머신러닝" /><summary type="html"><![CDATA[3-1 k-최근접 이웃 회귀]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="http://localhost:4000/assets/images/HGML.png" /><media:content medium="image" url="http://localhost:4000/assets/images/HGML.png" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">[Github Blog] 깃헙 블로그에 giscus 적용하기</title><link href="http://localhost:4000/blog/coments/" rel="alternate" type="text/html" title="[Github Blog] 깃헙 블로그에 giscus 적용하기" /><published>2022-04-28T00:00:00+09:00</published><updated>2022-04-28T00:00:00+09:00</updated><id>http://localhost:4000/blog/coments</id><content type="html" xml:base="http://localhost:4000/blog/coments/"><![CDATA[<p>github blog에 giscus를 사용하여 댓글창을 만들어보겠습니다.<br />
+보통 깃헙 블로그 댓글창으로는 disqus를 많이 사용하지만, 광고가 많고 무겁다는 평이 많아 비교적 가벼운 giscus를 적용해보려고 합니다.</p>
+
+<h3 id="1-giscus-설치하기">1. giscus 설치하기</h3>
+<p>다음 <a href="https://giscus.app/ko">giscus</a> 사이트에 접속합니다.<br />
+<br />
+<img src="../assets/images/giscus/gc1.png" alt="gc1" /><br />
+<br />
+다음 giscus를 눌러 giscus 댓글창을 사용할 레포지토리에 install 합니다.<br />
+<br />
+<img src="../assets/images/giscus/gc2.jpg" alt="gc2" /><br />
+<br />
+저는 이미 설치했기 때문에 configure이라고 뜨지만, 파란 install 버튼을 눌러줍니다.<br />
+install 버튼을 누르면, <code class="language-plaintext highlighter-rouge">all repositories</code>와 <code class="language-plaintext highlighter-rouge">only select repositories</code> 둘 중 선택하는 옵션이 있는데, <code class="language-plaintext highlighter-rouge">only select repositories &gt; 댓글창 적용할 repositories</code>선택하여 설치합니다.</p>
+
+<h3 id="2-repository-discussion-기능-활성화">2. repository discussion 기능 활성화</h3>
+<p>이제 giscus를 다운받은 repo의 discussion 기능을 활성화 시켜줘야 합니다.<br />
+<br />
+<img src="../assets/images/giscus/gc3.png" alt="gc3" /><br />
+<br />
+giscus를 다운받은 repo의 settings로 들어갑니다.<br />
+<br />
+<img src="../assets/images/giscus/gc4.png" alt="gc4" /><br />
+<br />
+스크롤을 내려 <code class="language-plaintext highlighter-rouge">Features/Discussions</code> 를 활성화 시켜줍니다.</p>
+
+<h3 id="3-giscus-코드-copy하기">3. giscus 코드 copy하기</h3>
+<p><br />
+<img src="../assets/images/giscus/gc5.png" alt="gc5" /><br />
+<br />
+이제 다시 giscus 사이트로 돌아가 언어를 지정하고, giscus를 설치하고 discussions 기능을 활성화해준 repo의 이름을 적어줍니다.<br />
+지금까지 정상적으로 진행되었다면 repo 입력란 주위에 통과했다는 메세지가 뜹니다.<br />
+그리고 페이지와 discussion 간의 연결을 선택해줍니다.<br />
+보통 title과 url보다 바뀔 가능성이 적은 경로로 연결하기 때문에 저도 그렇게 지정했습니다.<br />
+<br />
+<img src="../assets/images/giscus/gc6.png" alt="gc6" /><br />
+<br />
+이제 discussion 카테고리를 지정해주고, 본인이 원하는 기능을 선택한 후에 쓰고있는 테마를 선택합니다.<br />
+그럼 이제 giscus 활성화 아래 코드가 나타나는데, 코드를 copy하고 <code class="language-plaintext highlighter-rouge">_layouts/posts.html</code> 파일 마지막 부분에 붙여넣습니다.<br />
+<br />
+<img src="../assets/images/giscus/gc7.jpg" alt="gc7" /></p>
+
+<h3 id="4-config-파일에서-적용하기">4. config 파일에서 적용하기</h3>
+<p>제가 사용하는 minimal-mistakes 테마가 giscus를 지원하기 때문에 블로그의 _config.yml 파일에 comments를 지정하는 곳에 “giscus”를 입력하고 아래 giscus창에 앞선 코드를 참고하여 붙여넣어줍니다.<br />
+<br />
+<img src="../assets/images/giscus/gc8.png" alt="gc8" /><br />
+<br />
+보통 이 정도의 과정을 거치면 댓글창이 적용이 되지만, 확인해보니 아직 적용이 되지 않은 것을 볼 수 있습니다.<br />
+<br />
+<img src="../assets/images/giscus/gis1.png" alt="gis1" /><br />
+<br />
+이럴 때는 다음과 같이 각 포스트의 title 과 tag 등을 지정하는 곳에 <code class="language-plaintext highlighter-rouge">comments : "giscus"</code>를 지정해주고 push 해줍니다.<br />
+<br />
+<img src="../assets/images/giscus/gis2.png" alt="gis2" /><br />
+<br />
+<img src="../assets/images/giscus/gis3.png" alt="gis3" /><br />
+<br />
+그리고 다시 확인해보면 위와 같이 comments 창이 제대로 뜨는 것을 확인할 수 있습니다.</p>]]></content><author><name>Your Name</name></author><category term="Blog" /><category term="Blog" /><category term="giscus" /><category term="Github blog" /><category term="blog custom" /><summary type="html"><![CDATA[깃허브 블로그에 giscus를 이용하여 댓글 사용하기]]></summary></entry><entry><title type="html">[Github Blog] google analytics 적용하기</title><link href="http://localhost:4000/blog/GA-post/" rel="alternate" type="text/html" title="[Github Blog] google analytics 적용하기" /><published>2022-04-27T00:00:00+09:00</published><updated>2022-04-27T00:00:00+09:00</updated><id>http://localhost:4000/blog/GA%20post</id><content type="html" xml:base="http://localhost:4000/blog/GA-post/"><![CDATA[<p>github blog에 google analytics를 적용해보겠습니다.<br />
+저는 github blog에 jekyll minimal-mistakes 테마를 적용하고 있습니다.</p>
+
+<h3 id="1-google-analytics-계정-생성하기">1. google analytics 계정 생성하기</h3>
+<p>우선 <a href="https://analytics.google.com/analytics/web/provision/?hl=ko&amp;pli=1#/provision">google analytics</a> 페이지에 접속해서 계정을 생성합니다.<br />
+  <br />
+  <img src="../assets/images/GA/GA1.png" alt="GA1" /><br />
+  <br />
+  google analytics 페이지에서 측정 시작을 눌러줍니다.<br />
+  <br />
+  <img src="../assets/images/GA/GA2.png" alt="GA2" /><br />
+  <br />
+  계정 이름을 입력하고 다음으로 넘어갑니다.<br />
+  <br />
+  <img src="../assets/images/GA/GA3.png" alt="GA3" /><br />
+  <br />
+  속성 이름을 입력하고, 보고 시간대와 통화를 지정해줍니다.<br />
+  저는 속성 이름에 Github blog를, 시간대와 통화를 모두 대한민국으로 지정했습니다.<br />
+  <br />
+  <img src="../assets/images/GA/GA4.png" alt="GA4" /> <br />
+  <br />
+  비즈니스 정보를 입력합니다. 업종은 지정하지 않아도 됩니다.<br />
+  비즈니스 규모와 사용 계획은 본인의 사이트와 맞게 입력해줍니다.<br />
+  <br />
+  <img src="../assets/images/GA/GA5.png" alt="GA5" /><br />
+  <br />
+  마지막으로 만들기를 누르고, 약관에 동의하면 계정 만들기가 완료 되었습니다.</p>
+
+<h3 id="2-데이터-스트림-설정하기">2. 데이터 스트림 설정하기</h3>
+<p>이제 생성한 GA 계정을 이용하여 데이터 스트림을 설정하겠습니다.<br />
+<br />
+<img src="../assets/images/GA/GA6.png" alt="GA6" /><br />
+<br />
+다음 화면에서 우리는 github blog에 만들 것이기 때문에 웹을 선택해줍니다.<br />
+<br />
+<img src="../assets/images/GA/GA7.png" alt="GA7" />
+<br />
+데이터 스트림 설정 창이 뜨면, <code class="language-plaintext highlighter-rouge">http://</code> 를 제외한 깃헙 url을 입력한 후, 스트림 이름을 지정해줍니다.<br />
+저는 github blog로 지정하였습니다.<br />
+그리고 만들기를 눌러 생성합니다. 
+<br />
+<img src="../assets/images/GA/GA8.png" alt="GA8" /><br />
+<br />
+스트림을 만든 후, 웹 스트림 세부정보에서 측정 ID를 복사합니다.<br />
+이렇게 복사한 측정 ID는 github blog 로컬에 위치해있는 <code class="language-plaintext highlighter-rouge">_config.yml</code> 파일 속 google tracking id 적는 란에 다음과 같이 추가해줍니다.<br />
+<br />
+<img src="../assets/images/GA/GA9.png" alt="GA9" /></p>
+
+<blockquote>
+  <p>참고한 포스트
+<a href="https://ynkim0.github.io/posts/Jekyll-Chripy-Google-Analytics-%EC%97%B0%EB%8F%99%ED%95%98%EA%B8%B0/">Jekyll Chripy Google Analytics 연동하기</a></p>
+</blockquote>]]></content><author><name>Your Name</name></author><category term="Blog" /><category term="Blog" /><category term="google analytics" /><category term="Github blog" /><category term="blog custom" /><summary type="html"><![CDATA[깃허브 블로그에 GA를 설정하여 사용자 통계 확인하기]]></summary></entry><entry><title type="html">[Github Blog] google에서 검색되도록 설정하기</title><link href="http://localhost:4000/blog/SEO-set/" rel="alternate" type="text/html" title="[Github Blog] google에서 검색되도록 설정하기" /><published>2022-04-23T00:00:00+09:00</published><updated>2022-04-23T00:00:00+09:00</updated><id>http://localhost:4000/blog/SEO%20set</id><content type="html" xml:base="http://localhost:4000/blog/SEO-set/"><![CDATA[<p>github blog 글이 포털에 검색되도록 설정하려면 각 포탈에 블로그를 등록해주어야 합니다.<br />
+google에서 글이 검색이 가능하도록 등록해보겠습니다.</p>
+
+<h2 id="github-blog-글이-google에-검색되도록-설정하기">Github Blog 글이 google에 검색되도록 설정하기</h2>
+
+<h3 id="1-sitemap-설정">1. sitemap 설정</h3>
+<p>sitemap을 google에 등록함으로써 주기적인 크롤링을 통해 url을 연결할 수 있습니다. sitemap을 만들어보겠습니다.<br />
+블로그의 root 경로(github.io 폴더)에 <code class="language-plaintext highlighter-rouge">/sitemap.xml</code> 파일을 만들고 아래의 내용을 복사해서 붙여넣습니다.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+---
+layout: null
+---
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"&gt;
+  {% for post in site.posts %}
+    &lt;url&gt;
+      &lt;loc&gt;{{ site.url }}{{ post.url }}&lt;/loc&gt;
+      {% if post.lastmod == null %}
+        &lt;lastmod&gt;{{ post.date | date_to_xmlschema }}&lt;/lastmod&gt;
+      {% else %}
+        &lt;lastmod&gt;{{ post.lastmod | date_to_xmlschema }}&lt;/lastmod&gt;
+      {% endif %}
+
+      {% if post.sitemap.changefreq == null %}
+        &lt;changefreq&gt;weekly&lt;/changefreq&gt;
+      {% else %}
+        &lt;changefreq&gt;{{ post.sitemap.changefreq }}&lt;/changefreq&gt;
+      {% endif %}
+
+      {% if post.sitemap.priority == null %}
+          &lt;priority&gt;0.5&lt;/priority&gt;
+      {% else %}
+        &lt;priority&gt;{{ post.sitemap.priority }}&lt;/priority&gt;
+      {% endif %}
+
+    &lt;/url&gt;
+  {% endfor %}
+&lt;/urlset&gt;
+
+</code></pre></div></div>
+<p>다음 파일을 git commit으로 push 후에 <code class="language-plaintext highlighter-rouge">"blog_url"/sitemap.xml</code> 로 접속했을 때 아래와 같은 화면이 나와야 정상적으로 sitemap이 등록된 것입니다.</p>
+
+<p><img src="../assets/images/gooser/gooser1.png" alt="gooser1" /><br />
+sitemap에서는 해당 글의 정보들이 설정이 되는데 이것은 각 포스트의 맨 윗 부분에 다음과 같이 sitemap 옵션을 추가해줌으로서 추가적으로 설정할 수 있습니다.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>---
+layout: post
+title:  "제목"
+date:   2022-04-23 12:00:00 
+lastmod : 2022-04-24 12:00:00
+sitemap :
+  changefreq : daily
+  priority : 1.0
+---
+</code></pre></div></div>
+<p>포스트의 시작 부분에 다음과 같이 sitemap 코드를 적용해보겠습니다.</p>
+
+<p><img src="../assets/images/gooser/gooser3.png" alt="gooser3" /></p>
+
+<p>git push 한 후에 다시 <code class="language-plaintext highlighter-rouge">"blog_url"/sitemap.xml</code>로 접속하여 확인해보겠습니다.<br />
+<img src="../assets/images/gooser/gooser2.png" alt="gooser2" /></p>
+
+<p><img src="../assets/images/gooser/gooser4.png" alt="gooser4" /><br />
+위 사진이 <code class="language-plaintext highlighter-rouge">sitemap</code> 지정 전, 아래 사진이 지정 후 사진입니다.<br />
+<span style="background-color: #ffdce0">sitemap을 설정해준 부분</span>은 <code class="language-plaintext highlighter-rouge">changefreq</code>가 daily로 바뀌고, <code class="language-plaintext highlighter-rouge">priority</code>는 1.0으로 잘 바뀌었습니다. 
+반면 <span style="background-color: #f1f8ff">sitemap을 설정 안 한 포스트</span>는 default값 그대로임을 확인할 수 있습니다.</p>
+
+<h3 id="2-robotstxt-생성">2. robots.txt 생성</h3>
+<p><code class="language-plaintext highlighter-rouge">robots.txt</code> 파일에 sitemap.xml 파일의 위치를 등록해두면 검색 엔진의 크롤러들이 홈페이지를 크롤링하는 데에 도움이 된다고 합니다. 
+따라서 root 디렉토리<code class="language-plaintext highlighter-rouge">github.io/</code>에 <code class="language-plaintext highlighter-rouge">robots.txt</code> 파일을 만들고 다음과 같이 입력합니다.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>User-agent: *
+Allow: /
+
+Sitemap: http://"blog_url".github.io/sitemap.xml
+</code></pre></div></div>
+
+<h3 id="3-검색-엔진에-등록하기">3. 검색 엔진에 등록하기</h3>
+<p>google search console에 등록을 해야 최종적으로 검색 엔진에 블로그 포스트가 뜨게 됩니다.<br />
+<a href="https://developers.google.com/search#?modal_active=none">google search console site</a>에 접속한 후 시작하기 버튼을 누릅니다.</p>
+
+<p><img src="../assets/images/gooser/gooser5.png" alt="gooser5" /></p>
+
+<p>위 화면에서 <code class="language-plaintext highlighter-rouge">URL prefix</code>에 블로그 url을 붙여넣습니다. 
+여기서 Domain, URL prefix 등록의 차이점은 도메인 속성은 DNS 레코드만을 사용해서 verify할 수 있으나 모든 하위 도메인의 데이터를 포함한 웹사이트의 정보를 모두 얻을 수 있습니다.<br />
+URL perfix 등록은 입력한 속성과 하위 도메인의 레벨만 포함되기 때문에, https://yhp2205.github.io/를 등록했다면 https://yhp2205.github.io/First-post/ 같은 데이터는 포함이 되지만, 
+http://yhp2205.github.io는 포함이 되지 않습니다. 대신 DNS와 달리 여러 경로로 사이트 소유 인증을 할 수 있습니다.<br />
+저는 URL prefix를 이용하여 등록해보겠습니다.<br />
+<code class="language-plaintext highlighter-rouge">Other verification methods</code>에서 HTML tag를 눌러 메타 태그를 copy합니다.</p>
+
+<p><img src="../assets/images/gooser/gooser6.png" alt="gooser6" /></p>
+
+<p>이제 github blog의 root에 존재하는 <code class="language-plaintext highlighter-rouge">_includes/head/custom.html</code> 파일 맨 상단에 copy한 메타 태그를 붙여넣어 github에 push 해주었습니다.<br />
+그리고 HTML tag를 copy한 페이지에서 verify를 눌러줍니다.</p>
+
+<p><img src="../assets/images/gooser/gooser8.png" alt="gooser8" /></p>
+
+<p>그럼 <code class="language-plaintext highlighter-rouge">Ownership verified</code> 라는 문구가 뜨며 등록이 완료됩니다. 그럼 이제 마지막으로 sitemap을 올리기 위해 <code class="language-plaintext highlighter-rouge">GO TO PROPERTY</code>를 누릅니다.</p>
+
+<p><img src="../assets/images/gooser/gooser7.png" alt="gooser7" /></p>
+
+<p><img src="../assets/images/gooser/gooser9.png" alt="gooser9" /></p>
+
+<p>마지막으로 google search console 창에서 sitemaps 카테고리를 눌러 <code class="language-plaintext highlighter-rouge">sitemap.xml</code>을 submit 해주면 끝입니다.</p>
+
+<blockquote>
+  <p>참고한 포스트<br />
+<a href="https://www.moinnet.com/ko/digital-marketing/google-search-console-add-property/">쉽게 하는 웹사이트 구글서치콘솔 등록</a><br />
+<a href="http://jinyongjeong.github.io/2017/01/13/blog_make_searched/">github blog를 google에서 검색되도록 설정하기</a></p>
+</blockquote>]]></content><author><name>Your Name</name></author><category term="Blog" /><category term="Blog" /><category term="SEO" /><category term="Github blog" /><category term="blog custom" /><summary type="html"><![CDATA[깃허브 블로그 글이 포털사이트에서 검색될 수 있도록 설정하기]]></summary></entry><entry><title type="html">[혼공머신러닝] Ch 2. 데이터 다루기(2)</title><link href="http://localhost:4000/study/HG2-2/" rel="alternate" type="text/html" title="[혼공머신러닝] Ch 2. 데이터 다루기(2)" /><published>2022-04-21T00:00:00+09:00</published><updated>2022-04-21T00:00:00+09:00</updated><id>http://localhost:4000/study/HG2-2</id><content type="html" xml:base="http://localhost:4000/study/HG2-2/"><![CDATA[<p>앞선 머신러닝 알고리즘에서 길이 25센치에 무게 150g의 도미를 빙어로 예측한다는 이상한 결과가 나왔습니다.
+이를 보완하기 위해 우선 앞선 데이터를 다시 불러오겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#fish의 길이와 무게에 대한 데이터
+</span><span class="n">fish_length</span> <span class="o">=</span> <span class="p">[</span><span class="mf">25.4</span><span class="p">,</span> <span class="mf">26.3</span><span class="p">,</span> <span class="mf">26.5</span><span class="p">,</span> <span class="mf">29.0</span><span class="p">,</span> <span class="mf">29.0</span><span class="p">,</span> <span class="mf">29.7</span><span class="p">,</span> <span class="mf">29.7</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">30.7</span><span class="p">,</span> <span class="mf">31.0</span><span class="p">,</span> <span class="mf">31.0</span><span class="p">,</span> 
+                <span class="mf">31.5</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">,</span> <span class="mf">33.0</span><span class="p">,</span> <span class="mf">33.0</span><span class="p">,</span> <span class="mf">33.5</span><span class="p">,</span> <span class="mf">33.5</span><span class="p">,</span> <span class="mf">34.0</span><span class="p">,</span> <span class="mf">34.0</span><span class="p">,</span> <span class="mf">34.5</span><span class="p">,</span> <span class="mf">35.0</span><span class="p">,</span> 
+                <span class="mf">35.0</span><span class="p">,</span> <span class="mf">35.0</span><span class="p">,</span> <span class="mf">35.0</span><span class="p">,</span> <span class="mf">36.0</span><span class="p">,</span> <span class="mf">36.0</span><span class="p">,</span> <span class="mf">37.0</span><span class="p">,</span> <span class="mf">38.5</span><span class="p">,</span> <span class="mf">38.5</span><span class="p">,</span> <span class="mf">39.5</span><span class="p">,</span> <span class="mf">41.0</span><span class="p">,</span> <span class="mf">41.0</span><span class="p">,</span> <span class="mf">9.8</span><span class="p">,</span> 
+                <span class="mf">10.5</span><span class="p">,</span> <span class="mf">10.6</span><span class="p">,</span> <span class="mf">11.0</span><span class="p">,</span> <span class="mf">11.2</span><span class="p">,</span> <span class="mf">11.3</span><span class="p">,</span> <span class="mf">11.8</span><span class="p">,</span> <span class="mf">11.8</span><span class="p">,</span> <span class="mf">12.0</span><span class="p">,</span> <span class="mf">12.2</span><span class="p">,</span> <span class="mf">12.4</span><span class="p">,</span> <span class="mf">13.0</span><span class="p">,</span> <span class="mf">14.3</span><span class="p">,</span> <span class="mf">15.0</span><span class="p">]</span>
+<span class="n">fish_weight</span> <span class="o">=</span> <span class="p">[</span><span class="mf">242.0</span><span class="p">,</span> <span class="mf">290.0</span><span class="p">,</span> <span class="mf">340.0</span><span class="p">,</span> <span class="mf">363.0</span><span class="p">,</span> <span class="mf">430.0</span><span class="p">,</span> <span class="mf">450.0</span><span class="p">,</span> <span class="mf">500.0</span><span class="p">,</span> <span class="mf">390.0</span><span class="p">,</span> <span class="mf">450.0</span><span class="p">,</span> <span class="mf">500.0</span><span class="p">,</span> <span class="mf">475.0</span><span class="p">,</span> <span class="mf">500.0</span><span class="p">,</span> 
+                <span class="mf">500.0</span><span class="p">,</span> <span class="mf">340.0</span><span class="p">,</span> <span class="mf">600.0</span><span class="p">,</span> <span class="mf">600.0</span><span class="p">,</span> <span class="mf">700.0</span><span class="p">,</span> <span class="mf">700.0</span><span class="p">,</span> <span class="mf">610.0</span><span class="p">,</span> <span class="mf">650.0</span><span class="p">,</span> <span class="mf">575.0</span><span class="p">,</span> <span class="mf">685.0</span><span class="p">,</span> <span class="mf">620.0</span><span class="p">,</span> <span class="mf">680.0</span><span class="p">,</span> 
+                <span class="mf">700.0</span><span class="p">,</span> <span class="mf">725.0</span><span class="p">,</span> <span class="mf">720.0</span><span class="p">,</span> <span class="mf">714.0</span><span class="p">,</span> <span class="mf">850.0</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">,</span> <span class="mf">920.0</span><span class="p">,</span> <span class="mf">955.0</span><span class="p">,</span> <span class="mf">925.0</span><span class="p">,</span> <span class="mf">975.0</span><span class="p">,</span> <span class="mf">950.0</span><span class="p">,</span> <span class="mf">6.7</span><span class="p">,</span> 
+                <span class="mf">7.5</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">,</span> <span class="mf">9.7</span><span class="p">,</span> <span class="mf">9.8</span><span class="p">,</span> <span class="mf">8.7</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">9.9</span><span class="p">,</span> <span class="mf">9.8</span><span class="p">,</span> <span class="mf">12.2</span><span class="p">,</span> <span class="mf">13.4</span><span class="p">,</span> <span class="mf">12.2</span><span class="p">,</span> <span class="mf">19.7</span><span class="p">,</span> <span class="mf">19.9</span><span class="p">]</span>
+</code></pre></div></div>
+<p>numpy의 column_stack() 함수는 전달받은 리스트를 일렬로 세운 차례대로 연결해주는 함수입니다.<br />
+이 함수를 사용하여 fish_length와 fish_weight를 합쳐보겠습니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="n">fish_data</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">fish_length</span><span class="p">,</span> <span class="n">fish_weight</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">fish_data</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+</code></pre></div></div>
+<p>앞에서부터 5개의 데이터를 확인함으로써 두 리스트가 잘 연결된 것을 확인했습니다.
+동일한 방법으로 타깃 데이터도 만들어보겠습니다.
+넘파이에서는 np.ones() 와 np.zeros() 함수를 이용하여 배열을 만들 수 있습니다.
+또한 np.concatenate()함수를 이용하여 두 배열을 연결할 수 있습니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fish_target</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">np</span><span class="p">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">35</span><span class="p">),</span> <span class="n">np</span><span class="p">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">14</span><span class="p">)))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">fish_target</span><span class="p">)</span>
+</code></pre></div></div>
+<p>fish_target을 만들었으니 훈련세트와 테스트세트로 나눠보겠습니다.
+앞선 방식과 다르게 사이킷런의 model_selection 모듈 아래 있는 train_test_split() 함수를 이용합니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+</code></pre></div></div>
+<p>train_test_split() 함수에는 자체적으로 랜덤 시드를 지정할 수 있는 random_state 매개변수가 존재하니, 사용해서 나눠보겠습니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">train_input</span><span class="p">,</span> <span class="n">test_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">,</span> <span class="n">test_target</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">fish_data</span><span class="p">,</span> <span class="n">fish_target</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">42</span>
+<span class="p">)</span>
+</code></pre></div></div>
+<p>train_test_split() 함수는 기본적으로 25%를 테스트 세트로 분류합니다.
+잘 나누어졌는지 shape 속성으로 확인해보겠습니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">train_input</span><span class="p">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">test_input</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">train_target</span><span class="p">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">test_target</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+</code></pre></div></div>
+<p>이제 도미와 방어가 적절히 섞였는지 test_target을 출력하여 확인합니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">test_target</span><span class="p">)</span>
+</code></pre></div></div>
+<p>도미와 방어가 섞이기는 했지만 두 생선의 비율에 비해 샘플링 편향이 일어났습니다.
+따라서 train_test_split() 함수에서 stratify 매개변수에 타깃 데이터를 입력하면 클래스 비율에 맞춰 데이터를 나눌 수 있습니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">train_input</span><span class="p">,</span> <span class="n">test_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">,</span> <span class="n">test_target</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">fish_data</span><span class="p">,</span> <span class="n">fish_target</span><span class="p">,</span> <span class="n">stratify</span> <span class="o">=</span> <span class="n">fish_target</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">42</span>
+<span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">test_target</span><span class="p">)</span>
+</code></pre></div></div>
+<p>조금 더 전체 비율과 비슷한 비율로 나누었습니다.
+이 데이터를 가지고 앞서 진행했던 모델 훈련과 평가를 해보도록 하겠습니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">KNeighborsClassifier</span>
+<span class="n">kn</span> <span class="o">=</span> <span class="n">KNeighborsClassifier</span><span class="p">()</span>
+<span class="n">kn</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+<span class="n">kn</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_input</span><span class="p">,</span> <span class="n">test_target</span><span class="p">)</span>
+</code></pre></div></div>
+<p>이제 이 모델에 문제의 도미인 25cm에 150g의 물고기를 입력하여 예측값을 확인합니다.
+1은 도미, 0은 빙어입니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">kn</span><span class="p">.</span><span class="n">predict</span><span class="p">([[</span><span class="mi">25</span><span class="p">,</span> <span class="mi">150</span><span class="p">]]))</span>
+</code></pre></div></div>
+<p>도미가 빙어로 출력된 것을 볼 수 있습니다.
+이를 산점도로 그려 확인해봅니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">train_input</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">train_input</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'^'</span><span class="p">)</span> <span class="c1">#marker을 이용하여 다른 모양으로 지정해줍니다
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'length'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'weight'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="../assets/images/HG02-2/HG02-2-1.png" alt="HG02-2-1" /><br />
+샘플의 위치를 보면 도미에 가깝습니다.
+이를 빙어로 판단한 원인은 KNeighborsClassifier 클래스에 있습니다.
+KNeighborsClassifier 클래스는 주어진 샘플에서 가장 가까운 이웃 5개 중 다수인 클래스를 예측으로 사용합니다.
+indexes 배열을 사용하여 이웃 샘플을 구분해 산점도를 그려보겠습니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">distances</span><span class="p">,</span> <span class="n">indexes</span> <span class="o">=</span> <span class="n">kn</span><span class="p">.</span><span class="n">kneighbors</span><span class="p">([[</span><span class="mi">25</span><span class="p">,</span> <span class="mi">150</span><span class="p">]])</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">train_input</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">train_input</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="s">'^'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">train_input</span><span class="p">[</span><span class="n">indexes</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">train_input</span><span class="p">[</span><span class="n">indexes</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s">'D'</span><span class="p">)</span> <span class="c1"># marker = 'D' : 산점도 마름모로 그리기
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'length'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'weight'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="../assets/images/HG02-2/HG02-2-2.png" alt="HG02-2-2" /><br />
+산점도로 확인해보니 5개중 하나만 도미고, 4개의 데이터가 빙어입니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">train_input</span><span class="p">[</span><span class="n">indexes</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">train_target</span><span class="p">[</span><span class="n">indexes</span><span class="p">])</span>
+</code></pre></div></div>
+<p>직접 데이터를 확인해 본 결과, 더 명확히 1개만 도미고 나머지 이웃은 빙어임을 알 수 있습니다.
+이번엔 kneighbors() 매서드에서 이웃 샘플까지의 거리를 알 수 있는 distances 배열을 출력해보면,<br />
+산점도에서는 도미보다 빙어가 훨씬 많이 떨어져있는데, distances 배열에서는 그렇지 않은 것을 알 수 있습니다.<br />
+거리와 산점도가 다르게 나온 이유는 x축과 y축의 scale이 다르기 때문입니다.<br />
+length는 10부터 40이 주 범위인 반면에 weight는 0부터 1000까지의 넓은 범위를 갖고 있습니다.<br />
+x축의 scale을 조정하여 범위를 동일하게 맞추고 산점도를 다시 그려봅니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">train_input</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">train_input</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="s">'^'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">train_input</span><span class="p">[</span><span class="n">indexes</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">train_input</span><span class="p">[</span><span class="n">indexes</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">marker</span> <span class="o">=</span> <span class="s">'D'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'length'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'weight'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="../assets/images/HG02-2/HG02-2-3.png" alt="HG02-2-3" /><br />
+x축의 scale을 조정하여 범위를 동일하게 맞추면, 다음과 같이 산점도가 나오게 됩니다.
+이러한 데이터라면 length는 weight에 비해 크게 영향을 미치지 못하게 됩니다.
+따라서 두 특성의 범위가 다른 것을 고려하여, 특성값을 일정한 기준으로 맞춰주어야 하고 이런 작업을 데이터를 전처리한다고 말합니다.<br />
+이럴 때 가장 흔하게 사용되는 방법은 표준점수로, 각 특정 값이 0에서 표준편차의 몇 배만큼 떨어져있는지를 나타냅니다.
+이를 이용하면 실제 특성 값의 크기와 상관 없이 동일한 조건으로 비교할 수 있습니다.
+각 특성별로 계산해야하기 때문에 mean과 std를 axis = 0으로 지정하고 계산해보겠습니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">std</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">std</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">std</span><span class="p">)</span>
+</code></pre></div></div>
+<p>이제 train_input 데이터에서 평균을 빼고 표준편차로 나누어 표준 점수를 구합니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">train_scaled</span> <span class="o">=</span> <span class="p">(</span><span class="n">train_input</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span><span class="o">/</span><span class="n">std</span>
+</code></pre></div></div>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">train_scaled</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="s">'^'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'length'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'weight'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="../assets/images/HG02-2/HG02-2-4.png" alt="HG02-2-4" /><br />
+다시 산점도를 그려봤을 때 이런 결과가 나온 것은 데이터는 전부 표준점수화 시켜두고 25, 150의 샘플은 그대로 입력했기 때문입니다.<br />
+샘플 데이터인 25, 150도 mean과 std를 사용하여 변환해줍니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">new</span> <span class="o">=</span> <span class="p">([</span><span class="mi">25</span><span class="p">,</span> <span class="mi">150</span><span class="p">]</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span><span class="o">/</span><span class="n">std</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">train_scaled</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">new</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">new</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">marker</span> <span class="o">=</span> <span class="s">'^'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'length'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'weight'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="../assets/images/HG02-2/HG02-2-5.png" alt="HG02-2-5" /><br />
+산점도도 잘 그려지고 범위도 표준점수화 된 것을 확인했으니 모델을 다시 훈련합니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">kn</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+<span class="n">test_scaled</span> <span class="o">=</span> <span class="p">(</span><span class="n">test_input</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span><span class="o">/</span><span class="n">std</span> <span class="c1">#test dataset도 표준점수화하기
+</span><span class="n">kn</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">,</span> <span class="n">test_target</span><span class="p">)</span>
+</code></pre></div></div>
+<p>이제 앞서 잘못 분류했던 데이터를 predict 해보겠습니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">kn</span><span class="p">.</span><span class="n">predict</span><span class="p">([</span><span class="n">new</span><span class="p">]))</span> <span class="c1"># 1 = 도미, 0 = 빙어
+</span></code></pre></div></div>
+<p>결과값은 1로, 도미로 예측하였습니다.<br />
+마지막으로 kneighbors() 함수를 사용하여 근접한 이웃을 구하는 산점도를 그려봅니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">distances</span><span class="p">,</span> <span class="n">indexes</span> <span class="o">=</span> <span class="n">kn</span><span class="p">.</span><span class="n">kneighbors</span><span class="p">([</span><span class="n">new</span><span class="p">])</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">train_scaled</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">new</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">new</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">marker</span> <span class="o">=</span> <span class="s">'^'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">[</span><span class="n">indexes</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">train_scaled</span><span class="p">[</span><span class="n">indexes</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">marker</span> <span class="o">=</span> <span class="s">'D'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'length'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'weight'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="../assets/images/HG02-2/HG02-2-6.png" alt="HG02-2-6" /><br />
+이제 샘플에서 가까운 점들은 모두 도미로 옳게 출력이 된 것을 확인할 수 있습니다.</p>]]></content><author><name>Your Name</name></author><category term="[&quot;Study&quot;]" /><category term="Blog" /><category term="Machine learning" /><category term="Data mining" /><category term="혼공머신러닝" /><summary type="html"><![CDATA[2-2 데이터 전처리]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="http://localhost:4000/assets/images/HGML.png" /><media:content medium="image" url="http://localhost:4000/assets/images/HGML.png" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">[Github Blog] favicon 적용하기</title><link href="http://localhost:4000/blog/Blogfavi/" rel="alternate" type="text/html" title="[Github Blog] favicon 적용하기" /><published>2022-04-20T00:00:00+09:00</published><updated>2022-04-20T00:00:00+09:00</updated><id>http://localhost:4000/blog/Blogfavi</id><content type="html" xml:base="http://localhost:4000/blog/Blogfavi/"><![CDATA[<h2 id="github-blog에-favicon-적용하기">Github blog에 favicon 적용하기</h2>
+
+<p>favicon은 브라우저의 탭에 위치해있는 이미지를 의미합니다. 
+<img src="../assets/images/favi/favi1.png" alt="favi1" /></p>
+
+<p>favicon을 특별히 지정하지 않으면, 다음과 같이 지구본 모양을 띄게 됩니다.<br />
+favicon을 바꾸는 방법에 대해 알아보도록 하겠습니다.</p>
+
+<h2> 1. 적절한 이미지 준비하기 </h2>
+<p>저는 다음 이미지로 해보도록 하겠습니다. <br />
+  <img src="../assets/images/main.jpg" width="130px" height="130px" /></p>
+
+<h2> 2. 이미지 파일 사이트에 업로드하기 </h2>
+<p><a href="https://realfavicongenerator.net">realfavicongenerator</a> 사이트에 접속하여<br />
+  Select your Favicon image를 누르고 파일을 업로드 합니다.<br />
+  <br />
+  <img src="../assets/images/favi/favi2.png" alt="favi2" /></p>
+
+<p>다음 페이지에서는 원하는 이미지가 favicon으로 적용됐을 때 어떻게 보이는지 알려줍니다.</p>
+
+<p><br />
+  <img src="../assets/images/favi/favi3.png" alt="favi3" /></p>
+<h2> 3. 가공된 이미지 파일 다운받기 </h2>
+<p><br />
+  <img src="../assets/images/favi/favi4.png" alt="favi4" />
+  페이지 하단에 위치한 Generate your Favicons and HTML code를 누르고 다음 페이지의 Favicon package를 눌러 zip 파일을 다운로드 합니다.<br />
+  <br />
+  <img src="../assets/images/favi/favi5.png" alt="favi5" /></p>
+<h2> 4. asset 폴더 내에 logo 폴더 만들어서 붙여넣기 </h2>
+<p><img src="../assets/images/favi/favi6.png" alt="favi6" /><br />
+  <br />
+  다운로드한 파일 속에 있는 이미지들을 전부 복사하여<br />
+  github.io 속 asset 폴더에 새로 logo.ico 폴더를 생성하고 붙여넣기 해줍니다.<br />
+  <br />
+  <img src="../assets/images/favi/favi7.png" alt="favi7" /></p>
+<h2> 5. _includes 폴더 속 head.html 파일 수정하기 </h2>
+<p><img src="../assets/images/favi/favi9.png" alt="favi9" /><br />
+  <br />
+  사이트 마지막에 있었던 코드들을 _includes -&gt; head -&gt; custom.html 파일에 복사 붙여넣기 합니다.<br />
+  이 때 주의할 점이 {{site.baseurl}}/assets/logo.ico<br />
+   다음 코드를 반드시 href=” 뒤에 붙여주어야 합니다.<br />
+  <img src="../assets/images/favi/favi10.png" alt="favi10" /><br />
+  수정이 끝난 후 push를 해주었더니 다음과 같이 적용된 것을 확인할 수 있습니다.<br />
+  <br />
+  <img src="../assets/images/favi/favi8.png" alt="favi8" /></p>]]></content><author><name>Your Name</name></author><category term="Blog" /><category term="Blog" /><category term="favicon" /><category term="Github blog" /><category term="blog custom" /><summary type="html"><![CDATA[깃허브 블로그 탭에 이미지 넣기]]></summary></entry></feed>

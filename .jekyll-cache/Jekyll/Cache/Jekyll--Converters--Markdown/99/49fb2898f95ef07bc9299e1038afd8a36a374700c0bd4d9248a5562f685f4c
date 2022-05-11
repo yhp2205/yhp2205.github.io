@@ -1,0 +1,109 @@
+I"�<p>github blog 글이 포털에 검색되도록 설정하려면 각 포탈에 블로그를 등록해주어야 합니다.<br />
+google에서 글이 검색이 가능하도록 등록해보겠습니다.</p>
+
+<h2 id="github-blog-글이-google에-검색되도록-설정하기">Github Blog 글이 google에 검색되도록 설정하기</h2>
+
+<h3 id="1-sitemap-설정">1. sitemap 설정</h3>
+<p>sitemap을 google에 등록함으로써 주기적인 크롤링을 통해 url을 연결할 수 있습니다. sitemap을 만들어보겠습니다.<br />
+블로그의 root 경로(github.io 폴더)에 <code class="language-plaintext highlighter-rouge">/sitemap.xml</code> 파일을 만들고 아래의 내용을 복사해서 붙여넣습니다.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+---
+layout: null
+---
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"&gt;
+  {% for post in site.posts %}
+    &lt;url&gt;
+      &lt;loc&gt;{{ site.url }}{{ post.url }}&lt;/loc&gt;
+      {% if post.lastmod == null %}
+        &lt;lastmod&gt;{{ post.date | date_to_xmlschema }}&lt;/lastmod&gt;
+      {% else %}
+        &lt;lastmod&gt;{{ post.lastmod | date_to_xmlschema }}&lt;/lastmod&gt;
+      {% endif %}
+
+      {% if post.sitemap.changefreq == null %}
+        &lt;changefreq&gt;weekly&lt;/changefreq&gt;
+      {% else %}
+        &lt;changefreq&gt;{{ post.sitemap.changefreq }}&lt;/changefreq&gt;
+      {% endif %}
+
+      {% if post.sitemap.priority == null %}
+          &lt;priority&gt;0.5&lt;/priority&gt;
+      {% else %}
+        &lt;priority&gt;{{ post.sitemap.priority }}&lt;/priority&gt;
+      {% endif %}
+
+    &lt;/url&gt;
+  {% endfor %}
+&lt;/urlset&gt;
+
+</code></pre></div></div>
+<p>다음 파일을 git commit으로 push 후에 <code class="language-plaintext highlighter-rouge">"blog_url"/sitemap.xml</code> 로 접속했을 때 아래와 같은 화면이 나와야 정상적으로 sitemap이 등록된 것입니다.</p>
+
+<p><img src="../assets/images/gooser/gooser1.png" alt="gooser1" /><br />
+sitemap에서는 해당 글의 정보들이 설정이 되는데 이것은 각 포스트의 맨 윗 부분에 다음과 같이 sitemap 옵션을 추가해줌으로서 추가적으로 설정할 수 있습니다.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>---
+layout: post
+title:  "제목"
+date:   2022-04-23 12:00:00 
+lastmod : 2022-04-24 12:00:00
+sitemap :
+  changefreq : daily
+  priority : 1.0
+---
+</code></pre></div></div>
+<p>포스트의 시작 부분에 다음과 같이 sitemap 코드를 적용해보겠습니다.</p>
+
+<p><img src="../assets/images/gooser/gooser3.png" alt="gooser3" /></p>
+
+<p>git push 한 후에 다시 <code class="language-plaintext highlighter-rouge">"blog_url"/sitemap.xml</code>로 접속하여 확인해보겠습니다.<br />
+<img src="../assets/images/gooser/gooser2.png" alt="gooser2" /></p>
+
+<p><img src="../assets/images/gooser/gooser4.png" alt="gooser4" /><br />
+위 사진이 <code class="language-plaintext highlighter-rouge">sitemap</code> 지정 전, 아래 사진이 지정 후 사진입니다.<br />
+<span style="background-color: #ffdce0">sitemap을 설정해준 부분</span>은 <code class="language-plaintext highlighter-rouge">changefreq</code>가 daily로 바뀌고, <code class="language-plaintext highlighter-rouge">priority</code>는 1.0으로 잘 바뀌었습니다. 
+반면 <span style="background-color: #f1f8ff">sitemap을 설정 안 한 포스트</span>는 default값 그대로임을 확인할 수 있습니다.</p>
+
+<h3 id="2-robotstxt-생성">2. robots.txt 생성</h3>
+<p><code class="language-plaintext highlighter-rouge">robots.txt</code> 파일에 sitemap.xml 파일의 위치를 등록해두면 검색 엔진의 크롤러들이 홈페이지를 크롤링하는 데에 도움이 된다고 합니다. 
+따라서 root 디렉토리<code class="language-plaintext highlighter-rouge">github.io/</code>에 <code class="language-plaintext highlighter-rouge">robots.txt</code> 파일을 만들고 다음과 같이 입력합니다.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>User-agent: *
+Allow: /
+
+Sitemap: http://"blog_url".github.io/sitemap.xml
+</code></pre></div></div>
+
+<h3 id="3-검색-엔진에-등록하기">3. 검색 엔진에 등록하기</h3>
+<p>google search console에 등록을 해야 최종적으로 검색 엔진에 블로그 포스트가 뜨게 됩니다.<br />
+<a href="https://developers.google.com/search#?modal_active=none">google search console site</a>에 접속한 후 시작하기 버튼을 누릅니다.</p>
+
+<p><img src="../assets/images/gooser/gooser5.png" alt="gooser5" /></p>
+
+<p>위 화면에서 <code class="language-plaintext highlighter-rouge">URL prefix</code>에 블로그 url을 붙여넣습니다. 
+여기서 Domain, URL prefix 등록의 차이점은 도메인 속성은 DNS 레코드만을 사용해서 verify할 수 있으나 모든 하위 도메인의 데이터를 포함한 웹사이트의 정보를 모두 얻을 수 있습니다.<br />
+URL perfix 등록은 입력한 속성과 하위 도메인의 레벨만 포함되기 때문에, https://yhp2205.github.io/를 등록했다면 https://yhp2205.github.io/First-post/ 같은 데이터는 포함이 되지만, 
+http://yhp2205.github.io는 포함이 되지 않습니다. 대신 DNS와 달리 여러 경로로 사이트 소유 인증을 할 수 있습니다.<br />
+저는 URL prefix를 이용하여 등록해보겠습니다.<br />
+<code class="language-plaintext highlighter-rouge">Other verification methods</code>에서 HTML tag를 눌러 메타 태그를 copy합니다.</p>
+
+<p><img src="../assets/images/gooser/gooser6.png" alt="gooser6" /></p>
+
+<p>이제 github blog의 root에 존재하는 <code class="language-plaintext highlighter-rouge">_includes/head/custom.html</code> 파일 맨 상단에 copy한 메타 태그를 붙여넣어 github에 push 해주었습니다.<br />
+그리고 HTML tag를 copy한 페이지에서 verify를 눌러줍니다.</p>
+
+<p><img src="../assets/images/gooser/gooser8.png" alt="gooser8" /></p>
+
+<p>그럼 <code class="language-plaintext highlighter-rouge">Ownership verified</code> 라는 문구가 뜨며 등록이 완료됩니다. 그럼 이제 마지막으로 sitemap을 올리기 위해 <code class="language-plaintext highlighter-rouge">GO TO PROPERTY</code>를 누릅니다.</p>
+
+<p><img src="../assets/images/gooser/gooser7.png" alt="gooser7" /></p>
+
+<p><img src="../assets/images/gooser/gooser9.png" alt="gooser9" /></p>
+
+<p>마지막으로 google search console 창에서 sitemaps 카테고리를 눌러 <code class="language-plaintext highlighter-rouge">sitemap.xml</code>을 submit 해주면 끝입니다.</p>
+
+<blockquote>
+  <p>참고한 포스트<br />
+<a href="https://www.moinnet.com/ko/digital-marketing/google-search-console-add-property/">쉽게 하는 웹사이트 구글서치콘솔 등록</a><br />
+<a href="http://jinyongjeong.github.io/2017/01/13/blog_make_searched/">github blog를 google에서 검색되도록 설정하기</a></p>
+</blockquote>
+:ET

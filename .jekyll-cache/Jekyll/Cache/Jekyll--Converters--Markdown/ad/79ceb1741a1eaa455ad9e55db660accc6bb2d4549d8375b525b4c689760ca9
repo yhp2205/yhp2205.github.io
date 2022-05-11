@@ -1,0 +1,101 @@
+I"NE<h2 id="훈련-세트와-테스트-세트">훈련 세트와 테스트 세트</h2>
+<p>머신러닝 알고리즘</p>
+<ul>
+  <li>지도학습 : 훈련하기 위한 데이터, 정답이 필요</li>
+  <li>비지도학습</li>
+</ul>
+
+<p>지도학습에서 데이터를 입력, 정답(결과)을 타깃이라고 하고 입력과 타깃을 합쳐 훈련 데이터라고 하고,
+입력 데이터에서 타깃을 결정짓는 것을 특성이라고 합니다.</p>
+
+<p>데이터를 나누어 일부는 머신러닝 알고리즘을 만드는 데에 사용하고, 나머지는 만들어진 알고리즘의 성능을 평가하는 데에 쓰인다는 것은 알고 있기 때문에 바로 데이터를 나눠보겠습니다.</p>
+
+<p>우선 데이터를 입력합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#fish의 길이와 무게에 대한 데이터
+</span><span class="n">fish_length</span> <span class="o">=</span> <span class="p">[</span><span class="mf">25.4</span><span class="p">,</span> <span class="mf">26.3</span><span class="p">,</span> <span class="mf">26.5</span><span class="p">,</span> <span class="mf">29.0</span><span class="p">,</span> <span class="mf">29.0</span><span class="p">,</span> <span class="mf">29.7</span><span class="p">,</span> <span class="mf">29.7</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">30.7</span><span class="p">,</span> <span class="mf">31.0</span><span class="p">,</span> <span class="mf">31.0</span><span class="p">,</span> 
+                <span class="mf">31.5</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">,</span> <span class="mf">33.0</span><span class="p">,</span> <span class="mf">33.0</span><span class="p">,</span> <span class="mf">33.5</span><span class="p">,</span> <span class="mf">33.5</span><span class="p">,</span> <span class="mf">34.0</span><span class="p">,</span> <span class="mf">34.0</span><span class="p">,</span> <span class="mf">34.5</span><span class="p">,</span> <span class="mf">35.0</span><span class="p">,</span> 
+                <span class="mf">35.0</span><span class="p">,</span> <span class="mf">35.0</span><span class="p">,</span> <span class="mf">35.0</span><span class="p">,</span> <span class="mf">36.0</span><span class="p">,</span> <span class="mf">36.0</span><span class="p">,</span> <span class="mf">37.0</span><span class="p">,</span> <span class="mf">38.5</span><span class="p">,</span> <span class="mf">38.5</span><span class="p">,</span> <span class="mf">39.5</span><span class="p">,</span> <span class="mf">41.0</span><span class="p">,</span> <span class="mf">41.0</span><span class="p">,</span> <span class="mf">9.8</span><span class="p">,</span> 
+                <span class="mf">10.5</span><span class="p">,</span> <span class="mf">10.6</span><span class="p">,</span> <span class="mf">11.0</span><span class="p">,</span> <span class="mf">11.2</span><span class="p">,</span> <span class="mf">11.3</span><span class="p">,</span> <span class="mf">11.8</span><span class="p">,</span> <span class="mf">11.8</span><span class="p">,</span> <span class="mf">12.0</span><span class="p">,</span> <span class="mf">12.2</span><span class="p">,</span> <span class="mf">12.4</span><span class="p">,</span> <span class="mf">13.0</span><span class="p">,</span> <span class="mf">14.3</span><span class="p">,</span> <span class="mf">15.0</span><span class="p">]</span>
+<span class="n">fish_weight</span> <span class="o">=</span> <span class="p">[</span><span class="mf">242.0</span><span class="p">,</span> <span class="mf">290.0</span><span class="p">,</span> <span class="mf">340.0</span><span class="p">,</span> <span class="mf">363.0</span><span class="p">,</span> <span class="mf">430.0</span><span class="p">,</span> <span class="mf">450.0</span><span class="p">,</span> <span class="mf">500.0</span><span class="p">,</span> <span class="mf">390.0</span><span class="p">,</span> <span class="mf">450.0</span><span class="p">,</span> <span class="mf">500.0</span><span class="p">,</span> <span class="mf">475.0</span><span class="p">,</span> <span class="mf">500.0</span><span class="p">,</span> 
+                <span class="mf">500.0</span><span class="p">,</span> <span class="mf">340.0</span><span class="p">,</span> <span class="mf">600.0</span><span class="p">,</span> <span class="mf">600.0</span><span class="p">,</span> <span class="mf">700.0</span><span class="p">,</span> <span class="mf">700.0</span><span class="p">,</span> <span class="mf">610.0</span><span class="p">,</span> <span class="mf">650.0</span><span class="p">,</span> <span class="mf">575.0</span><span class="p">,</span> <span class="mf">685.0</span><span class="p">,</span> <span class="mf">620.0</span><span class="p">,</span> <span class="mf">680.0</span><span class="p">,</span> 
+                <span class="mf">700.0</span><span class="p">,</span> <span class="mf">725.0</span><span class="p">,</span> <span class="mf">720.0</span><span class="p">,</span> <span class="mf">714.0</span><span class="p">,</span> <span class="mf">850.0</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">,</span> <span class="mf">920.0</span><span class="p">,</span> <span class="mf">955.0</span><span class="p">,</span> <span class="mf">925.0</span><span class="p">,</span> <span class="mf">975.0</span><span class="p">,</span> <span class="mf">950.0</span><span class="p">,</span> <span class="mf">6.7</span><span class="p">,</span> 
+                <span class="mf">7.5</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">,</span> <span class="mf">9.7</span><span class="p">,</span> <span class="mf">9.8</span><span class="p">,</span> <span class="mf">8.7</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">9.9</span><span class="p">,</span> <span class="mf">9.8</span><span class="p">,</span> <span class="mf">12.2</span><span class="p">,</span> <span class="mf">13.4</span><span class="p">,</span> <span class="mf">12.2</span><span class="p">,</span> <span class="mf">19.7</span><span class="p">,</span> <span class="mf">19.9</span><span class="p">]</span>
+</code></pre></div></div>
+<p>fish_length와 fist_weight 이 각각의 데이터를 fish_data라는 이름의 하나의 데이터로 묶고,<br />
+target 변수로 도미 35마리, 빙어 14마리로 각각 지정해줍니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fish_data</span> <span class="o">=</span> <span class="p">[[</span><span class="n">l</span><span class="p">,</span> <span class="n">w</span><span class="p">]</span> <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">fish_length</span><span class="p">,</span> <span class="n">fish_weight</span><span class="p">)]</span>
+<span class="n">fish_target</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">35</span> <span class="o">+</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">14</span>  <span class="c1">#target 변수를 앞선 35개엔 1로, 나머지 14개에는 0으로 부여
+</span></code></pre></div></div>
+<p>모델 객체를 만들기 위하여 사이킷런의 KNeighborsClassifier을 임포트해줍니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">KNeighborsClassifier</span>
+<span class="n">kn</span> <span class="o">=</span> <span class="n">KNeighborsClassifier</span><span class="p">()</span>
+</code></pre></div></div>
+<p>전체 데이터에서 처음 35개의 데이터를 훈련 세트로, 나머지 14개의 데이터를 테스트 세트로 사용합니다. <br />
+슬라이싱하여 선택하도록 하겠습니다.<br />
+슬라이싱을 사용할 때 마지막 인덱스의 번호는 포함되지 않는다는 것을 유의합니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 훈련 세트로 입력값 중 0부터 34번째 인덱스까지 사용할 때
+</span><span class="n">train_input</span> <span class="o">=</span> <span class="n">fish_data</span><span class="p">[:</span><span class="mi">35</span><span class="p">]</span>
+<span class="n">train_target</span> <span class="o">=</span> <span class="n">fish_target</span><span class="p">[:</span><span class="mi">35</span><span class="p">]</span>
+
+<span class="c1"># 테스트 세트로 입력값 중 35번째부터 마지막 인덱스까지 사용할 때
+</span><span class="n">test_input</span> <span class="o">=</span> <span class="n">fish_data</span><span class="p">[</span><span class="mi">35</span><span class="p">:]</span>
+<span class="n">test_target</span> <span class="o">=</span> <span class="n">fish_target</span><span class="p">[</span><span class="mi">35</span><span class="p">:]</span>
+</code></pre></div></div>
+<p>훈련 데이터와 테스트용 데이터를 준비했으니 훈련 세트로 fit() 메서드를 호출하여 모델을 훈련하고,
+테스트 세트로 score() 매서드를 호출하여 평가해봅니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">kn</span> <span class="o">=</span> <span class="n">kn</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+<span class="n">kn</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_input</span><span class="p">,</span> <span class="n">test_target</span><span class="p">)</span>
+</code></pre></div></div>
+<p>정확도가 0이 나오는 것을 확인할 수 있는데, 이는 훈련세트와 테스트세트가 적절하지 못하게 나뉘었기 때문입니다.<br />
+fish_data에는 순서대로 35개의 도미와 14개의 빙어가 들어있기 때문에, 훈련세트에 빙어가 없었다는 것입니다.<br />
+이러한 샘플링 편향을 방지하기 위해 데이터를 섞거나 고루 샘플을 뽑는 법을 알아보겠습니다.</p>
+
+<p>배열을 다루기 위해서는 파이썬의 대표적인 배열 라이브러리인 numpy를 알아야 합니다.
+넘파이를 사용하여 데이터를 다시 나눌 것이기 때문에 우선 import를 해줍니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+</code></pre></div></div>
+<p>그리고 넘파이를 이용하여 파이썬 리스트 형태였던 fish_data, fish_target을 넘파이 배열로 바꿔줍니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">input_arr</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">fish_data</span><span class="p">)</span>
+<span class="n">target_arr</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">fish_target</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">input_arr</span><span class="p">)</span>
+</code></pre></div></div>
+<p>원하는 형태로 잘 저장된 것을 볼 수 있습니다.
+이제 무작위로 샘플을 고릅니다.
+우선 인덱스를 input_arr와 target_arr에 부여하고 랜덤하게 섞어 출력해보면, 골고루 섞인 것을 확인할 수 있습니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">49</span><span class="p">)</span>
+<span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+</code></pre></div></div>
+<p>이제 넘파이 배열을 인덱스로 전달하여 랜덤한 35개의 샘플을 train 세트로 만들고,<br />
+나머지 14개의 샘플을 test 세트로 만듭니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">train_input</span> <span class="o">=</span> <span class="n">input_arr</span><span class="p">[</span><span class="n">index</span><span class="p">[:</span><span class="mi">35</span><span class="p">]]</span>
+<span class="n">train_target</span> <span class="o">=</span> <span class="n">target_arr</span><span class="p">[</span><span class="n">index</span><span class="p">[:</span><span class="mi">35</span><span class="p">]]</span>
+
+<span class="n">test_input</span> <span class="o">=</span> <span class="n">input_arr</span><span class="p">[</span><span class="n">index</span><span class="p">[</span><span class="mi">35</span><span class="p">:]]</span>
+<span class="n">test_target</span> <span class="o">=</span> <span class="n">target_arr</span><span class="p">[</span><span class="n">index</span><span class="p">[</span><span class="mi">35</span><span class="p">:]]</span>
+</code></pre></div></div>
+<p>이제 훈련 데이터를 잘 섞어서 만들었으니 산점도를 그려 잘 섞여있는지 다시 한 번 확인합니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">train_input</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">train_input</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">test_input</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">test_input</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'length'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'weight'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p>이제 모델을 다시 만들어보겠습니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">kn</span> <span class="o">=</span> <span class="n">kn</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+<span class="n">kn</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_input</span><span class="p">,</span> <span class="n">test_target</span><span class="p">)</span>
+</code></pre></div></div>
+<p>아까와 달리 정확도가 1.0이 나온 것을 알 수 있습니다.<br />
+이제 predict() 메서드를 사용하여 예측 결과와 실제 타깃을 확인합니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">kn</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_input</span><span class="p">)</span>
+</code></pre></div></div>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">test_target</span>
+</code></pre></div></div>
+<p>predict 메서드를 사용한 결과와 실제 test_target 결과가 일치합니다.</p>
+
+<p>처음에 진행한 모델링에서는 도미와 빙어가 적절히 섞이지 않은 데이터를 가지고 훈련을 했기 때문에 정확도가 매우 떨어졌지만, 후에 데이터를 적절히 잘 섞어 골라 모델을 만들고 나니 정확도가 올라가는 것을 경험할 수 있었습니다.<br />
+이와 같이 데이터를 추출하여 지도학습을 할 때에 train dataset과 test dataset을 적절히 잘 나누어 모델링을 해야 좋은 결과를 얻을 수 있습니다.</p>
+:ET
