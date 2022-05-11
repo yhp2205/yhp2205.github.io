@@ -24,6 +24,6 @@ docs:
   - title: Blog
     children:
       - title: "Blog"
-        url: Blog/
+        url: Blog_page/
         category: "Blog"
 
