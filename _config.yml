@@ -289,5 +289,5 @@ defaults:
       share: true
       related: true
       show_date : true
-      sidebar : 
-        nav: "docs"
+      mathjax : true
+      sidebar_main : true
