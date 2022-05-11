@@ -290,4 +290,4 @@ defaults:
       related: true
       show_date : true
       mathjax : true
-      sidebar_main : true
+      sidebar : true
