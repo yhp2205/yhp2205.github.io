@@ -21,9 +21,9 @@ docs:
       - title: "혼자공부하는머신러닝"
         url: Study/
         category: "Study"
-  - title: blog
+  - title: Blog
     children:
-      - title: "blog"
-        url: blog/
-        category: "blog"
+      - title: "Blog"
+        url: Blog/
+        category: "Blog"
 
