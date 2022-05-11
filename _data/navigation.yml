@@ -14,3 +14,16 @@ main:
   #   url: /collection-archive/
   # - title: "Sitemap"
   #   url: /sitemap/
+
+docs:
+  - title: Study
+    children:
+      - title: "혼자공부하는머신러닝"
+        url: Study/
+        category: "Study"
+  - title: blog
+    children:
+      - title: "blog"
+        url: blog/
+        category: "blog"
+
