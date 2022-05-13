@@ -291,3 +291,4 @@ defaults:
       show_date : true
       mathjax : true
       sidebar : true
+      future : true

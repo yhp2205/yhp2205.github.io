@@ -15,6 +15,8 @@ sidebar :
 ---
 
 오늘은 Github Actions를 사용하여 잔디심기 대시보드를 다음과 같이 만들어보겠습니다.  
+참고한 포스트는 게시글 하단에 작성해 두었습니다.  
+
 ![A1](https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A1.png?raw=true)
 
 ## 1. 잔디심기 대시보드 만들 레포지토리 선택해서 권한 설정
