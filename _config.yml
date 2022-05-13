@@ -27,6 +27,7 @@ repository               : "yhp2205/yhp2205.github.io" # GitHub username/repo-na
 teaser                   : "/assets/images/main.jpg" # path of fallback teaser image, e.g. "/assets/images/500x300.png"
 logo                     : "/assets/images/main.jpg" # path of logo image to display in the masthead, e.g. "/assets/images/88x88.png"
 masthead_title           : # overrides the website title displayed in the masthead, use " " for no title
+future                   : true
 # breadcrumbs            : false # true, false (default)
 words_per_minute         : 200
 comments:
@@ -291,4 +292,3 @@ defaults:
       show_date : true
       mathjax : true
       sidebar : true
-      future : true
