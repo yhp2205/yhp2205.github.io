@@ -1,0 +1,55 @@
+I"�<p>오늘은 Github Actions를 사용하여 잔디심기 대시보드를 다음과 같이 만들어보겠습니다.<br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A1.png?raw=true" alt="A1" /></p>
+
+<h2 id="1-잔디심기-대시보드-만들-레포지토리-선택해서-권한-설정">1. 잔디심기 대시보드 만들 레포지토리 선택해서 권한 설정</h2>
+<p>잔디심기 대시보드를 표시할 레포지토리를 정합니다. 저는 깃허브 프로필 페이지에 띄울것이기 때문에 고유 아이디로 된 yhp2205 레포지토리로 결정했습니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A2.png?raw=true" alt="A2" />
+레포지토리를 정했으면 그 레포지토리의 권한을 설정하기 위해 settings를 눌러 들어갑니다.<br />
+<br /></p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A3.png?raw=true" alt="A3" /><br />
+<br />
+settings의 좌측 카테고리에서 <code class="language-plaintext highlighter-rouge">Actions - General</code>로 들어가서</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A4.png?raw=true" alt="A4" /><br />
+<br />
+페이지 하단에 위치한 Workflow permissions를 다음과 같이 설정해줍니다.</p>
+
+<h2 id="2-metrics-기능-fork-해서-가져오기">2. metrics 기능 fork 해서 가져오기</h2>
+<p><a href="https://github.com/lowlighter/metrics">다음 사이트</a>에 접속하여 metrics 기능을 fork 해서 가져오겠습니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A5.png?raw=true" alt="A5" /><br />
+<br />
+이런 페이지가 뜨면 우측 상단의 fork 버튼을 누르고</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A6.png?raw=true" alt="A6" /><br />
+<br />
+Create fork를 눌러 본인의 깃허브 계정으로 가져옵니다.</p>
+
+<h2 id="3-personal-token-생성하기">3. personal token 생성하기</h2>
+<p>metrics를 가져왔으니 계정의 token을 생성해보겠습니다.<br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A7.png?raw=true" alt="A7" /><br />
+<br />
+다음과 같이 계정의 settings로 들어갑니다. (레포지토리의 settings가 아닌 깃허브 계정의 settings로 들어갑니다)</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A8.png?raw=true" alt="A8" /><br />
+<br />
+우측 카테고리 제일 하단의 Developer settings를 누릅니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A9.png?raw=true" alt="A9" /><br />
+<br />
+다음과 같이 <code class="language-plaintext highlighter-rouge">personal access token - Generate new token</code>을 눌러줍니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A10.png?raw=true" alt="A10" /><br />
+<br /></p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A11.png?raw=true" alt="A11" /><br />
+<br />
+note에 token의 이름을 지정해주고, 유효기간을 설정합니다. 90일로 설정했으나 원하는 대로 설정하면 됩니다.<br />
+그리고 아래 repo, read::packages, read:org, gist, read:user를 선택한 후에 토큰을 만들어 줍니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A12.png?raw=true" alt="A12" /><br />
+<br />
+토큰을 성공적으로 생성했을 때 다음과 같은 페이지가 뜨고</p>
+:ET

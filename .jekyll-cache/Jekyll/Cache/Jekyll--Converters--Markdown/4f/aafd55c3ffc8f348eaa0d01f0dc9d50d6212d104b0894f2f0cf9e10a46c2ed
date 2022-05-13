@@ -1,0 +1,116 @@
+I"m<p>오늘은 Github Actions를 사용하여 잔디심기 대시보드를 다음과 같이 만들어보겠습니다.<br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A1.png?raw=true" alt="A1" /></p>
+
+<h2 id="1-잔디심기-대시보드-만들-레포지토리-선택해서-권한-설정">1. 잔디심기 대시보드 만들 레포지토리 선택해서 권한 설정</h2>
+<p>잔디심기 대시보드를 표시할 레포지토리를 정합니다. 저는 깃허브 프로필 페이지에 띄울것이기 때문에 고유 아이디로 된 yhp2205 레포지토리로 결정했습니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A2.png?raw=true" alt="A2" /><br />
+<br />
+레포지토리를 정했으면 그 레포지토리의 권한을 설정하기 위해 settings를 눌러 들어갑니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A3.png?raw=true" alt="A3" /><br />
+<br />
+settings의 좌측 카테고리에서 <code class="language-plaintext highlighter-rouge">Actions - General</code>로 들어가서</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A4.png?raw=true" alt="A4" /><br />
+<br />
+페이지 하단에 위치한 Workflow permissions를 다음과 같이 설정해줍니다.</p>
+
+<h2 id="2-metrics-기능-fork-해서-가져오기">2. metrics 기능 fork 해서 가져오기</h2>
+<p><a href="https://github.com/lowlighter/metrics">다음 사이트</a>에 접속하여 metrics 기능을 fork 해서 가져오겠습니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A5.png?raw=true" alt="A5" /><br />
+<br />
+이런 페이지가 뜨면 우측 상단의 fork 버튼을 누르고</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A6.png?raw=true" alt="A6" /><br />
+<br />
+Create fork를 눌러 본인의 깃허브 계정으로 가져옵니다.</p>
+
+<h2 id="3-personal-token-생성하기">3. personal token 생성하기</h2>
+<p>metrics를 가져왔으니 계정의 token을 생성해보겠습니다.<br />
+<br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A7.png?raw=true" alt="A7" /><br />
+<br />
+다음과 같이 계정의 settings로 들어갑니다. (레포지토리의 settings가 아닌 깃허브 계정의 settings로 들어갑니다)</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A8.png?raw=true" alt="A8" /><br />
+<br />
+우측 카테고리 제일 하단의 Developer settings를 누릅니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A9.png?raw=true" alt="A9" /><br />
+<br />
+다음과 같이 <code class="language-plaintext highlighter-rouge">personal access token - Generate new token</code>을 눌러줍니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A10.png?raw=true" alt="A10" /><br />
+<br /></p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A11.png?raw=true" alt="A11" /><br />
+<br />
+note에 token의 이름을 지정해주고, 유효기간을 설정합니다. 90일로 설정했으나 원하는 대로 설정하면 됩니다. 그리고 아래 repo, read::packages, read:org, gist, read:user를 선택한 후에 토큰을 만들어 줍니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A12.png?raw=true" alt="A12" /><br />
+<br />
+토큰을 성공적으로 생성했을 때 다음과 같은 페이지가 뜨고 빨간 박스로 표시한 아이콘을 눌러 토큰을 복사합니다. 잃어버리면 안되기 때문에 다른 메모장에 적어두셔도 좋습니다!</p>
+
+<h2 id="4-actions-secrets에-token-등록하기">4. Actions secrets에 token 등록하기</h2>
+<p>토큰을 만들어 잘 복사해두었다면 다음으로 잔디심기를 올릴 레포지토리에 토큰을 등록해보겠습니다.<br />
+<br /></p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A13.png?raw=true" alt="A13" /><br />
+<br />
+잔디심기 대시보드를 만들 레포지토리에 들어갑니다. 1에서 권한을 설정해 주었던 레포지토리의 <code class="language-plaintext highlighter-rouge">settings - secrets - actions</code>를 차례로 눌러 들어가줍니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A14.png?raw=true" alt="A14" /><br />
+<br />
+<code class="language-plaintext highlighter-rouge">New repository secret</code>을 눌러 토큰을 등록하겠습니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A15.png?raw=true" alt="A15" /><br />
+<br />
+다음과 같은 창이 뜨면 토큰의 이름을 작성하고(저는 YOUNGHYUNS_METRICS_TOKEN으로 등록하였습니다), Value 값에 복사해둔 token값을 넣고 Add secret 해줍니다.</p>
+
+<h2 id="5-repo-내에-yml-파일-만들기">5. repo 내에 yml 파일 만들기</h2>
+
+<p>깃허브 토큰 등록한 repo 내에 yml 파일을 만들겠습니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A16.png?raw=true" alt="A16" /><br />
+<br />
+<code class="language-plaintext highlighter-rouge">Actions - set up a workflow yourself</code>를 누릅니다.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # 하루에 한 번 씩 빌드 수행
+  schedule:
+    - cron: '0 1 * * *'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: [빌드를 수행할 때 표시할 작업명]
+        uses: [metrics를 fork한 저장소명]/metrics@latest
+        with:
+          token: $
+          filename: [빌드한 후 생성할 파일명].svg
+          base: ""
+          plugin_isocalendar: yes
+          plugin_isocalendar_duration: full-year
+</code></pre></div></div>
+<p>다음 코드를 복사해서 붙여넣습니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A17.png?raw=true" alt="A17" /><br />
+<br />
+다음과 같이 <code class="language-plaintext highlighter-rouge">activity_metrics_build.yml</code>로 이름을 지정해주고 앞선 코드에서 표시된 부분을 본인의 repo에 맞게 작성합니다. 하늘색 박스로 표시된 부분에는 전에 등록해준 토큰의 이름을 작성하면 됩니다. 저는 <code class="language-plaintext highlighter-rouge">YOUNGHYUNS_METRICS_TOKEN</code> 으로 지정했기 때문에 그대로 작성하였습니다.</p>
+:ET

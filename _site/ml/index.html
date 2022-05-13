@@ -58,6 +58,8 @@
 </script>
 
 
+  <meta name="google-site-verification" content="flHI7POn7YCbdVsZAXDxsOOoL1c0Y-JsCMLr6gc17YY" />
+
 
 
 
@@ -129,6 +131,11 @@
             </li><li class="masthead__menu-item">
               <a href="/tags/">Tags</a>
             </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <i class="fas fa-search"></i>
+        </button>
         
         <button class="greedy-nav__toggle hidden" type="button">
           <span class="visually-hidden">Toggle menu</span>
@@ -306,7 +313,7 @@
             <li><a href="/Blog_page/">Blog(5)</a></li>
           
           
-            <li><a href="/Github/">Github()</a></li>
+            <li><a href="/Github/">Github(1)</a></li>
           
         </ul>
         
@@ -353,8 +360,15 @@
 
   <p class="page__meta">
     
-
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-05-05T00:00:00+09:00">May 5, 2022</time>
+      </span>
     
+
+    <span class="page__meta-sep"></span>
 
     
       
@@ -388,8 +402,15 @@
 
   <p class="page__meta">
     
-
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-05-04T00:00:00+09:00">May 4, 2022</time>
+      </span>
     
+
+    <span class="page__meta-sep"></span>
 
     
       
@@ -423,8 +444,15 @@
 
   <p class="page__meta">
     
-
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-05-03T00:00:00+09:00">May 3, 2022</time>
+      </span>
     
+
+    <span class="page__meta-sep"></span>
 
     
       
@@ -458,8 +486,15 @@
 
   <p class="page__meta">
     
-
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-05-02T00:00:00+09:00">May 2, 2022</time>
+      </span>
     
+
+    <span class="page__meta-sep"></span>
 
     
       
@@ -493,8 +528,15 @@
 
   <p class="page__meta">
     
-
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-05-02T00:00:00+09:00">May 2, 2022</time>
+      </span>
     
+
+    <span class="page__meta-sep"></span>
 
     
       
@@ -528,8 +570,15 @@
 
   <p class="page__meta">
     
-
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-04-21T00:00:00+09:00">April 21, 2022</time>
+      </span>
     
+
+    <span class="page__meta-sep"></span>
 
     
       
@@ -563,8 +612,15 @@
 
   <p class="page__meta">
     
-
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-04-19T00:00:00+09:00">April 19, 2022</time>
+      </span>
     
+
+    <span class="page__meta-sep"></span>
 
     
       
@@ -590,6 +646,17 @@
 </div>
     </div>
 
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';" role="search">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
     
 
     <div id="footer" class="page__footer">
@@ -633,6 +700,10 @@
 
 
 
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
 
 
 

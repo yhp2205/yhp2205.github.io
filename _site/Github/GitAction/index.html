@@ -1,0 +1,920 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>[Github] 깃허브 메인 페이지에 잔디심기 띄우기 - YOUNGHYUN’s Blog</title>
+<meta name="description" content="Github Actions를 사용한 잔디심기 대시보드 만들기">
+
+
+  <meta name="author" content="Younghyun Park">
+  
+  <meta property="article:author" content="Younghyun Park">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_KR">
+<meta property="og:site_name" content="YOUNGHYUN's Blog">
+<meta property="og:title" content="[Github] 깃허브 메인 페이지에 잔디심기 띄우기">
+<meta property="og:url" content="http://localhost:4000/github/GitAction/">
+
+
+  <meta property="og:description" content="Github Actions를 사용한 잔디심기 대시보드 만들기">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2022-05-14T00:00:00+09:00">
+
+
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="http://localhost:4000/github/GitAction/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Younghyun Park",
+      "url": "http://localhost:4000/"
+    
+  }
+</script>
+
+
+  <meta name="google-site-verification" content="flHI7POn7YCbdVsZAXDxsOOoL1c0Y-JsCMLr6gc17YY" />
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="YOUNGHYUN's Blog Feed">
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <!-- start custom head snippets -->
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/logo.ico/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/logo.ico/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/logo.ico/favicon-16x16.png">
+<link rel="manifest" herf="/assets/logo.ico/site.webmanifest">
+<link rel="mask-icon" herf="/assets/logo.ico/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/main.jpg" alt="YOUNGHYUN's Blog"></a>
+        
+        <a class="site-title" href="/">
+          YOUNGHYUN's Blog
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/categories/">Category</a>
+            </li><li class="masthead__menu-item">
+              <a href="/tags/">Tags</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <i class="fas fa-search"></i>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person" class="h-card">
+
+  
+    <div class="author__avatar">
+      <a href="http://localhost:4000/">
+        <img src="/assets/images/main.jpg" alt="Younghyun Park" itemprop="image" class="u-photo">
+      </a>
+    </div>
+  
+
+  <div class="author__content">
+    <h3 class="author__name p-name" itemprop="name">
+      <a class="u-url" rel="me" href="http://localhost:4000/" itemprop="url">Younghyun Park</a>
+    </h3>
+    
+      <div class="author__bio p-note" itemprop="description">
+        <p><strong>노력하는 개발자</strong><br /><em>열정적인 개발자</em></p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name" class="p-locality">Republic of Korea</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="mailto:yhp2205@gmail.com" rel="nofollow noopener noreferrer me"><i class="fas fa-fw fa-envelope-square" aria-hidden="true"></i><span class="label">Email</span></a></li>
+          
+        
+          
+            <li><a href="https://yhp2205.github.io" rel="nofollow noopener noreferrer me"><i class="fas fa-fw fa-link" aria-hidden="true"></i><span class="label">Website</span></a></li>
+          
+        
+          
+        
+          
+        
+          
+            <li><a href="https://github.com/yhp2205" rel="nofollow noopener noreferrer me"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+  
+    
+      
+      
+      
+      
+    
+    
+      
+
+<nav class="nav__list">
+  
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc">Toggle Menu</label>
+  <ul class="nav__items">
+    
+      <li>
+        
+          <span class="nav__sub-title">Study</span>
+        
+
+        
+        <ul>
+          
+          
+            <li><a href="/ML/">Machine Learning(7)</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">Git</span>
+        
+
+        
+        <ul>
+          
+          
+            <li><a href="/Blog_page/">Blog(5)</a></li>
+          
+          
+            <li><a href="/Github/">Github(1)</a></li>
+          
+        </ul>
+        
+      </li>
+    
+  </ul>
+</nav>
+
+    
+  
+  </div>
+
+
+
+
+
+<nav class="nav__list">
+  
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc">Toggle Menu</label>
+  <ul class="nav__items">
+    
+  </ul>
+</nav>
+
+
+
+
+  <article class="page h-entry" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="[Github] 깃허브 메인 페이지에 잔디심기 띄우기">
+    <meta itemprop="description" content="Github Actions를 사용한 잔디심기 대시보드 만들기">
+    <meta itemprop="datePublished" content="2022-05-14T00:00:00+09:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title p-name" itemprop="headline">
+            <a href="http://localhost:4000/github/GitAction/" class="u-url" itemprop="url">[Github] 깃허브 메인 페이지에 잔디심기 띄우기
+</a>
+          </h1>
+          
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-05-14T00:00:00+09:00">May 14, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          2 minute read
+        
+      </span>
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content e-content" itemprop="text">
+        
+        <p>오늘은 Github Actions를 사용하여 잔디심기 대시보드를 다음과 같이 만들어보겠습니다.<br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A1.png?raw=true" alt="A1" /></p>
+
+<h2 id="1-잔디심기-대시보드-만들-레포지토리-선택해서-권한-설정">1. 잔디심기 대시보드 만들 레포지토리 선택해서 권한 설정</h2>
+<p>잔디심기 대시보드를 표시할 레포지토리를 정합니다. 저는 깃허브 프로필 페이지에 띄울것이기 때문에 고유 아이디로 된 yhp2205 레포지토리로 결정했습니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A2.png?raw=true" alt="A2" /><br />
+<br />
+레포지토리를 정했으면 그 레포지토리의 권한을 설정하기 위해 settings를 눌러 들어갑니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A3.png?raw=true" alt="A3" /><br />
+<br />
+settings의 좌측 카테고리에서 <code class="language-plaintext highlighter-rouge">Actions - General</code>로 들어가서</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A4.png?raw=true" alt="A4" /><br />
+<br />
+페이지 하단에 위치한 Workflow permissions를 다음과 같이 설정해줍니다.</p>
+
+<h2 id="2-metrics-기능-fork-해서-가져오기">2. metrics 기능 fork 해서 가져오기</h2>
+<p><a href="https://github.com/lowlighter/metrics">다음 사이트</a>에 접속하여 metrics 기능을 fork 해서 가져오겠습니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A5.png?raw=true" alt="A5" /><br />
+<br />
+이런 페이지가 뜨면 우측 상단의 fork 버튼을 누르고</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A6.png?raw=true" alt="A6" /><br />
+<br />
+Create fork를 눌러 본인의 깃허브 계정으로 가져옵니다.</p>
+
+<h2 id="3-personal-token-생성하기">3. personal token 생성하기</h2>
+<p>metrics를 가져왔으니 계정의 token을 생성해보겠습니다.<br />
+<br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A7.png?raw=true" alt="A7" /><br />
+<br />
+다음과 같이 계정의 settings로 들어갑니다. (레포지토리의 settings가 아닌 깃허브 계정의 settings로 들어갑니다)</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A8.png?raw=true" alt="A8" /><br />
+<br />
+우측 카테고리 제일 하단의 Developer settings를 누릅니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A9.png?raw=true" alt="A9" /><br />
+<br />
+다음과 같이 <code class="language-plaintext highlighter-rouge">personal access token - Generate new token</code>을 눌러줍니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A10.png?raw=true" alt="A10" /><br />
+<br /></p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A11.png?raw=true" alt="A11" /><br />
+<br />
+note에 token의 이름을 지정해주고, 유효기간을 설정합니다. 90일로 설정했으나 원하는 대로 설정하면 됩니다. 그리고 아래 repo, read::packages, read:org, gist, read:user를 선택한 후에 토큰을 만들어 줍니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A12.png?raw=true" alt="A12" /><br />
+<br />
+토큰을 성공적으로 생성했을 때 다음과 같은 페이지가 뜨고 빨간 박스로 표시한 아이콘을 눌러 토큰을 복사합니다. 잃어버리면 안되기 때문에 다른 메모장에 적어두셔도 좋습니다!</p>
+
+<h2 id="4-actions-secrets에-token-등록하기">4. Actions secrets에 token 등록하기</h2>
+<p>토큰을 만들어 잘 복사해두었다면 다음으로 잔디심기를 올릴 레포지토리에 토큰을 등록해보겠습니다.<br />
+<br /></p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A13.png?raw=true" alt="A13" /><br />
+<br />
+잔디심기 대시보드를 만들 레포지토리에 들어갑니다. 1에서 권한을 설정해 주었던 레포지토리의 <code class="language-plaintext highlighter-rouge">settings - secrets - actions</code>를 차례로 눌러 들어가줍니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A14.png?raw=true" alt="A14" /><br />
+<br />
+<code class="language-plaintext highlighter-rouge">New repository secret</code>을 눌러 토큰을 등록하겠습니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A15.png?raw=true" alt="A15" /><br />
+<br />
+다음과 같은 창이 뜨면 토큰의 이름을 작성하고(저는 YOUNGHYUNS_METRICS_TOKEN으로 등록하였습니다), Value 값에 복사해둔 token값을 넣고 Add secret 해줍니다.</p>
+
+<h2 id="5-repo-내에-yml-파일-만들기">5. repo 내에 yml 파일 만들기</h2>
+
+<p>깃허브 토큰 등록한 repo 내에 yml 파일을 만들겠습니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A16.png?raw=true" alt="A16" /><br />
+<br />
+<code class="language-plaintext highlighter-rouge">Actions - set up a workflow yourself</code>를 누릅니다.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # 하루에 한 번 씩 빌드 수행
+  schedule:
+    - cron: '0 1 * * *'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: [빌드를 수행할 때 표시할 작업명]
+        uses: [metrics를 fork한 저장소명]/metrics@latest
+        with:
+          token: $
+          filename: [빌드한 후 생성할 파일명].svg
+          base: ""
+          plugin_isocalendar: yes
+          plugin_isocalendar_duration: full-year
+</code></pre></div></div>
+<p>다음 코드를 복사해서 붙여넣습니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A17.png?raw=true" alt="A17" /><br />
+<br />
+다음과 같이 <code class="language-plaintext highlighter-rouge">activity_metrics_build.yml</code>로 이름을 지정해주고 앞선 코드에서 표시된 부분을 본인의 repo에 맞게 작성합니다. 하늘색 박스로 표시된 부분에는 전에 등록해준 토큰의 이름을 작성하면 됩니다. 저는 <code class="language-plaintext highlighter-rouge">YOUNGHYUNS_METRICS_TOKEN</code> 으로 지정했기 때문에 그대로 작성하였습니다.<br />
+<br />
+작성이 완료되었다면 우측 상단에 위치한 Start commit 버튼을 눌러 Commit new file을 해줍니다.</p>
+
+<h2 id="6-workflow-실행하여-svg-파일-생성하기">6. Workflow 실행하여 svg 파일 생성하기</h2>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A18.png?raw=true" alt="A18" /><br />
+<br />
+commit을 완료하여 yml 파일을 생성했다면 다시 Actions 탭으로 들어갑니다. 그럼 다음과 같이 CI라는 이름의 workflow가 생성된 것을 확인할 수 있습니다. CI를 선택한 후에, 빨간색으로 표시되어 있는 Run Workflow를 눌러 workflow를 실행합니다.<br />
+<br />
+CI가 실행되는 데에는 약 5분정도의 시간이 걸립니다. 주황색 불이 들어와서 실행중임을 알리고 있다면 빌드가 완료될 때까지 기다립니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A19.png?raw=true" alt="A19" />
+<br />
+시간이 지난 후, 초록 표시가 들어오고 빌드가 완료된 것을 알리면, 레포지토리 내에 다음과 같이 svg 파일이 생성된 것을 볼 수 있습니다.</p>
+
+<h2 id="7-잔디심기-대시보드-게시하기">7. 잔디심기 대시보드 게시하기</h2>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A20.png?raw=true" alt="A20" /><br />
+<br />
+마지막으로 동일 레포지토리의 Readme.md 파일에 다음과 같이 작성해줍니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A21.png?raw=true" alt="A21" /><br />
+<br />
+정상적으로 실행되었을 때, 다음과 같이 깃허브 메인 화면에서 잔디심기 보드를 확인할 수 있습니다.</p>
+
+<blockquote>
+  <p>참고한 포스트 <a href="https://ynkim0.github.io/posts/Github-Actions%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-%EC%9E%94%EB%94%94%EC%8B%AC%EA%B8%B0-%EB%8C%80%EC%89%AC%EB%B3%B4%EB%93%9C-%EB%A7%8C%EB%93%A4%EA%B8%B0/">Github Actions를 이용한 잔디심기 대쉬보드 만들기</a></p>
+</blockquote>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/tags/#github" class="page__taxonomy-item p-category" rel="tag">Github</a><span class="sep">, </span>
+    
+      <a href="/tags/#github-actions" class="page__taxonomy-item p-category" rel="tag">Github actions</a>
+    
+    </span>
+  </p>
+
+
+
+
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-folder-open" aria-hidden="true"></i> Categories: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/categories/#github" class="page__taxonomy-item p-category" rel="tag">Github</a>
+    
+    </span>
+  </p>
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time class="dt-published" datetime="2022-05-14T00:00:00+09:00">May 14, 2022</time></p>
+
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?text=%5BGithub%5D+%EA%B9%83%ED%97%88%EB%B8%8C+%EB%A9%94%EC%9D%B8+%ED%8E%98%EC%9D%B4%EC%A7%80%EC%97%90+%EC%9E%94%EB%94%94%EC%8B%AC%EA%B8%B0+%EB%9D%84%EC%9A%B0%EA%B8%B0%20http%3A%2F%2Flocalhost%3A4000%2Fgithub%2FGitAction%2F" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Flocalhost%3A4000%2Fgithub%2FGitAction%2F" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Flocalhost%3A4000%2Fgithub%2FGitAction%2F" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/ml/HG4-2/" class="pagination--pager" title="[혼공머신러닝] Ch 4. 다양한 분류 알고리즘(2)
+">Previous</a>
+    
+    
+      <a href="#" class="pagination--pager disabled">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h2 class="page__related-title">You May Also Enjoy</h2>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/main.jpg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/ml/HG4-2/" rel="permalink">[혼공머신러닝] Ch 4. 다양한 분류 알고리즘(2)
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-05-05T00:00:00+09:00">May 5, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          less than 1 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">4-2 확률적 경사 하강법
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/main.jpg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/ml/HG4-1/" rel="permalink">[혼공머신러닝] Ch 4. 다양한 분류 알고리즘
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-05-04T00:00:00+09:00">May 4, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">4-1 로지스틱 회귀
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/main.jpg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/ml/HG3-3/" rel="permalink">[혼공머신러닝] Ch 3. 회귀 알고리즘과 모델 규제(3)
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-05-03T00:00:00+09:00">May 3, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          4 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">3-3 특성 공학과 규제
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/main.jpg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/ml/HG3-2/" rel="permalink">[혼공머신러닝] Ch 3. 회귀 알고리즘과 모델 규제(2)
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-05-02T00:00:00+09:00">May 2, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          3 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">3-2 선형 회귀
+</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';" role="search">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2022 Younghyun Park. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+    <script>
+  'use strict';
+
+  (function () {
+    var commentContainer = document.querySelector('#giscus-comments');
+
+    if (!commentContainer) {
+      return;
+    }
+
+    var script = document.createElement('script');
+    script.setAttribute('src', 'https://giscus.app/client.js');
+    script.setAttribute('data-repo', 'yhp2205/yhp2205.github.io');
+    script.setAttribute('data-repo-id', 'yhp2205/yhp2205.github.io');
+    script.setAttribute('data-category', 'General');
+    script.setAttribute('data-category-id', 'DIC_kwDOHUb7es4CPDVC');
+    script.setAttribute('data-mapping', 'pathname');
+    script.setAttribute('data-reactions-enabled', '1');
+    script.setAttribute('data-theme', 'light');
+    script.setAttribute('crossorigin', 'anonymous');
+
+    commentContainer.appendChild(script);
+  })();
+</script>
+  
+
+
+
+
+
+  </body>
+</html>
