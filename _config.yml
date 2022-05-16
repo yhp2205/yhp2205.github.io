@@ -252,6 +252,9 @@ whitelist:
 category_archive:
   type: liquid
   path: /categories/
+  sidebar : 
+    nav : "docs"
+  author_profile: true
 tag_archive:
   type: liquid
   path: /tags/
