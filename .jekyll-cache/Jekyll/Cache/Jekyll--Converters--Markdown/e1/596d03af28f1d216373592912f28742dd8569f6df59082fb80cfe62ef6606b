@@ -1,0 +1,69 @@
+I"<p>결정 트리 알고리즘을 사용하여 새로운 분류 문제를 다루어보도록 하겠습니다.</p>
+
+<p>우선적으로 와인 데이터의 여러 변수를 사용하여 와인 종류를 구별할 수 있도록 로지스틱 회귀를 사용합니다.</p>
+
+<h2 id="로지스틱-회귀로-와인-분류하기">로지스틱 회귀로 와인 분류하기</h2>
+
+<p>판다스를 이용해 데이터를 불러옵니다. head() 메서드를 사용해 데이터를 확인합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+
+<span class="n">wine</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'https://bit.ly/wine-date'</span><span class="p">)</span>
+<span class="n">wine</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG5/HG5-1-1.png?raw=true" alt="HG5-1-1" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">wine</span><span class="p">.</span><span class="n">info</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG5/HG5-1-2.png?raw=true" alt="HG5-1-2" /><br />
+와인 데이터 프레임의 각 데이터 타입과 누락된 값이 있는지 확인하기 위해 .info() 메서드를 사용합니다. 결과적으로 총 6497열 중에 각 column 값이 6497인 것을 보아 누락된 데이터는 없다는 것을 확인했습니다.<br />
+다음으로 describe() 메서드를 사용하여 각 column에 대한 간단한 통계값을 출력합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">wine</span><span class="p">.</span><span class="n">describe</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG5/HG5-1-3.png?raw=true" alt="HG5-1-3" />
+이 값에서 확인할 수 잇는 점은 각 column에 대해 스케일이 다르다는 것입니다. 따라서 앞서 진행했던 것처럼 표준화를 해주어야 합니다. 표준화에 앞서 배열을 넘파이 형식으로 바꾼 후에 훈련 데이터와 테스트 데이터로 나누는 작업을 진행합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data</span> <span class="o">=</span> <span class="n">wine</span><span class="p">[[</span><span class="s">'alcohol'</span><span class="p">,</span> <span class="s">'sugar'</span><span class="p">,</span> <span class="s">'pH'</span><span class="p">]].</span><span class="n">to_numpy</span><span class="p">()</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">wine</span><span class="p">[</span><span class="s">'class'</span><span class="p">].</span><span class="n">to_numpy</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+
+<span class="n">train_input</span><span class="p">,</span> <span class="n">test_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">,</span> <span class="n">test_target</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">train_input</span><span class="p">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">test_input</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>(5197, 3) (1300, 3)<br />
+훈련 세트와 테스트 세트의 갯수를 확인해봤습니다. 이제 StandardScaler을 사용해서 표준화합니다. 그리고 그 데이터를 사용하여 로지스틱 회귀 모델을 훈련합니다.</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+
+:ET

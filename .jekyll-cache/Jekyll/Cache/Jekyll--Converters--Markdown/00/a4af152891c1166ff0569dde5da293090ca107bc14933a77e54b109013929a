@@ -1,0 +1,171 @@
+I"�L<p>결정 트리 알고리즘을 사용하여 새로운 분류 문제를 다루어보도록 하겠습니다.</p>
+
+<p>우선적으로 와인 데이터의 여러 변수를 사용하여 와인 종류를 구별할 수 있도록 로지스틱 회귀를 사용합니다.</p>
+
+<h2 id="로지스틱-회귀로-와인-분류하기">로지스틱 회귀로 와인 분류하기</h2>
+
+<p>판다스를 이용해 데이터를 불러옵니다. head() 메서드를 사용해 데이터를 확인합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+
+<span class="n">wine</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'https://bit.ly/wine-date'</span><span class="p">)</span>
+<span class="n">wine</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG5/HG5-1-1.png?raw=true" alt="HG5-1-1" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">wine</span><span class="p">.</span><span class="n">info</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG5/HG5-1-2.png?raw=true" alt="HG5-1-2" /><br />
+와인 데이터 프레임의 각 데이터 타입과 누락된 값이 있는지 확인하기 위해 .info() 메서드를 사용합니다. 결과적으로 총 6497열 중에 각 column 값이 6497인 것을 보아 누락된 데이터는 없다는 것을 확인했습니다.<br />
+다음으로 describe() 메서드를 사용하여 각 column에 대한 간단한 통계값을 출력합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">wine</span><span class="p">.</span><span class="n">describe</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG5/HG5-1-3.png?raw=true" alt="HG5-1-3" />
+이 값에서 확인할 수 잇는 점은 각 column에 대해 스케일이 다르다는 것입니다. 따라서 앞서 진행했던 것처럼 표준화를 해주어야 합니다. 표준화에 앞서 배열을 넘파이 형식으로 바꾼 후에 훈련 데이터와 테스트 데이터로 나누는 작업을 진행합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data</span> <span class="o">=</span> <span class="n">wine</span><span class="p">[[</span><span class="s">'alcohol'</span><span class="p">,</span> <span class="s">'sugar'</span><span class="p">,</span> <span class="s">'pH'</span><span class="p">]].</span><span class="n">to_numpy</span><span class="p">()</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">wine</span><span class="p">[</span><span class="s">'class'</span><span class="p">].</span><span class="n">to_numpy</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+
+<span class="n">train_input</span><span class="p">,</span> <span class="n">test_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">,</span> <span class="n">test_target</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">train_input</span><span class="p">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">test_input</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>(5197, 3) (1300, 3)</p>
+</blockquote>
+
+<p>훈련 세트와 테스트 세트의 갯수를 확인해봤습니다. 이제 StandardScaler을 사용해서 표준화합니다. 그리고 그 데이터를 사용하여 로지스틱 회귀 모델을 훈련합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+
+<span class="n">ss</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
+<span class="n">ss</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_input</span><span class="p">)</span>
+
+<span class="n">train_scaled</span> <span class="o">=</span> <span class="n">ss</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">train_input</span><span class="p">)</span>
+<span class="n">test_scaled</span> <span class="o">=</span> <span class="n">ss</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">test_input</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+
+<span class="n">lr</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">()</span>
+<span class="n">lr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.7808350971714451
+0.7776923076923077</p>
+</blockquote>
+
+<p>모델의 점수가 높지 않은 것을 확인할 수 있습니다. 로지스틱 회귀가 학습한 계수와 절편을 출력해봅니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">coef_</span><span class="p">,</span> <span class="n">lr</span><span class="p">.</span><span class="n">intercept_</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[[ 0.51270274  1.6733911  -0.68767781]] [1.81777902]</p>
+</blockquote>
+
+<p>모델을 설명하기 위해 로지스틱 회귀가 학습한 계수들을 출력해보았습니다. 그러나 한눈에 알아보기 어렵다는 단점이 있고, 관계를 쉽게 설명할 수 없기 때문에 비교적 설명이 쉬운 결정트리 모델을 학습해보겠습니다.</p>
+
+<h2 id="결정트리">결정트리</h2>
+
+<p>결정트리 모델을 사이킷런의 DecisionTreeClassifier 클래스에서 제공합니다. 모델을 훈련한 후 점수를 출력해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span>
+
+<span class="n">dt</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">dt</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">dt</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">dt</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.996921300750433
+0.8592307692307692<br />
+정확도가 아까보다 높게 출력되었습니다. 다만 점수 차이를 보니 과대적합이 된 것 같습니다. 모델을 그림으로 표현해봅니다.</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">plot_tree</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="n">plot_tree</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG5/HG5-1-4.png?raw=true" alt="HG5-1-4" /><br />
+트리 그림이 너무 복잡하기 때문에 깊이를 제한해서 다시 그려보겠습니다. 트리의 깊이는 max_depth() 매개변수를 사용하면 됩니다. filled는 노드의 색을 칠할 수 있고 feature_names는 특성의 이름을 전달할 수 있습니다. 다음과 같은 매개변수들을 사용해서 다시 그림을 그려보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="n">plot_tree</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">filled</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">feature_names</span><span class="o">=</span><span class="p">[</span><span class="s">'alcohol'</span><span class="p">,</span> <span class="s">'sugar'</span><span class="p">,</span> <span class="s">'pH'</span><span class="p">])</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG5/HG5-1-5.png?raw=true" alt="HG5-1-5" /></p>
+
+<h3 id="가지치기">가지치기</h3>
+
+<p>결정트리에서는 노드 수가 너무 많아지면 훈련 데이터에 과대적합될 수 있기 때문에 노드의 수를 조절하는 가지치기가 필요합니다. 가지치기를 할 수 있는 가장 간단한 방법은 max_depth를 조절하는 것입니다. 루트 노드 아래로 3개의 노드만 만들어 모델을 훈련해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dt</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">dt</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">dt</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">dt</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.8454877814123533<br />
+0.8415384615384616</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">15</span><span class="p">))</span>
+<span class="n">plot_tree</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">filled</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">feature_names</span><span class="o">=</span><span class="p">[</span><span class="s">'alcohol'</span><span class="p">,</span> <span class="s">'sugar'</span><span class="p">,</span> <span class="s">'pH'</span><span class="p">])</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG5/HG5-1-6.png?raw=true" alt="HG5-1-6" /></p>
+
+<p>훈련 세트의 점수는 낮아지고 테스트 세트 점수는 거의 비슷하기 때문에 그림으로 그려보았습니다. 
+깊이 3에 있는 마지막 노드들이 최종 노드인 리프 노드입니다. 
+세 번째에 위치한 노드만 음성 클래스가 더 많기 때문에 이 노드에 도착한 것들만 레드 와인으로 예측합니다. 
+루트 노드부터 이 노드까지 도달하기 위해서는 당도가 -0.239보다 작고 -0.802보다도 작아야 합니다. 알코올 도수는 0.454보다도 작아야 이 노드에 도달할 수 있습니다.<br />
+<br />
+결정트리는 불순도에 따라 샘플을 나누는데, 불순도는 클래스별 비율을 가지고 계산하기 때문에 표준화 작업이 필요가 없습니다. 
+그렇다면 원래 데이터를 가지고 결정트리 모델을 다시 훈련해봅니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dt</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">dt</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">dt</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">dt</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_input</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.8454877814123533<br />
+0.8415384615384616</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">15</span><span class="p">))</span>
+<span class="n">plot_tree</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">filled</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">feature_names</span><span class="o">=</span><span class="p">[</span><span class="s">'alcohol'</span><span class="p">,</span> <span class="s">'sugar'</span><span class="p">,</span> <span class="s">'pH'</span><span class="p">])</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG5/HG5-1-7HG.png?raw=true" alt="HG5-1-7" /><br />
+점수는 동일하지만, 특성값이 음수로 나오지 않기 때문에 설명하기 쉬워졌습니다. 
+마지막으로 결정 트리에서 어떤 특성이 가장 유용한지 나타내는 특성 중요도를 계산합니다. 
+feature_importances_ 속성으로 알아볼 수 있습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">dt</span><span class="p">.</span><span class="n">feature_importances_</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[0.12345626 0.86862934 0.0079144 ]<br />
+<br />
+두번째 값인 당도가 0.87 정도로 특성 중요도가 가장 높은 것을 볼 수 있습니다. 
+특성 중요도는 각 노드의 정보 이득과 전체 샘플에 대한 비율을 곱한 후 특성별로 더해서 계산합니다. 
+특성 중요도를 활용하면 결정트리 모델을 특성 선택에 활용할 수 있습니다. 
+성능이 매우 좋지는 않지만 설명하기는 좋은 모델이라고 생각할 수 있습니다.</p>
+</blockquote>
+
+<p>다음 절에서는 결정 트리의 다양한 매개변수들, 하이퍼파라미터를 자동으로 찾을 수 있는 방법에 대해 알아보도록 하겠습니다.</p>
+
+:ET
