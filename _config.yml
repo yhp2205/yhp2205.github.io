@@ -292,5 +292,3 @@ defaults:
       show_date : true
       mathjax : true
       sidebar : true 
-      toc: true 
-   	  toc_sticky: true
