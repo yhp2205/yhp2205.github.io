@@ -1,0 +1,208 @@
+I"Z<h2 id="교차-검증과-그리드-서치">교차 검증과 그리드 서치</h2>
+
+<p>테스트 세트 성능을 올바르게 판단하기 위해서는 모델을 전부 만든 뒤에 마지막에 한 번만 사용하는 것이 좋습니다. 그렇다면 테스트 세트를 사용하지 않고 어떻게 하이퍼 파라미터 튜닝을 할 수 있을지 알아보도록 하겠습니다.</p>
+
+<h3 id="검증-세트">검증 세트</h3>
+<p>테스트 세트를 사용하지 않고 모델이 과대적합인지 과소적합인지 알아보기 위해서는 훈련 세트를 또 나누는 방법을 취할 수 있습니다.
+이 데이터를 검증세트라고 합니다.
+훈련 세트에서 모델을 훈련한 후 검증세트로 평가합니다. 이런 식으로 매개변수들을 바꿔가며 가장 좋은 모델을 고르면 됩니다.</p>
+
+<p>그럼 데이터를 불러와서 train 세트와 test 세트로 나눈 후에 검증 세트로도 나눠보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+
+<span class="n">wine</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'https://bit.ly/wine_csv_data'</span><span class="p">)</span>
+</code></pre></div></div>
+<p>와인 데이터를 data에는 alcohol, sugar, pH 를 지정하고, target에는 class 를 넘파이 배열로 지정해줍니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data</span> <span class="o">=</span> <span class="n">wine</span><span class="p">[[</span><span class="s">'alcohol'</span><span class="p">,</span> <span class="s">'sugar'</span><span class="p">,</span> <span class="s">'pH'</span><span class="p">]].</span><span class="n">to_numpy</span><span class="p">()</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">wine</span><span class="p">[</span><span class="s">'class'</span><span class="p">].</span><span class="n">to_numpy</span><span class="p">()</span>
+</code></pre></div></div>
+<p>train_test_split를 사용하여 train data와 test data로 나눕니다. test_size를 0.2로 지정하여 20%만 test 데이터로 가져옵니다. test size를 지정하지 않을 경우 train_test_split는 디폴트로 0.25를 테스트 세트로 지정합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+
+<span class="n">train_input</span><span class="p">,</span> <span class="n">test_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">,</span> <span class="n">test_target</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+</code></pre></div></div>
+<p>그리고 train data를 sub data와 val data로 한번 더 나누어 줍니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sub_input</span><span class="p">,</span> <span class="n">val_input</span><span class="p">,</span> <span class="n">sub_target</span><span class="p">,</span> <span class="n">val_target</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+</code></pre></div></div>
+<p>훈련 세트와 검증 세트의 크기를 확인해봅니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">sub_input</span><span class="p">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">val_input</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>(4157, 3) (1040, 3)</p>
+</blockquote>
+
+<p>데이터를 각각 훈련데이터, 검증데이터, 테스트 데이터로 나누어줬습니다. 
+다음으로 훈련데이터와 검증데이터를 사용하여 모델을 만들고 평가합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span>
+
+<span class="n">dt</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">dt</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">sub_input</span><span class="p">,</span> <span class="n">sub_target</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">dt</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">sub_input</span><span class="p">,</span> <span class="n">sub_target</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">dt</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">val_input</span><span class="p">,</span> <span class="n">val_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.9971133028626413<br />
+0.864423076923077</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">cross_validate</span>
+
+<span class="n">scores</span> <span class="o">=</span> <span class="n">cross_validate</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="s">'test_score'</span><span class="p">]))</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">StratifiedKFold</span>
+
+<span class="n">scores</span> <span class="o">=</span> <span class="n">cross_validate</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">StratifiedKFold</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="s">'test_score'</span><span class="p">]))</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">splitter</span> <span class="o">=</span> <span class="n">StratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">scores</span> <span class="o">=</span> <span class="n">cross_validate</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">splitter</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="s">'test_score'</span><span class="p">]))</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">GridSearchCV</span>
+
+<span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s">'min_impurity_decrease'</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.0001</span><span class="p">,</span> <span class="mf">0.0002</span><span class="p">,</span> <span class="mf">0.0003</span><span class="p">,</span> <span class="mf">0.0004</span><span class="p">,</span> <span class="mf">0.0005</span><span class="p">]}</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">gs</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">),</span> <span class="n">params</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">gs</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>GridSearchCV(estimator=DecisionTreeClassifier(random_state=42), n_jobs=-1,
+             param_grid={‘min_impurity_decrease’: [0.0001, 0.0002, 0.0003,
+                                                   0.0004, 0.0005]})</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dt</span> <span class="o">=</span> <span class="n">gs</span><span class="p">.</span><span class="n">best_estimator_</span>
+<span class="k">print</span><span class="p">(</span><span class="n">dt</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.9615162593804117</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">gs</span><span class="p">.</span><span class="n">best_params_</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>{‘min_impurity_decrease’: 0.0001}</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">gs</span><span class="p">.</span><span class="n">cv_results_</span><span class="p">[</span><span class="s">'mean_test_score'</span><span class="p">])</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[0.86819297 0.86453617 0.86492226 0.86780891 0.86761605]</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">best_index</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">gs</span><span class="p">.</span><span class="n">cv_results_</span><span class="p">[</span><span class="s">'mean_test_score'</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">gs</span><span class="p">.</span><span class="n">cv_results_</span><span class="p">[</span><span class="s">'params'</span><span class="p">][</span><span class="n">best_index</span><span class="p">])</span>
+</code></pre></div></div>
+<blockquote>
+  <p>{‘min_impurity_decrease’: 0.0001}</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s">'min_impurity_decrease'</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.0001</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.0001</span><span class="p">),</span>
+          <span class="s">'max_depth'</span><span class="p">:</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+          <span class="s">'min_samples_split'</span><span class="p">:</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+          <span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">gs</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">),</span> <span class="n">params</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">gs</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>GridSearchCV(estimator=DecisionTreeClassifier(random_state=42), n_jobs=-1,
+             param_grid={‘max_depth’: range(5, 20),
+                         ‘min_impurity_decrease’: array([0.0001, 0.0002, 0.0003, 0.0004, 0.0005, 0.0006, 0.0007, 0.0008,
+       0.0009]),
+                         ‘min_samples_split’: range(2, 100, 10)})</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">gs</span><span class="p">.</span><span class="n">best_params_</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>{‘max_depth’: 14, ‘min_impurity_decrease’: 0.0004, ‘min_samples_split’: 12}</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">max</span><span class="p">(</span><span class="n">gs</span><span class="p">.</span><span class="n">cv_results_</span><span class="p">[</span><span class="s">'mean_test_score'</span><span class="p">]))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.8683865773302731</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">uniform</span><span class="p">,</span> <span class="n">randint</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rgen</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">rgen</span><span class="p">.</span><span class="n">rvs</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>array([3, 6, 1, 2, 3, 1, 7, 6, 5, 1])</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">np</span><span class="p">.</span><span class="n">unique</span><span class="p">(</span><span class="n">rgen</span><span class="p">.</span><span class="n">rvs</span><span class="p">(</span><span class="mi">1000</span><span class="p">),</span> <span class="n">return_counts</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>(array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]),
+ array([ 79,  89, 110, 112, 106, 104,  95,  99, 104, 102]))</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ugen</span> <span class="o">=</span> <span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">ugen</span><span class="p">.</span><span class="n">rvs</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>array([0.38360187, 0.85618662, 0.41423051, 0.18153867, 0.36998781,
+       0.93449236, 0.36294108, 0.2842492 , 0.26135179, 0.12996384])</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s">'min_impurity_decrease'</span><span class="p">:</span> <span class="n">uniform</span><span class="p">(</span><span class="mf">0.0001</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">),</span>
+          <span class="s">'max_depth'</span><span class="p">:</span> <span class="n">randint</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+          <span class="s">'min_samples_split'</span><span class="p">:</span> <span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span>
+          <span class="s">'min_samples_leaf'</span><span class="p">:</span> <span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span>
+          <span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">RandomizedSearchCV</span>
+
+<span class="n">gs</span> <span class="o">=</span> <span class="n">RandomizedSearchCV</span><span class="p">(</span><span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">),</span> <span class="n">params</span><span class="p">,</span> 
+                        <span class="n">n_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">gs</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">gs</span><span class="p">.</span><span class="n">best_params_</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>{‘max_depth’: 39, ‘min_impurity_decrease’: 0.00034102546602601173, ‘min_samples_leaf’: 7, ‘min_samples_split’: 13}</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">max</span><span class="p">(</span><span class="n">gs</span><span class="p">.</span><span class="n">cv_results_</span><span class="p">[</span><span class="s">'mean_test_score'</span><span class="p">]))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.8695428296438884</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dt</span> <span class="o">=</span> <span class="n">gs</span><span class="p">.</span><span class="n">best_estimator_</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">dt</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_input</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.86</p>
+</blockquote>
+:ET

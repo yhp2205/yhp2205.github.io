@@ -1,0 +1,1086 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>[혼공머신러닝] Ch 5. 트리 알고리즘(2) - YOUNGHYUN’s Blog</title>
+<meta name="description" content="5-2 교차 검증과 그리드 서치">
+
+
+  <meta name="author" content="Younghyun Park">
+  
+  <meta property="article:author" content="Younghyun Park">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_KR">
+<meta property="og:site_name" content="YOUNGHYUN's Blog">
+<meta property="og:title" content="[혼공머신러닝] Ch 5. 트리 알고리즘(2)">
+<meta property="og:url" content="http://localhost:4000/ml/HG5-2/">
+
+
+  <meta property="og:description" content="5-2 교차 검증과 그리드 서치">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2022-05-28T00:00:00+09:00">
+
+
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="http://localhost:4000/ml/HG5-2/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Younghyun Park",
+      "url": "http://localhost:4000/"
+    
+  }
+</script>
+
+
+  <meta name="google-site-verification" content="flHI7POn7YCbdVsZAXDxsOOoL1c0Y-JsCMLr6gc17YY" />
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="YOUNGHYUN's Blog Feed">
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <!-- start custom head snippets -->
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/logo.ico/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/logo.ico/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/logo.ico/favicon-16x16.png">
+<link rel="manifest" herf="/assets/logo.ico/site.webmanifest">
+<link rel="mask-icon" herf="/assets/logo.ico/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/main.jpg" alt="YOUNGHYUN's Blog"></a>
+        
+        <a class="site-title" href="/">
+          YOUNGHYUN's Blog
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/categories/">Category</a>
+            </li><li class="masthead__menu-item">
+              <a href="/tags/">Tags</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <i class="fas fa-search"></i>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person" class="h-card">
+
+  
+    <div class="author__avatar">
+      <a href="http://localhost:4000/">
+        <img src="/assets/images/main.jpg" alt="Younghyun Park" itemprop="image" class="u-photo">
+      </a>
+    </div>
+  
+
+  <div class="author__content">
+    <h3 class="author__name p-name" itemprop="name">
+      <a class="u-url" rel="me" href="http://localhost:4000/" itemprop="url">Younghyun Park</a>
+    </h3>
+    
+      <div class="author__bio p-note" itemprop="description">
+        <p><strong>노력하는 개발자</strong><br /><em>열정적인 개발자</em></p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name" class="p-locality">Republic of Korea</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="mailto:yhp2205@gmail.com" rel="nofollow noopener noreferrer me"><i class="fas fa-fw fa-envelope-square" aria-hidden="true"></i><span class="label">Email</span></a></li>
+          
+        
+          
+            <li><a href="https://yhp2205.github.io" rel="nofollow noopener noreferrer me"><i class="fas fa-fw fa-link" aria-hidden="true"></i><span class="label">Website</span></a></li>
+          
+        
+          
+        
+          
+        
+          
+            <li><a href="https://github.com/yhp2205" rel="nofollow noopener noreferrer me"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+  
+    
+      
+      
+      
+      
+    
+    
+      
+
+<nav class="nav__list">
+  
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc">Toggle Menu</label>
+  <ul class="nav__items">
+    
+      <li>
+        
+          <span class="nav__sub-title">Study</span>
+        
+
+        
+        <ul>
+          
+          
+            <li><a href="/ML/">Machine Learning(9)</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">Git</span>
+        
+
+        
+        <ul>
+          
+          
+            <li><a href="/Blog_page/">Blog(5)</a></li>
+          
+          
+            <li><a href="/Github/">Github(1)</a></li>
+          
+        </ul>
+        
+      </li>
+    
+  </ul>
+</nav>
+
+    
+  
+  </div>
+
+
+
+
+
+<nav class="nav__list">
+  
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc">Toggle Menu</label>
+  <ul class="nav__items">
+    
+  </ul>
+</nav>
+
+
+
+
+  <article class="page h-entry" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="[혼공머신러닝] Ch 5. 트리 알고리즘(2)">
+    <meta itemprop="description" content="5-2 교차 검증과 그리드 서치">
+    <meta itemprop="datePublished" content="2022-05-28T00:00:00+09:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title p-name" itemprop="headline">
+            <a href="http://localhost:4000/ml/HG5-2/" class="u-url" itemprop="url">[혼공머신러닝] Ch 5. 트리 알고리즘(2)
+</a>
+          </h1>
+          
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-05-28T00:00:00+09:00">May 28, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          4 minute read
+        
+      </span>
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content e-content" itemprop="text">
+        
+          <aside class="sidebar__right sticky">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On this page</h4></header>
+              <ul class="toc__menu"><li><a href="#교차-검증과-그리드-서치">교차 검증과 그리드 서치</a><ul><li><a href="#검증-세트">검증 세트</a></li><li><a href="#교차-검증">교차 검증</a></li><li><a href="#하이퍼파라미터-튜닝">하이퍼파라미터 튜닝</a></li><li><a href="#랜덤서치">랜덤서치</a></li></ul></li></ul>
+
+            </nav>
+          </aside>
+        
+        <h1 id="교차-검증과-그리드-서치">교차 검증과 그리드 서치</h1>
+
+<p>테스트 세트 성능을 올바르게 판단하기 위해서는 모델을 전부 만든 뒤에 마지막에 한 번만 사용하는 것이 좋습니다. 그렇다면 테스트 세트를 사용하지 않고 어떻게 하이퍼 파라미터 튜닝을 할 수 있을지 알아보도록 하겠습니다.</p>
+
+<h2 id="검증-세트">검증 세트</h2>
+<p>테스트 세트를 사용하지 않고 모델이 과대적합인지 과소적합인지 알아보기 위해서는 훈련 세트를 또 나누는 방법을 취할 수 있습니다.
+이 데이터를 검증세트라고 합니다.
+훈련 세트에서 모델을 훈련한 후 검증세트로 평가합니다. 이런 식으로 매개변수들을 바꿔가며 가장 좋은 모델을 고르면 됩니다.</p>
+
+<p>그럼 데이터를 불러와서 train 세트와 test 세트로 나눈 후에 검증 세트로도 나눠보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+
+<span class="n">wine</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'https://bit.ly/wine_csv_data'</span><span class="p">)</span>
+</code></pre></div></div>
+<p>와인 데이터를 data에는 alcohol, sugar, pH 를 지정하고, target에는 class 를 넘파이 배열로 지정해줍니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data</span> <span class="o">=</span> <span class="n">wine</span><span class="p">[[</span><span class="s">'alcohol'</span><span class="p">,</span> <span class="s">'sugar'</span><span class="p">,</span> <span class="s">'pH'</span><span class="p">]].</span><span class="n">to_numpy</span><span class="p">()</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">wine</span><span class="p">[</span><span class="s">'class'</span><span class="p">].</span><span class="n">to_numpy</span><span class="p">()</span>
+</code></pre></div></div>
+<p>train_test_split를 사용하여 train data와 test data로 나눕니다. test_size를 0.2로 지정하여 20%만 test 데이터로 가져옵니다. test size를 지정하지 않을 경우 train_test_split는 디폴트로 0.25를 테스트 세트로 지정합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+
+<span class="n">train_input</span><span class="p">,</span> <span class="n">test_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">,</span> <span class="n">test_target</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+</code></pre></div></div>
+<p>그리고 train data를 sub data와 val data로 한번 더 나누어 줍니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sub_input</span><span class="p">,</span> <span class="n">val_input</span><span class="p">,</span> <span class="n">sub_target</span><span class="p">,</span> <span class="n">val_target</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+</code></pre></div></div>
+<p>훈련 세트와 검증 세트의 크기를 확인해봅니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">sub_input</span><span class="p">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">val_input</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>(4157, 3) (1040, 3)</p>
+</blockquote>
+
+<p>데이터를 각각 훈련데이터, 검증데이터, 테스트 데이터로 나누어줬습니다. 
+다음으로 훈련데이터와 검증데이터를 사용하여 모델을 만들고 평가합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span>
+
+<span class="n">dt</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">dt</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">sub_input</span><span class="p">,</span> <span class="n">sub_target</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">dt</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">sub_input</span><span class="p">,</span> <span class="n">sub_target</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">dt</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">val_input</span><span class="p">,</span> <span class="n">val_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.9971133028626413<br />
+0.864423076923077</p>
+</blockquote>
+
+<p>모델이 훈련 세트에 과대적합 되어있으니 매개변수를 바꾸어 더 좋은 모델을 찾아보겠습니다.</p>
+
+<h2 id="교차-검증">교차 검증</h2>
+<p>많은 데이터를 훈련세트에 사용할 수록 모델의 정확도가 좋아집니다. 그렇다고 검증세트를 적게 사용하면 검증 점수가 불안정하게 나올 수 있습니다. 이를 해결하기 위해 교차검증을 이용합니다.<br />
+검증세트를 떼어놓는 과정을 여러 번 반복하고 이 점수들을 평균내어 검증 점수를 얻어냅니다.
+이런 방법을 사용하면 데이터의 8,90% 정도를 훈련에 사용할 수 있습니다.
+사이킷런에 cross_validate() 함수를 사용하여 교차검증을 해보도록 하겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">cross_validate</span>
+
+<span class="n">scores</span> <span class="o">=</span> <span class="n">cross_validate</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>{‘fit_time’: array([0.00482202, 0.00468516, 0.00489712, 0.00469923, 0.0045011 ]), ‘score_time’: array([0.0005331 , 0.00038004, 0.00038218, 0.00042176, 0.00033784]), ‘test_score’: array([0.86923077, 0.84615385, 0.87680462, 0.84889317, 0.83541867])}</p>
+</blockquote>
+
+<p>이 함수는 fit_time, score_time, test_score 키를 갖는 딕셔너리를 반환합니다. 
+cross_validate 함수는 기본적으로 5-폴드 교차검증을 수행하기 때문에 각 키마다 5개의 숫자가 담겨있습니다. 
+교차 검증의 점수들을 평균내어 최종 점수를 얻습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="s">'test_score'</span><span class="p">]))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.855300214703487</p>
+</blockquote>
+
+<p>다만 cross_validate 함수는 훈련 세트를 섞어서 폴드를 나누지 않기 때문에 만약 훈련세트를 섞어서 나누고 싶다면 splitter을 지정해줘야합니다. 
+cross_validate 함수는 기본적으로 회귀모델일 경우 KFold 분할기를 사용하고 분류모델일 경우 StratifiedKFold를 사용합니다. 
+다음 코드와 앞서 수행한 교차 검증은 동일합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">StratifiedKFold</span>
+
+<span class="n">scores</span> <span class="o">=</span> <span class="n">cross_validate</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">StratifiedKFold</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="s">'test_score'</span><span class="p">]))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.855300214703487</p>
+</blockquote>
+
+<p>10-교차검증을 해보고 싶다면 다음과 같이 stratifiedKFold에 splits를 10으로 지정하고 splitter에 할당하여 사용하면 됩니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">splitter</span> <span class="o">=</span> <span class="n">StratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">scores</span> <span class="o">=</span> <span class="n">cross_validate</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">splitter</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="s">'test_score'</span><span class="p">]))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.8574181117533719</p>
+</blockquote>
+
+<h2 id="하이퍼파라미터-튜닝">하이퍼파라미터 튜닝</h2>
+
+<p>결정트리 모델에서는 여러 매개변수를 동시에 바꿔가며 최적의 값을 찾아야하기 때문에 그리드 서치를 사용합니다. 
+GridSearchCV 클래스는 하이퍼파라미터 탐색과 교차 검증을 한번에 수행해줍니다. 
+한 예시로 기본 매개변수를 사용한 결정트리 모델에서 min_impurity_decrease 매개변수의 최적값을 찾아보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">GridSearchCV</span>
+
+<span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s">'min_impurity_decrease'</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.0001</span><span class="p">,</span> <span class="mf">0.0002</span><span class="p">,</span> <span class="mf">0.0003</span><span class="p">,</span> <span class="mf">0.0004</span><span class="p">,</span> <span class="mf">0.0005</span><span class="p">]}</span>
+</code></pre></div></div>
+<p>여기서는 5개의 값을 시도합니다. 
+결정트리 클래스의 객체를 생성하고 바로 전달합니다.<br />
+gs 객체에 fit 메서드를 호출합니다. 메서드를 호출하면 그리드 서치 객체는 min_impurity_decrease 값을 바꿔가며 5번 실행합니다. 
+많은 모델을 훈련하기 때문에 n_jobs 매개변수를 사용하여 미리 사용할 CPU 코어수를 지정해줄 수 있습니다. 
+이 매개변수의 기본 값은 1로, -1로 지정하면 시스템에 있는 모든 코어를 사용합니다. 
+사이킷런의 그리드 서치는 훈련이 끝나면 best_estimator_속성에 가장 좋은 모델을 저장합니다. 
+그리고 그리드 서치로 찾은 최적의 매개변수는 best_params_ 속성에 저장되어있습니다. 
+확인해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">gs</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">),</span> <span class="n">params</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">gs</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>GridSearchCV(estimator=DecisionTreeClassifier(random_state=42), n_jobs=-1,
+             param_grid={‘min_impurity_decrease’: [0.0001, 0.0002, 0.0003,
+                                                   0.0004, 0.0005]})</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dt</span> <span class="o">=</span> <span class="n">gs</span><span class="p">.</span><span class="n">best_estimator_</span>
+<span class="k">print</span><span class="p">(</span><span class="n">dt</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.9615162593804117</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">gs</span><span class="p">.</span><span class="n">best_params_</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>{‘min_impurity_decrease’: 0.0001}</p>
+</blockquote>
+
+<p>0.0001이 가장 좋은 값으로 선택되었습니다. 
+각 매개변수에서 수행한 교차 검증의 평균 점수는 mean_test_score에 저장되어있습니다. 
+그리고 어떤 값이 큰지 확인하기 위해 넘파이의 argmax() 함수를사용합니다. 
+그다음 그 인덱스를 이용하여 params키에 저장된 매개변수를 출력합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">gs</span><span class="p">.</span><span class="n">cv_results_</span><span class="p">[</span><span class="s">'mean_test_score'</span><span class="p">])</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[0.86819297 0.86453617 0.86492226 0.86780891 0.86761605]</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">best_index</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">gs</span><span class="p">.</span><span class="n">cv_results_</span><span class="p">[</span><span class="s">'mean_test_score'</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">gs</span><span class="p">.</span><span class="n">cv_results_</span><span class="p">[</span><span class="s">'params'</span><span class="p">][</span><span class="n">best_index</span><span class="p">])</span>
+</code></pre></div></div>
+<blockquote>
+  <p>{‘min_impurity_decrease’: 0.0001}</p>
+</blockquote>
+
+<p>이제 더 복잡한 매개변수 조합들에서도 사용해보겠습니다. params에 다음과 같이 여러 매개변수의 범위를 설정하고 그리드 서치를 실행해봅니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s">'min_impurity_decrease'</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.0001</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.0001</span><span class="p">),</span>
+          <span class="s">'max_depth'</span><span class="p">:</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+          <span class="s">'min_samples_split'</span><span class="p">:</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+          <span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">gs</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">),</span> <span class="n">params</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">gs</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>GridSearchCV(estimator=DecisionTreeClassifier(random_state=42), n_jobs=-1,
+             param_grid={‘max_depth’: range(5, 20),
+                         ‘min_impurity_decrease’: array([0.0001, 0.0002, 0.0003, 0.0004, 0.0005, 0.0006, 0.0007, 0.0008,
+       0.0009]),
+                         ‘min_samples_split’: range(2, 100, 10)})</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">gs</span><span class="p">.</span><span class="n">best_params_</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>{‘max_depth’: 14, ‘min_impurity_decrease’: 0.0004, ‘min_samples_split’: 12}</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">max</span><span class="p">(</span><span class="n">gs</span><span class="p">.</span><span class="n">cv_results_</span><span class="p">[</span><span class="s">'mean_test_score'</span><span class="p">]))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.8683865773302731</p>
+</blockquote>
+
+<h2 id="랜덤서치">랜덤서치</h2>
+
+<p>매개변수의 값의 범위를 미리 정하기 어려울 때, 그리드 서치 수행시간이 너무 오래걸릴 때 랜덤서치를 사용할 수 있습니다. 
+랜덤 서치에는 매개변수를 샘플링할 수 있는 확률분포를 전달합니다. 
+확률 분포 클래스를 임포트하겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">uniform</span><span class="p">,</span> <span class="n">randint</span>
+</code></pre></div></div>
+<p>임포트한 두 클래스 모두 주어진 범위 내에서 고르게 값을 뽑습니다. 
+차이점은 randint 값은 정숫값을, uniform은 실수값을 뽑습니다. 
+0과 10 사이의 범위를 갖는 randint 객체를 만들어 샘플링을 해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rgen</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">rgen</span><span class="p">.</span><span class="n">rvs</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>array([3, 6, 1, 2, 3, 1, 7, 6, 5, 1])</p>
+</blockquote>
+
+<p>고르게 샘플링이 되는지 확인하기 어려우니, 1000개를 샘플링해서 각 갯수를 세어봅니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">np</span><span class="p">.</span><span class="n">unique</span><span class="p">(</span><span class="n">rgen</span><span class="p">.</span><span class="n">rvs</span><span class="p">(</span><span class="mi">1000</span><span class="p">),</span> <span class="n">return_counts</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>(array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]),
+ array([ 79,  89, 110, 112, 106, 104,  95,  99, 104, 102]))</p>
+</blockquote>
+
+<p>꽤 고르게 샘플링이 된 것을 확인할 수 있습니다.
+마찬가지로 uniform도 사용해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ugen</span> <span class="o">=</span> <span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">ugen</span><span class="p">.</span><span class="n">rvs</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>array([0.38360187, 0.85618662, 0.41423051, 0.18153867, 0.36998781,
+       0.93449236, 0.36294108, 0.2842492 , 0.26135179, 0.12996384])</p>
+</blockquote>
+
+<p>난수 발생기와 유사한 형태로 출력되었습니다.</p>
+
+<p>이제 탐색할 매개변수의 딕셔너리를 만들어줍니다. 
+탐색할 매개변수의 범위를 다음과 같이 지정합니다. 
+min_samples_leaf 매개변수는 리프 노드가 되기 위한 최소 샘플의 개수입니다. 이보다 자식노드의 샘플수가 적을경우 분할하지 않는다는 의미입니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s">'min_impurity_decrease'</span><span class="p">:</span> <span class="n">uniform</span><span class="p">(</span><span class="mf">0.0001</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">),</span>
+          <span class="s">'max_depth'</span><span class="p">:</span> <span class="n">randint</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+          <span class="s">'min_samples_split'</span><span class="p">:</span> <span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span>
+          <span class="s">'min_samples_leaf'</span><span class="p">:</span> <span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span>
+          <span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">RandomizedSearchCV</span>
+
+<span class="n">gs</span> <span class="o">=</span> <span class="n">RandomizedSearchCV</span><span class="p">(</span><span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">),</span> <span class="n">params</span><span class="p">,</span> 
+                        <span class="n">n_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">gs</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>RandomizedSearchCV(estimator=DecisionTreeClassifier(random_state=42),
+                   n_iter=100, n_jobs=-1,
+                   param_distributions={‘max_depth’: &lt;scipy.stats._distn_infrastructure.rv_frozen object at 0x7f8f08156b80&gt;,
+                                        ‘min_impurity_decrease’: &lt;scipy.stats._distn_infrastructure.rv_frozen object at 0x7f8f510ecfd0&gt;,
+                                        ‘min_samples_leaf’: &lt;scipy.stats._distn_infrastructure.rv_frozen object at 0x7f8f081568b0&gt;,
+                                        ‘min_samples_split’: &lt;scipy.stats._distn_infrastructure.rv_frozen object at 0x7f8f202cc2b0&gt;},
+                   random_state=42)</p>
+</blockquote>
+
+<p>params에서 정의된 범위에서 총 100번을 샘플링하여 교차검증을 수행하여 최적의 값을 찾습니다.
+샘플링 횟수는 n_iter 매개변수에 지정해주었습니다.
+이제 최적의 매개변수의 값을 출력하고 최고의 교차 검증 점수도 확인해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">gs</span><span class="p">.</span><span class="n">best_params_</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>{‘max_depth’: 39, ‘min_impurity_decrease’: 0.00034102546602601173, ‘min_samples_leaf’: 7, ‘min_samples_split’: 13}</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">max</span><span class="p">(</span><span class="n">gs</span><span class="p">.</span><span class="n">cv_results_</span><span class="p">[</span><span class="s">'mean_test_score'</span><span class="p">]))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.8695428296438884</p>
+</blockquote>
+
+<p>best_estimator_에 저장되어있는 최적의 모델을 사용하여 테스트의 성능을 확인합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dt</span> <span class="o">=</span> <span class="n">gs</span><span class="p">.</span><span class="n">best_estimator_</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">dt</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_input</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.86</p>
+</blockquote>
+
+<p>오늘은 수동으로 매개변수를 바꾸는 대신 그리드 서치나 랜덤 서치를 이용하여 최적의 매개변수를 찾는 방법을 알아보았습니다. 다음에는 결정 트리를 확장한 앙상블 모델에 대해 알아보도록 하겠습니다.</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/tags/#blog" class="page__taxonomy-item p-category" rel="tag">Blog</a><span class="sep">, </span>
+    
+      <a href="/tags/#data-mining" class="page__taxonomy-item p-category" rel="tag">Data mining</a><span class="sep">, </span>
+    
+      <a href="/tags/#machine-learning" class="page__taxonomy-item p-category" rel="tag">Machine learning</a><span class="sep">, </span>
+    
+      <a href="/tags/#%ED%98%BC%EA%B3%B5%EB%A8%B8%EC%8B%A0%EB%9F%AC%EB%8B%9D" class="page__taxonomy-item p-category" rel="tag">혼공머신러닝</a>
+    
+    </span>
+  </p>
+
+
+
+
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-folder-open" aria-hidden="true"></i> Categories: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/categories/#ml" class="page__taxonomy-item p-category" rel="tag">ML</a>
+    
+    </span>
+  </p>
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time class="dt-published" datetime="2022-05-28T00:00:00+09:00">May 28, 2022</time></p>
+
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?text=%5B%ED%98%BC%EA%B3%B5%EB%A8%B8%EC%8B%A0%EB%9F%AC%EB%8B%9D%5D+Ch+5.+%ED%8A%B8%EB%A6%AC+%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98%282%29%20http%3A%2F%2Flocalhost%3A4000%2Fml%2FHG5-2%2F" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Flocalhost%3A4000%2Fml%2FHG5-2%2F" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Flocalhost%3A4000%2Fml%2FHG5-2%2F" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/ml/HG5-1/" class="pagination--pager" title="[혼공머신러닝] Ch 5. 트리 알고리즘
+">Previous</a>
+    
+    
+      <a href="#" class="pagination--pager disabled">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h2 class="page__related-title">You May Also Enjoy</h2>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/main.jpg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/ml/HG5-1/" rel="permalink">[혼공머신러닝] Ch 5. 트리 알고리즘
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-05-27T00:00:00+09:00">May 27, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          2 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">5-1 결정 트리
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/main.jpg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/ml/HG4-2/" rel="permalink">[혼공머신러닝] Ch 4. 다양한 분류 알고리즘(2)
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-05-27T00:00:00+09:00">May 27, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          1 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">4-2 확률적 경사 하강법
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/main.jpg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/github/GitAction/" rel="permalink">[Github] 깃허브 메인 페이지에 잔디심기 띄우기
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-05-14T00:00:00+09:00">May 14, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          2 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">Github Actions를 사용한 잔디심기 대시보드 만들기
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/main.jpg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/ml/HG4-1/" rel="permalink">[혼공머신러닝] Ch 4. 다양한 분류 알고리즘
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-05-04T00:00:00+09:00">May 4, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">4-1 로지스틱 회귀
+</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';" role="search">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2022 Younghyun Park. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+    <script>
+  'use strict';
+
+  (function () {
+    var commentContainer = document.querySelector('#giscus-comments');
+
+    if (!commentContainer) {
+      return;
+    }
+
+    var script = document.createElement('script');
+    script.setAttribute('src', 'https://giscus.app/client.js');
+    script.setAttribute('data-repo', 'yhp2205/yhp2205.github.io');
+    script.setAttribute('data-repo-id', 'yhp2205/yhp2205.github.io');
+    script.setAttribute('data-category', 'General');
+    script.setAttribute('data-category-id', 'DIC_kwDOHUb7es4CPDVC');
+    script.setAttribute('data-mapping', 'pathname');
+    script.setAttribute('data-reactions-enabled', '1');
+    script.setAttribute('data-theme', 'light');
+    script.setAttribute('crossorigin', 'anonymous');
+
+    commentContainer.appendChild(script);
+  })();
+</script>
+  
+
+
+
+
+
+  </body>
+</html>

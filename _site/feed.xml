@@ -1,99 +1,298 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-05-27T04:13:51+09:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">YOUNGHYUN’s Blog</title><subtitle>노력하는 흔적 남기기</subtitle><author><name>Younghyun Park</name></author><entry><title type="html">[혼공머신러닝] Ch 4. 다양한 분류 알고리즘(2)</title><link href="http://localhost:4000/ml/HG4-2/" rel="alternate" type="text/html" title="[혼공머신러닝] Ch 4. 다양한 분류 알고리즘(2)" /><published>2022-05-27T00:00:00+09:00</published><updated>2022-05-27T00:00:00+09:00</updated><id>http://localhost:4000/ml/HG4-2</id><content type="html" xml:base="http://localhost:4000/ml/HG4-2/"><![CDATA[<h2 id="확률적-경사-하강법">확률적 경사 하강법</h2>
-<p>확률적 경사 하강법이란 Stochastic Gradient Descent로써, 무작위로 배치 크기가 1인 데이터를 추출하여 기울기를 계산하고 경사 하강 알고리즘을 적용하는 방법을 말합니다. 랜덤하게 하나의 샘플을 택하여 하강 알고리즘을 적용하기 때문에 전체 샘플을 사용하지 않습니다. 이러한 형태로 전체 샘플을 모두 사용할 때 까지 알고리즘을 여러번 적용한다고 생각하면 됩니다.<br />
-<br /></p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-05-28T23:27:50+09:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">YOUNGHYUN’s Blog</title><subtitle>노력하는 흔적 남기기</subtitle><author><name>Younghyun Park</name></author><entry><title type="html">[혼공머신러닝] Ch 5. 트리 알고리즘(2)</title><link href="http://localhost:4000/ml/HG5-2/" rel="alternate" type="text/html" title="[혼공머신러닝] Ch 5. 트리 알고리즘(2)" /><published>2022-05-28T00:00:00+09:00</published><updated>2022-05-28T00:00:00+09:00</updated><id>http://localhost:4000/ml/HG5-2</id><content type="html" xml:base="http://localhost:4000/ml/HG5-2/"><![CDATA[<h1 id="교차-검증과-그리드-서치">교차 검증과 그리드 서치</h1>
 
-<p>우선 pandas를 사용하여 데이터를 불러오겠습니다.</p>
+<p>테스트 세트 성능을 올바르게 판단하기 위해서는 모델을 전부 만든 뒤에 마지막에 한 번만 사용하는 것이 좋습니다. 그렇다면 테스트 세트를 사용하지 않고 어떻게 하이퍼 파라미터 튜닝을 할 수 있을지 알아보도록 하겠습니다.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#dataframe 생성
-</span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
-<span class="n">fish</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'https://bit.ly/fish_csv'</span><span class="p">)</span>
+<h2 id="검증-세트">검증 세트</h2>
+<p>테스트 세트를 사용하지 않고 모델이 과대적합인지 과소적합인지 알아보기 위해서는 훈련 세트를 또 나누는 방법을 취할 수 있습니다.
+이 데이터를 검증세트라고 합니다.
+훈련 세트에서 모델을 훈련한 후 검증세트로 평가합니다. 이런 식으로 매개변수들을 바꿔가며 가장 좋은 모델을 고르면 됩니다.</p>
 
-<span class="k">print</span><span class="p">(</span><span class="n">fish</span><span class="p">)</span>
+<p>그럼 데이터를 불러와서 train 세트와 test 세트로 나눈 후에 검증 세트로도 나눠보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+
+<span class="n">wine</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'https://bit.ly/wine_csv_data'</span><span class="p">)</span>
 </code></pre></div></div>
-<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG4/HG4-2-1.png?raw=true" alt="HG4-2-1" /><br />
-<br />
-우선 데이터를 불러온 후에 Species 열을 제외한 열들을 입력 데이터로, Species 열을 타깃 데이터롤 설정합니다.</p>
+<p>와인 데이터를 data에는 alcohol, sugar, pH 를 지정하고, target에는 class 를 넘파이 배열로 지정해줍니다.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fish_input</span> <span class="o">=</span> <span class="n">fish</span><span class="p">[[</span><span class="s">'Weight'</span><span class="p">,</span> <span class="s">'Length'</span><span class="p">,</span> <span class="s">'Diagonal'</span><span class="p">,</span> <span class="s">'Height'</span><span class="p">,</span> <span class="s">'Width'</span><span class="p">]].</span><span class="n">to_numpy</span><span class="p">()</span>
-<span class="n">fish_target</span> <span class="o">=</span> <span class="n">fish</span><span class="p">[</span><span class="s">'Species'</span><span class="p">].</span><span class="n">to_numpy</span><span class="p">()</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data</span> <span class="o">=</span> <span class="n">wine</span><span class="p">[[</span><span class="s">'alcohol'</span><span class="p">,</span> <span class="s">'sugar'</span><span class="p">,</span> <span class="s">'pH'</span><span class="p">]].</span><span class="n">to_numpy</span><span class="p">()</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">wine</span><span class="p">[</span><span class="s">'class'</span><span class="p">].</span><span class="n">to_numpy</span><span class="p">()</span>
+</code></pre></div></div>
+<p>train_test_split를 사용하여 train data와 test data로 나눕니다. test_size를 0.2로 지정하여 20%만 test 데이터로 가져옵니다. test size를 지정하지 않을 경우 train_test_split는 디폴트로 0.25를 테스트 세트로 지정합니다.</p>
 
-<span class="c1">#train set와 test set으로 나누기
-</span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+
 <span class="n">train_input</span><span class="p">,</span> <span class="n">test_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">,</span> <span class="n">test_target</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
-        <span class="n">fish_input</span><span class="p">,</span> <span class="n">fish_target</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">42</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
 </code></pre></div></div>
-<p>fish 데이터를 sklearn을 이용하여 train set와 test set로 나눠줍니다. 
-그리고 StandardScaler을 사용하여 train set와 test set를 표준화 전처리를 해주도록 하겠습니다.</p>
+<p>그리고 train data를 sub data와 val data로 한번 더 나누어 줍니다.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
-<span class="n">ss</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
-<span class="n">ss</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_input</span><span class="p">)</span>
-<span class="n">train_scaled</span> <span class="o">=</span> <span class="n">ss</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">train_input</span><span class="p">)</span>
-<span class="n">test_scaled</span> <span class="o">=</span> <span class="n">ss</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">test_input</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sub_input</span><span class="p">,</span> <span class="n">val_input</span><span class="p">,</span> <span class="n">sub_target</span><span class="p">,</span> <span class="n">val_target</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
 </code></pre></div></div>
-<p>이제 확률적 경사 하강법을 사용하기 위해 sklearn의 SGDClassifier 클래스를 이용합니다. SGDClassifier 클래스에는 loss 변수에 손실 함수의 종류를 지정해주고, max_iter 변수에는 수행할 에포크의 횟수를 지정합니다.</p>
+<p>훈련 세트와 검증 세트의 크기를 확인해봅니다.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">SGDClassifier</span>
-
-<span class="n">sc</span> <span class="o">=</span> <span class="n">SGDClassifier</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="s">'log'</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">42</span><span class="p">)</span>
-<span class="n">sc</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">sc</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
-<span class="k">print</span><span class="p">(</span><span class="n">sc</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">sub_input</span><span class="p">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">val_input</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
 </code></pre></div></div>
 <blockquote>
-  <p>0.773109243697479<br />
-0.775</p>
+  <p>(4157, 3) (1040, 3)</p>
 </blockquote>
 
-<p>점수가 낮게 나왔기 때문에 점수를 높이기 위해 이어서 훈련하여 점진적인 학습을 해보도록 합니다. 이어서 훈련할 때에는 partial_fit() 메서드를 사용하는데, 사용할 때 마다 1 epoch 씩 이어 훈련할 수 있습니다.</p>
+<p>데이터를 각각 훈련데이터, 검증데이터, 테스트 데이터로 나누어줬습니다. 
+다음으로 훈련데이터와 검증데이터를 사용하여 모델을 만들고 평가합니다.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sc</span><span class="p">.</span><span class="n">partial_fit</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">sc</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
-<span class="k">print</span><span class="p">(</span><span class="n">sc</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span>
+
+<span class="n">dt</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">dt</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">sub_input</span><span class="p">,</span> <span class="n">sub_target</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">dt</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">sub_input</span><span class="p">,</span> <span class="n">sub_target</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">dt</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">val_input</span><span class="p">,</span> <span class="n">val_target</span><span class="p">))</span>
 </code></pre></div></div>
 <blockquote>
-  <p>0.8151260504201681<br />
-0.85</p>
+  <p>0.9971133028626413<br />
+0.864423076923077</p>
 </blockquote>
 
-<p>확률적 경사 하강법을 사용한 모델은 에포크의 횟수에 따라 과대적합이나 과소적합 될 수 있기 때문에 에포크 횟수에 따른 훈련세트 점수와 테스트세트 점수를 그래프로 나타내 적절한 에포크의 값을 찾아줘야 합니다.</p>
+<p>모델이 훈련 세트에 과대적합 되어있으니 매개변수를 바꾸어 더 좋은 모델을 찾아보겠습니다.</p>
+
+<h2 id="교차-검증">교차 검증</h2>
+<p>많은 데이터를 훈련세트에 사용할 수록 모델의 정확도가 좋아집니다. 그렇다고 검증세트를 적게 사용하면 검증 점수가 불안정하게 나올 수 있습니다. 이를 해결하기 위해 교차검증을 이용합니다.<br />
+검증세트를 떼어놓는 과정을 여러 번 반복하고 이 점수들을 평균내어 검증 점수를 얻어냅니다.
+이런 방법을 사용하면 데이터의 8,90% 정도를 훈련에 사용할 수 있습니다.
+사이킷런에 cross_validate() 함수를 사용하여 교차검증을 해보도록 하겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">cross_validate</span>
+
+<span class="n">scores</span> <span class="o">=</span> <span class="n">cross_validate</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>{‘fit_time’: array([0.00482202, 0.00468516, 0.00489712, 0.00469923, 0.0045011 ]), ‘score_time’: array([0.0005331 , 0.00038004, 0.00038218, 0.00042176, 0.00033784]), ‘test_score’: array([0.86923077, 0.84615385, 0.87680462, 0.84889317, 0.83541867])}</p>
+</blockquote>
+
+<p>이 함수는 fit_time, score_time, test_score 키를 갖는 딕셔너리를 반환합니다. 
+cross_validate 함수는 기본적으로 5-폴드 교차검증을 수행하기 때문에 각 키마다 5개의 숫자가 담겨있습니다. 
+교차 검증의 점수들을 평균내어 최종 점수를 얻습니다.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
-<span class="n">sc</span> <span class="o">=</span> <span class="n">SGDClassifier</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="s">'log'</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">42</span><span class="p">)</span>
-<span class="n">train_score</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="n">test_score</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="n">classes</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">unique</span><span class="p">(</span><span class="n">train_target</span><span class="p">)</span>
 
-<span class="c1">#300번의 epoch동안 훈련 반복 진행
-</span><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">300</span><span class="p">):</span>
-    <span class="n">sc</span><span class="p">.</span><span class="n">partial_fit</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">,</span> <span class="n">classes</span> <span class="o">=</span> <span class="n">classes</span><span class="p">)</span>
-    <span class="n">train_score</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">sc</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
-    <span class="n">test_score</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">sc</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
-
-<span class="c1">#그래프 그리기
-</span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
-<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">train_score</span><span class="p">)</span>
-<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">test_score</span><span class="p">)</span>
-<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'epoch'</span><span class="p">)</span>
-<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'accuracy'</span><span class="p">)</span>
-<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
-</code></pre></div></div>
-<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG4/HG4-2-2.png?raw=true" alt="HG4-2-2" /></p>
-
-<p>결과인 그래프를 보면 초반에는 과소적합되어 훈련세트와 테스트세트 점수가 낮고, 약 100번째 에포크 이후에는 훈련세트와 테스트 세트의 점수가 벌어지고 있는 것을 볼 수 있습니다. 100번째 에포크가 적절한 값인 것을 확인할 수 있습니다. 반복횟수를 100으로 설정하고 모델을 다시 훈련합니다.</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sc</span> <span class="o">=</span> <span class="n">SGDClassifier</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="s">'log'</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">42</span><span class="p">)</span> 
-<span class="n">sc</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
-
-<span class="k">print</span><span class="p">(</span><span class="n">sc</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
-<span class="k">print</span><span class="p">(</span><span class="n">sc</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="s">'test_score'</span><span class="p">]))</span>
 </code></pre></div></div>
 <blockquote>
-  <p>0.957983193277311<br />
-0.925</p>
+  <p>0.855300214703487</p>
 </blockquote>
 
-<p>최종 점수가 잘 나오는 것을 확인할 수 있습니다.</p>]]></content><author><name>Younghyun Park</name></author><category term="ML" /><category term="Blog" /><category term="Machine learning" /><category term="Data mining" /><category term="혼공머신러닝" /><summary type="html"><![CDATA[4-2 확률적 경사 하강법]]></summary></entry><entry><title type="html">[혼공머신러닝] Ch 5. 트리 알고리즘</title><link href="http://localhost:4000/ml/HG5-1/" rel="alternate" type="text/html" title="[혼공머신러닝] Ch 5. 트리 알고리즘" /><published>2022-05-27T00:00:00+09:00</published><updated>2022-05-27T00:00:00+09:00</updated><id>http://localhost:4000/ml/HG5-1</id><content type="html" xml:base="http://localhost:4000/ml/HG5-1/"><![CDATA[<p>결정 트리 알고리즘을 사용하여 새로운 분류 문제를 다루어보도록 하겠습니다.</p>
+<p>다만 cross_validate 함수는 훈련 세트를 섞어서 폴드를 나누지 않기 때문에 만약 훈련세트를 섞어서 나누고 싶다면 splitter을 지정해줘야합니다. 
+cross_validate 함수는 기본적으로 회귀모델일 경우 KFold 분할기를 사용하고 분류모델일 경우 StratifiedKFold를 사용합니다. 
+다음 코드와 앞서 수행한 교차 검증은 동일합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">StratifiedKFold</span>
+
+<span class="n">scores</span> <span class="o">=</span> <span class="n">cross_validate</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">StratifiedKFold</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="s">'test_score'</span><span class="p">]))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.855300214703487</p>
+</blockquote>
+
+<p>10-교차검증을 해보고 싶다면 다음과 같이 stratifiedKFold에 splits를 10으로 지정하고 splitter에 할당하여 사용하면 됩니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">splitter</span> <span class="o">=</span> <span class="n">StratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">scores</span> <span class="o">=</span> <span class="n">cross_validate</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">splitter</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="s">'test_score'</span><span class="p">]))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.8574181117533719</p>
+</blockquote>
+
+<h2 id="하이퍼파라미터-튜닝">하이퍼파라미터 튜닝</h2>
+
+<p>결정트리 모델에서는 여러 매개변수를 동시에 바꿔가며 최적의 값을 찾아야하기 때문에 그리드 서치를 사용합니다. 
+GridSearchCV 클래스는 하이퍼파라미터 탐색과 교차 검증을 한번에 수행해줍니다. 
+한 예시로 기본 매개변수를 사용한 결정트리 모델에서 min_impurity_decrease 매개변수의 최적값을 찾아보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">GridSearchCV</span>
+
+<span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s">'min_impurity_decrease'</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.0001</span><span class="p">,</span> <span class="mf">0.0002</span><span class="p">,</span> <span class="mf">0.0003</span><span class="p">,</span> <span class="mf">0.0004</span><span class="p">,</span> <span class="mf">0.0005</span><span class="p">]}</span>
+</code></pre></div></div>
+<p>여기서는 5개의 값을 시도합니다. 
+결정트리 클래스의 객체를 생성하고 바로 전달합니다.<br />
+gs 객체에 fit 메서드를 호출합니다. 메서드를 호출하면 그리드 서치 객체는 min_impurity_decrease 값을 바꿔가며 5번 실행합니다. 
+많은 모델을 훈련하기 때문에 n_jobs 매개변수를 사용하여 미리 사용할 CPU 코어수를 지정해줄 수 있습니다. 
+이 매개변수의 기본 값은 1로, -1로 지정하면 시스템에 있는 모든 코어를 사용합니다. 
+사이킷런의 그리드 서치는 훈련이 끝나면 best_estimator_속성에 가장 좋은 모델을 저장합니다. 
+그리고 그리드 서치로 찾은 최적의 매개변수는 best_params_ 속성에 저장되어있습니다. 
+확인해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">gs</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">),</span> <span class="n">params</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">gs</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>GridSearchCV(estimator=DecisionTreeClassifier(random_state=42), n_jobs=-1,
+             param_grid={‘min_impurity_decrease’: [0.0001, 0.0002, 0.0003,
+                                                   0.0004, 0.0005]})</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dt</span> <span class="o">=</span> <span class="n">gs</span><span class="p">.</span><span class="n">best_estimator_</span>
+<span class="k">print</span><span class="p">(</span><span class="n">dt</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.9615162593804117</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">gs</span><span class="p">.</span><span class="n">best_params_</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>{‘min_impurity_decrease’: 0.0001}</p>
+</blockquote>
+
+<p>0.0001이 가장 좋은 값으로 선택되었습니다. 
+각 매개변수에서 수행한 교차 검증의 평균 점수는 mean_test_score에 저장되어있습니다. 
+그리고 어떤 값이 큰지 확인하기 위해 넘파이의 argmax() 함수를사용합니다. 
+그다음 그 인덱스를 이용하여 params키에 저장된 매개변수를 출력합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">gs</span><span class="p">.</span><span class="n">cv_results_</span><span class="p">[</span><span class="s">'mean_test_score'</span><span class="p">])</span>
+</code></pre></div></div>
+<blockquote>
+  <p>[0.86819297 0.86453617 0.86492226 0.86780891 0.86761605]</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">best_index</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">gs</span><span class="p">.</span><span class="n">cv_results_</span><span class="p">[</span><span class="s">'mean_test_score'</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">gs</span><span class="p">.</span><span class="n">cv_results_</span><span class="p">[</span><span class="s">'params'</span><span class="p">][</span><span class="n">best_index</span><span class="p">])</span>
+</code></pre></div></div>
+<blockquote>
+  <p>{‘min_impurity_decrease’: 0.0001}</p>
+</blockquote>
+
+<p>이제 더 복잡한 매개변수 조합들에서도 사용해보겠습니다. params에 다음과 같이 여러 매개변수의 범위를 설정하고 그리드 서치를 실행해봅니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s">'min_impurity_decrease'</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.0001</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.0001</span><span class="p">),</span>
+          <span class="s">'max_depth'</span><span class="p">:</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+          <span class="s">'min_samples_split'</span><span class="p">:</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+          <span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">gs</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">),</span> <span class="n">params</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">gs</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>GridSearchCV(estimator=DecisionTreeClassifier(random_state=42), n_jobs=-1,
+             param_grid={‘max_depth’: range(5, 20),
+                         ‘min_impurity_decrease’: array([0.0001, 0.0002, 0.0003, 0.0004, 0.0005, 0.0006, 0.0007, 0.0008,
+       0.0009]),
+                         ‘min_samples_split’: range(2, 100, 10)})</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">gs</span><span class="p">.</span><span class="n">best_params_</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>{‘max_depth’: 14, ‘min_impurity_decrease’: 0.0004, ‘min_samples_split’: 12}</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">max</span><span class="p">(</span><span class="n">gs</span><span class="p">.</span><span class="n">cv_results_</span><span class="p">[</span><span class="s">'mean_test_score'</span><span class="p">]))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.8683865773302731</p>
+</blockquote>
+
+<h2 id="랜덤서치">랜덤서치</h2>
+
+<p>매개변수의 값의 범위를 미리 정하기 어려울 때, 그리드 서치 수행시간이 너무 오래걸릴 때 랜덤서치를 사용할 수 있습니다. 
+랜덤 서치에는 매개변수를 샘플링할 수 있는 확률분포를 전달합니다. 
+확률 분포 클래스를 임포트하겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">uniform</span><span class="p">,</span> <span class="n">randint</span>
+</code></pre></div></div>
+<p>임포트한 두 클래스 모두 주어진 범위 내에서 고르게 값을 뽑습니다. 
+차이점은 randint 값은 정숫값을, uniform은 실수값을 뽑습니다. 
+0과 10 사이의 범위를 갖는 randint 객체를 만들어 샘플링을 해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rgen</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">rgen</span><span class="p">.</span><span class="n">rvs</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>array([3, 6, 1, 2, 3, 1, 7, 6, 5, 1])</p>
+</blockquote>
+
+<p>고르게 샘플링이 되는지 확인하기 어려우니, 1000개를 샘플링해서 각 갯수를 세어봅니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">np</span><span class="p">.</span><span class="n">unique</span><span class="p">(</span><span class="n">rgen</span><span class="p">.</span><span class="n">rvs</span><span class="p">(</span><span class="mi">1000</span><span class="p">),</span> <span class="n">return_counts</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>(array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]),
+ array([ 79,  89, 110, 112, 106, 104,  95,  99, 104, 102]))</p>
+</blockquote>
+
+<p>꽤 고르게 샘플링이 된 것을 확인할 수 있습니다.
+마찬가지로 uniform도 사용해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ugen</span> <span class="o">=</span> <span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">ugen</span><span class="p">.</span><span class="n">rvs</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>array([0.38360187, 0.85618662, 0.41423051, 0.18153867, 0.36998781,
+       0.93449236, 0.36294108, 0.2842492 , 0.26135179, 0.12996384])</p>
+</blockquote>
+
+<p>난수 발생기와 유사한 형태로 출력되었습니다.</p>
+
+<p>이제 탐색할 매개변수의 딕셔너리를 만들어줍니다. 
+탐색할 매개변수의 범위를 다음과 같이 지정합니다. 
+min_samples_leaf 매개변수는 리프 노드가 되기 위한 최소 샘플의 개수입니다. 이보다 자식노드의 샘플수가 적을경우 분할하지 않는다는 의미입니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s">'min_impurity_decrease'</span><span class="p">:</span> <span class="n">uniform</span><span class="p">(</span><span class="mf">0.0001</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">),</span>
+          <span class="s">'max_depth'</span><span class="p">:</span> <span class="n">randint</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+          <span class="s">'min_samples_split'</span><span class="p">:</span> <span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span>
+          <span class="s">'min_samples_leaf'</span><span class="p">:</span> <span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span>
+          <span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">RandomizedSearchCV</span>
+
+<span class="n">gs</span> <span class="o">=</span> <span class="n">RandomizedSearchCV</span><span class="p">(</span><span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">),</span> <span class="n">params</span><span class="p">,</span> 
+                        <span class="n">n_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">gs</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>RandomizedSearchCV(estimator=DecisionTreeClassifier(random_state=42),
+                   n_iter=100, n_jobs=-1,
+                   param_distributions={‘max_depth’: &lt;scipy.stats._distn_infrastructure.rv_frozen object at 0x7f8f08156b80&gt;,
+                                        ‘min_impurity_decrease’: &lt;scipy.stats._distn_infrastructure.rv_frozen object at 0x7f8f510ecfd0&gt;,
+                                        ‘min_samples_leaf’: &lt;scipy.stats._distn_infrastructure.rv_frozen object at 0x7f8f081568b0&gt;,
+                                        ‘min_samples_split’: &lt;scipy.stats._distn_infrastructure.rv_frozen object at 0x7f8f202cc2b0&gt;},
+                   random_state=42)</p>
+</blockquote>
+
+<p>params에서 정의된 범위에서 총 100번을 샘플링하여 교차검증을 수행하여 최적의 값을 찾습니다.
+샘플링 횟수는 n_iter 매개변수에 지정해주었습니다.
+이제 최적의 매개변수의 값을 출력하고 최고의 교차 검증 점수도 확인해보겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">gs</span><span class="p">.</span><span class="n">best_params_</span><span class="p">)</span>
+</code></pre></div></div>
+<blockquote>
+  <p>{‘max_depth’: 39, ‘min_impurity_decrease’: 0.00034102546602601173, ‘min_samples_leaf’: 7, ‘min_samples_split’: 13}</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">max</span><span class="p">(</span><span class="n">gs</span><span class="p">.</span><span class="n">cv_results_</span><span class="p">[</span><span class="s">'mean_test_score'</span><span class="p">]))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.8695428296438884</p>
+</blockquote>
+
+<p>best_estimator_에 저장되어있는 최적의 모델을 사용하여 테스트의 성능을 확인합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dt</span> <span class="o">=</span> <span class="n">gs</span><span class="p">.</span><span class="n">best_estimator_</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">dt</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_input</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.86</p>
+</blockquote>
+
+<p>오늘은 수동으로 매개변수를 바꾸는 대신 그리드 서치나 랜덤 서치를 이용하여 최적의 매개변수를 찾는 방법을 알아보았습니다. 다음에는 결정 트리를 확장한 앙상블 모델에 대해 알아보도록 하겠습니다.</p>]]></content><author><name>Younghyun Park</name></author><category term="ML" /><category term="Blog" /><category term="Machine learning" /><category term="Data mining" /><category term="혼공머신러닝" /><summary type="html"><![CDATA[5-2 교차 검증과 그리드 서치]]></summary></entry><entry><title type="html">[혼공머신러닝] Ch 5. 트리 알고리즘</title><link href="http://localhost:4000/ml/HG5-1/" rel="alternate" type="text/html" title="[혼공머신러닝] Ch 5. 트리 알고리즘" /><published>2022-05-27T00:00:00+09:00</published><updated>2022-05-27T00:00:00+09:00</updated><id>http://localhost:4000/ml/HG5-1</id><content type="html" xml:base="http://localhost:4000/ml/HG5-1/"><![CDATA[<p>결정 트리 알고리즘을 사용하여 새로운 분류 문제를 다루어보도록 하겠습니다.</p>
 
 <p>우선적으로 와인 데이터의 여러 변수를 사용하여 와인 종류를 구별할 수 있도록 로지스틱 회귀를 사용합니다.</p>
 
@@ -263,7 +462,102 @@ feature_importances_ 속성으로 알아볼 수 있습니다.</p>
 특성 중요도를 활용하면 결정트리 모델을 특성 선택에 활용할 수 있습니다. 
 성능이 매우 좋지는 않지만 설명하기는 좋은 모델이라고 생각할 수 있습니다.</p>
 
-<p>다음 절에서는 결정 트리의 다양한 매개변수들, 하이퍼파라미터를 자동으로 찾을 수 있는 방법에 대해 알아보도록 하겠습니다.</p>]]></content><author><name>Younghyun Park</name></author><category term="ML" /><category term="Blog" /><category term="Machine learning" /><category term="Data mining" /><category term="혼공머신러닝" /><summary type="html"><![CDATA[5-1 결정 트리]]></summary></entry><entry><title type="html">[Github] 깃허브 메인 페이지에 잔디심기 띄우기</title><link href="http://localhost:4000/github/GitAction/" rel="alternate" type="text/html" title="[Github] 깃허브 메인 페이지에 잔디심기 띄우기" /><published>2022-05-14T00:00:00+09:00</published><updated>2022-05-14T00:00:00+09:00</updated><id>http://localhost:4000/github/GitAction</id><content type="html" xml:base="http://localhost:4000/github/GitAction/"><![CDATA[<p>오늘은 Github Actions를 사용하여 잔디심기 대시보드를 다음과 같이 만들어보겠습니다.<br />
+<p>다음 절에서는 결정 트리의 다양한 매개변수들, 하이퍼파라미터를 자동으로 찾을 수 있는 방법에 대해 알아보도록 하겠습니다.</p>]]></content><author><name>Younghyun Park</name></author><category term="ML" /><category term="Blog" /><category term="Machine learning" /><category term="Data mining" /><category term="혼공머신러닝" /><summary type="html"><![CDATA[5-1 결정 트리]]></summary></entry><entry><title type="html">[혼공머신러닝] Ch 4. 다양한 분류 알고리즘(2)</title><link href="http://localhost:4000/ml/HG4-2/" rel="alternate" type="text/html" title="[혼공머신러닝] Ch 4. 다양한 분류 알고리즘(2)" /><published>2022-05-27T00:00:00+09:00</published><updated>2022-05-27T00:00:00+09:00</updated><id>http://localhost:4000/ml/HG4-2</id><content type="html" xml:base="http://localhost:4000/ml/HG4-2/"><![CDATA[<h2 id="확률적-경사-하강법">확률적 경사 하강법</h2>
+<p>확률적 경사 하강법이란 Stochastic Gradient Descent로써, 무작위로 배치 크기가 1인 데이터를 추출하여 기울기를 계산하고 경사 하강 알고리즘을 적용하는 방법을 말합니다. 랜덤하게 하나의 샘플을 택하여 하강 알고리즘을 적용하기 때문에 전체 샘플을 사용하지 않습니다. 이러한 형태로 전체 샘플을 모두 사용할 때 까지 알고리즘을 여러번 적용한다고 생각하면 됩니다.<br />
+<br /></p>
+
+<p>우선 pandas를 사용하여 데이터를 불러오겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#dataframe 생성
+</span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="n">fish</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'https://bit.ly/fish_csv'</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">fish</span><span class="p">)</span>
+</code></pre></div></div>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG4/HG4-2-1.png?raw=true" alt="HG4-2-1" /><br />
+<br />
+우선 데이터를 불러온 후에 Species 열을 제외한 열들을 입력 데이터로, Species 열을 타깃 데이터롤 설정합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fish_input</span> <span class="o">=</span> <span class="n">fish</span><span class="p">[[</span><span class="s">'Weight'</span><span class="p">,</span> <span class="s">'Length'</span><span class="p">,</span> <span class="s">'Diagonal'</span><span class="p">,</span> <span class="s">'Height'</span><span class="p">,</span> <span class="s">'Width'</span><span class="p">]].</span><span class="n">to_numpy</span><span class="p">()</span>
+<span class="n">fish_target</span> <span class="o">=</span> <span class="n">fish</span><span class="p">[</span><span class="s">'Species'</span><span class="p">].</span><span class="n">to_numpy</span><span class="p">()</span>
+
+<span class="c1">#train set와 test set으로 나누기
+</span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="n">train_input</span><span class="p">,</span> <span class="n">test_input</span><span class="p">,</span> <span class="n">train_target</span><span class="p">,</span> <span class="n">test_target</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+        <span class="n">fish_input</span><span class="p">,</span> <span class="n">fish_target</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">42</span><span class="p">)</span>
+</code></pre></div></div>
+<p>fish 데이터를 sklearn을 이용하여 train set와 test set로 나눠줍니다. 
+그리고 StandardScaler을 사용하여 train set와 test set를 표준화 전처리를 해주도록 하겠습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="n">ss</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
+<span class="n">ss</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_input</span><span class="p">)</span>
+<span class="n">train_scaled</span> <span class="o">=</span> <span class="n">ss</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">train_input</span><span class="p">)</span>
+<span class="n">test_scaled</span> <span class="o">=</span> <span class="n">ss</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">test_input</span><span class="p">)</span>
+</code></pre></div></div>
+<p>이제 확률적 경사 하강법을 사용하기 위해 sklearn의 SGDClassifier 클래스를 이용합니다. SGDClassifier 클래스에는 loss 변수에 손실 함수의 종류를 지정해주고, max_iter 변수에는 수행할 에포크의 횟수를 지정합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">SGDClassifier</span>
+
+<span class="n">sc</span> <span class="o">=</span> <span class="n">SGDClassifier</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="s">'log'</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">42</span><span class="p">)</span>
+<span class="n">sc</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">sc</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">sc</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.773109243697479<br />
+0.775</p>
+</blockquote>
+
+<p>점수가 낮게 나왔기 때문에 점수를 높이기 위해 이어서 훈련하여 점진적인 학습을 해보도록 합니다. 이어서 훈련할 때에는 partial_fit() 메서드를 사용하는데, 사용할 때 마다 1 epoch 씩 이어 훈련할 수 있습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sc</span><span class="p">.</span><span class="n">partial_fit</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">sc</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">sc</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.8151260504201681<br />
+0.85</p>
+</blockquote>
+
+<p>확률적 경사 하강법을 사용한 모델은 에포크의 횟수에 따라 과대적합이나 과소적합 될 수 있기 때문에 에포크 횟수에 따른 훈련세트 점수와 테스트세트 점수를 그래프로 나타내 적절한 에포크의 값을 찾아줘야 합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="n">sc</span> <span class="o">=</span> <span class="n">SGDClassifier</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="s">'log'</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">42</span><span class="p">)</span>
+<span class="n">train_score</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">test_score</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">classes</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">unique</span><span class="p">(</span><span class="n">train_target</span><span class="p">)</span>
+
+<span class="c1">#300번의 epoch동안 훈련 반복 진행
+</span><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">300</span><span class="p">):</span>
+    <span class="n">sc</span><span class="p">.</span><span class="n">partial_fit</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">,</span> <span class="n">classes</span> <span class="o">=</span> <span class="n">classes</span><span class="p">)</span>
+    <span class="n">train_score</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">sc</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+    <span class="n">test_score</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">sc</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+
+<span class="c1">#그래프 그리기
+</span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">train_score</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">test_score</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'epoch'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'accuracy'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG4/HG4-2-2.png?raw=true" alt="HG4-2-2" /></p>
+
+<p>결과인 그래프를 보면 초반에는 과소적합되어 훈련세트와 테스트세트 점수가 낮고, 약 100번째 에포크 이후에는 훈련세트와 테스트 세트의 점수가 벌어지고 있는 것을 볼 수 있습니다. 100번째 에포크가 적절한 값인 것을 확인할 수 있습니다. 반복횟수를 100으로 설정하고 모델을 다시 훈련합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sc</span> <span class="o">=</span> <span class="n">SGDClassifier</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="s">'log'</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">42</span><span class="p">)</span> 
+<span class="n">sc</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">sc</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">train_scaled</span><span class="p">,</span> <span class="n">train_target</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">sc</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_scaled</span><span class="p">,</span> <span class="n">test_target</span><span class="p">))</span>
+</code></pre></div></div>
+<blockquote>
+  <p>0.957983193277311<br />
+0.925</p>
+</blockquote>
+
+<p>최종 점수가 잘 나오는 것을 확인할 수 있습니다.</p>]]></content><author><name>Younghyun Park</name></author><category term="ML" /><category term="Blog" /><category term="Machine learning" /><category term="Data mining" /><category term="혼공머신러닝" /><summary type="html"><![CDATA[4-2 확률적 경사 하강법]]></summary></entry><entry><title type="html">[Github] 깃허브 메인 페이지에 잔디심기 띄우기</title><link href="http://localhost:4000/github/GitAction/" rel="alternate" type="text/html" title="[Github] 깃허브 메인 페이지에 잔디심기 띄우기" /><published>2022-05-14T00:00:00+09:00</published><updated>2022-05-14T00:00:00+09:00</updated><id>http://localhost:4000/github/GitAction</id><content type="html" xml:base="http://localhost:4000/github/GitAction/"><![CDATA[<p>오늘은 Github Actions를 사용하여 잔디심기 대시보드를 다음과 같이 만들어보겠습니다.<br />
 참고한 포스트는 게시글 하단에 작성해 두었습니다.</p>
 
 <p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/Actions/A1.png?raw=true" alt="A1" /></p>
@@ -1361,111 +1655,4 @@ giscus를 다운받은 repo의 settings로 들어갑니다.<br />
 <blockquote>
   <p>참고한 포스트
 <a href="https://ynkim0.github.io/posts/Jekyll-Chripy-Google-Analytics-%EC%97%B0%EB%8F%99%ED%95%98%EA%B8%B0/">Jekyll Chripy Google Analytics 연동하기</a></p>
-</blockquote>]]></content><author><name>Younghyun Park</name></author><category term="Blog" /><category term="Blog" /><category term="google analytics" /><category term="Github blog" /><category term="blog custom" /><summary type="html"><![CDATA[깃허브 블로그에 GA를 설정하여 사용자 통계 확인하기]]></summary></entry><entry><title type="html">[Github Blog] google에서 검색되도록 설정하기</title><link href="http://localhost:4000/blog/SEO-set/" rel="alternate" type="text/html" title="[Github Blog] google에서 검색되도록 설정하기" /><published>2022-04-23T00:00:00+09:00</published><updated>2022-04-23T00:00:00+09:00</updated><id>http://localhost:4000/blog/SEO%20set</id><content type="html" xml:base="http://localhost:4000/blog/SEO-set/"><![CDATA[<p>github blog 글이 포털에 검색되도록 설정하려면 각 포탈에 블로그를 등록해주어야 합니다.<br />
-google에서 글이 검색이 가능하도록 등록해보겠습니다.</p>
-
-<h2 id="github-blog-글이-google에-검색되도록-설정하기">Github Blog 글이 google에 검색되도록 설정하기</h2>
-
-<h3 id="1-sitemap-설정">1. sitemap 설정</h3>
-<p>sitemap을 google에 등록함으로써 주기적인 크롤링을 통해 url을 연결할 수 있습니다. sitemap을 만들어보겠습니다.<br />
-블로그의 root 경로(github.io 폴더)에 <code class="language-plaintext highlighter-rouge">/sitemap.xml</code> 파일을 만들고 아래의 내용을 복사해서 붙여넣습니다.</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
----
-layout: null
----
-&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"&gt;
-  {% for post in site.posts %}
-    &lt;url&gt;
-      &lt;loc&gt;{{ site.url }}{{ post.url }}&lt;/loc&gt;
-      {% if post.lastmod == null %}
-        &lt;lastmod&gt;{{ post.date | date_to_xmlschema }}&lt;/lastmod&gt;
-      {% else %}
-        &lt;lastmod&gt;{{ post.lastmod | date_to_xmlschema }}&lt;/lastmod&gt;
-      {% endif %}
-
-      {% if post.sitemap.changefreq == null %}
-        &lt;changefreq&gt;weekly&lt;/changefreq&gt;
-      {% else %}
-        &lt;changefreq&gt;{{ post.sitemap.changefreq }}&lt;/changefreq&gt;
-      {% endif %}
-
-      {% if post.sitemap.priority == null %}
-          &lt;priority&gt;0.5&lt;/priority&gt;
-      {% else %}
-        &lt;priority&gt;{{ post.sitemap.priority }}&lt;/priority&gt;
-      {% endif %}
-
-    &lt;/url&gt;
-  {% endfor %}
-&lt;/urlset&gt;
-
-</code></pre></div></div>
-<p>다음 파일을 git commit으로 push 후에 <code class="language-plaintext highlighter-rouge">"blog_url"/sitemap.xml</code> 로 접속했을 때 아래와 같은 화면이 나와야 정상적으로 sitemap이 등록된 것입니다.</p>
-
-<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/gooser/gooser1.png?raw=truehttps://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/gooser/gooser1.png?raw=true" alt="gooser1" /><br />
-sitemap에서는 해당 글의 정보들이 설정이 되는데 이것은 각 포스트의 맨 윗 부분에 다음과 같이 sitemap 옵션을 추가해줌으로서 추가적으로 설정할 수 있습니다.</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>---
-layout: post
-title:  "제목"
-date:   2022-04-23 12:00:00 
-lastmod : 2022-04-24 12:00:00
-sitemap :
-  changefreq : daily
-  priority : 1.0
----
-</code></pre></div></div>
-<p>포스트의 시작 부분에 다음과 같이 sitemap 코드를 적용해보겠습니다.</p>
-
-<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/gooser/gooser3.png?raw=true" alt="gooser3" /></p>
-
-<p>git push 한 후에 다시 <code class="language-plaintext highlighter-rouge">"blog_url"/sitemap.xml</code>로 접속하여 확인해보겠습니다.<br />
-<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/gooser/gooser2.png?raw=true" alt="gooser2" /></p>
-
-<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/gooser/gooser4.png?raw=true" alt="gooser4" /><br />
-위 사진이 <code class="language-plaintext highlighter-rouge">sitemap</code> 지정 전, 아래 사진이 지정 후 사진입니다.<br />
-<span style="background-color: #ffdce0">sitemap을 설정해준 부분</span>은 <code class="language-plaintext highlighter-rouge">changefreq</code>가 daily로 바뀌고, <code class="language-plaintext highlighter-rouge">priority</code>는 1.0으로 잘 바뀌었습니다. 
-반면 <span style="background-color: #f1f8ff">sitemap을 설정 안 한 포스트</span>는 default값 그대로임을 확인할 수 있습니다.</p>
-
-<h3 id="2-robotstxt-생성">2. robots.txt 생성</h3>
-<p><code class="language-plaintext highlighter-rouge">robots.txt</code> 파일에 sitemap.xml 파일의 위치를 등록해두면 검색 엔진의 크롤러들이 홈페이지를 크롤링하는 데에 도움이 된다고 합니다. 
-따라서 root 디렉토리<code class="language-plaintext highlighter-rouge">github.io/</code>에 <code class="language-plaintext highlighter-rouge">robots.txt</code> 파일을 만들고 다음과 같이 입력합니다.</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>User-agent: *
-Allow: /
-
-Sitemap: http://"blog_url".github.io/sitemap.xml
-</code></pre></div></div>
-
-<h3 id="3-검색-엔진에-등록하기">3. 검색 엔진에 등록하기</h3>
-<p>google search console에 등록을 해야 최종적으로 검색 엔진에 블로그 포스트가 뜨게 됩니다.<br />
-<a href="https://developers.google.com/search#?modal_active=none">google search console site</a>에 접속한 후 시작하기 버튼을 누릅니다.</p>
-
-<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/gooser/gooser5.png?raw=true" alt="gooser5" /></p>
-
-<p>위 화면에서 <code class="language-plaintext highlighter-rouge">URL prefix</code>에 블로그 url을 붙여넣습니다. 
-여기서 Domain, URL prefix 등록의 차이점은 도메인 속성은 DNS 레코드만을 사용해서 verify할 수 있으나 모든 하위 도메인의 데이터를 포함한 웹사이트의 정보를 모두 얻을 수 있습니다.<br />
-URL perfix 등록은 입력한 속성과 하위 도메인의 레벨만 포함되기 때문에, https://yhp2205.github.io/를 등록했다면 https://yhp2205.github.io/First-post/ 같은 데이터는 포함이 되지만, 
-http://yhp2205.github.io는 포함이 되지 않습니다. 대신 DNS와 달리 여러 경로로 사이트 소유 인증을 할 수 있습니다.<br />
-저는 URL prefix를 이용하여 등록해보겠습니다.<br />
-<code class="language-plaintext highlighter-rouge">Other verification methods</code>에서 HTML tag를 눌러 메타 태그를 copy합니다.</p>
-
-<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/gooser/gooser6.png?raw=true" alt="gooser6" /></p>
-
-<p>이제 github blog의 root에 존재하는 <code class="language-plaintext highlighter-rouge">_includes/head/custom.html</code> 파일 맨 상단에 copy한 메타 태그를 붙여넣어 github에 push 해주었습니다.<br />
-그리고 HTML tag를 copy한 페이지에서 verify를 눌러줍니다.</p>
-
-<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/gooser/gooser8.png?raw=true" alt="gooser8" /></p>
-
-<p>그럼 <code class="language-plaintext highlighter-rouge">Ownership verified</code> 라는 문구가 뜨며 등록이 완료됩니다. 그럼 이제 마지막으로 sitemap을 올리기 위해 <code class="language-plaintext highlighter-rouge">GO TO PROPERTY</code>를 누릅니다.</p>
-
-<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/gooser/gooser7.png?raw=true" alt="gooser7" /></p>
-
-<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/gooser/gooser9.png?raw=true" alt="gooser9" /></p>
-
-<p>마지막으로 google search console 창에서 sitemaps 카테고리를 눌러 <code class="language-plaintext highlighter-rouge">sitemap.xml</code>을 submit 해주면 끝입니다.</p>
-
-<blockquote>
-  <p>참고한 포스트<br />
-<a href="https://www.moinnet.com/ko/digital-marketing/google-search-console-add-property/">쉽게 하는 웹사이트 구글서치콘솔 등록</a><br />
-<a href="http://jinyongjeong.github.io/2017/01/13/blog_make_searched/">github blog를 google에서 검색되도록 설정하기</a></p>
-</blockquote>]]></content><author><name>Younghyun Park</name></author><category term="Blog" /><category term="Blog" /><category term="SEO" /><category term="Github blog" /><category term="blog custom" /><summary type="html"><![CDATA[깃허브 블로그 글이 포털사이트에서 검색될 수 있도록 설정하기]]></summary></entry></feed>
+</blockquote>]]></content><author><name>Younghyun Park</name></author><category term="Blog" /><category term="Blog" /><category term="google analytics" /><category term="Github blog" /><category term="blog custom" /><summary type="html"><![CDATA[깃허브 블로그에 GA를 설정하여 사용자 통계 확인하기]]></summary></entry></feed>
