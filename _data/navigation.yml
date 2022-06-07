@@ -21,6 +21,9 @@ docs:
       - title: "Machine Learning"
         url: ML/
         category: "ML"
+      - title: "Deep Learning"
+        url: DL/
+        category: "DL"
   - title: Git
     children:
       - title: "Blog"

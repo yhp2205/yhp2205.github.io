@@ -1,4 +1,99 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-05-28T23:27:50+09:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">YOUNGHYUN’s Blog</title><subtitle>노력하는 흔적 남기기</subtitle><author><name>Younghyun Park</name></author><entry><title type="html">[혼공머신러닝] Ch 5. 트리 알고리즘(2)</title><link href="http://localhost:4000/ml/HG5-2/" rel="alternate" type="text/html" title="[혼공머신러닝] Ch 5. 트리 알고리즘(2)" /><published>2022-05-28T00:00:00+09:00</published><updated>2022-05-28T00:00:00+09:00</updated><id>http://localhost:4000/ml/HG5-2</id><content type="html" xml:base="http://localhost:4000/ml/HG5-2/"><![CDATA[<h1 id="교차-검증과-그리드-서치">교차 검증과 그리드 서치</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-06-07T19:39:32+09:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">YOUNGHYUN’s Blog</title><subtitle>노력하는 흔적 남기기</subtitle><author><name>Younghyun Park</name></author><entry><title type="html">[혼공머신러닝] Ch 8. 이미지를 위한 인공 신경망</title><link href="http://localhost:4000/dl/HG8-4/" rel="alternate" type="text/html" title="[혼공머신러닝] Ch 8. 이미지를 위한 인공 신경망" /><published>2022-06-07T00:00:00+09:00</published><updated>2022-06-07T00:00:00+09:00</updated><id>http://localhost:4000/dl/HG8-4</id><content type="html" xml:base="http://localhost:4000/dl/HG8-4/"><![CDATA[<p>2절에서는 패션 MNIST 데이터를 사용하여 합성곱 신경망을 만들고 그래프를 그려보았습니다. 그리고 3절에서는 함수형 API를 사용하여 합성곱 신경망의 시각화에 대해 알아봤습니다. 이 글은 함수형 API에 대해 다뤄보고자 작성하였습니다.</p>
+
+<h1 id="sequential-api로-만든-모델">Sequential API로 만든 모델</h1>
+
+<p>2절에서는 신경망 모델을 만들 때에 다음과 같이 Sequential 클래스를 사용했습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">model</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">Sequential</span><span class="p">()</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Conv2D</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">,</span> 
+                              <span class="n">padding</span><span class="o">=</span><span class="s">'same'</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span><span class="mi">28</span><span class="p">,</span><span class="mi">1</span><span class="p">)))</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">MaxPooling2D</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Conv2D</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">,</span> 
+                              <span class="n">padding</span><span class="o">=</span><span class="s">'same'</span><span class="p">))</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">MaxPooling2D</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Flatten</span><span class="p">())</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">))</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.4</span><span class="p">))</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'softmax'</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>Sequential 객체를 만들고 두 개의 합성곱-풀링 층을 만든 후 Flatten 클래스와 은닉층, 드롭아웃층 그리고 출력층을 차례로 구성한 모델입니다.<br />
+model.summary()로 모델의 형태를 출력해보면 다음과 같습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">model</span><span class="p">.</span><span class="n">summary</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG8/HG8-4-1.png?raw=true" alt="HG8-4-1" /></p>
+
+<p>이를 함수형 API를 사용하여 만들어보겠습니다.</p>
+
+<h1 id="함수형-api로-만든-모델">함수형 API로 만든 모델</h1>
+<p>앞서 만든 모델과 모든 조건을 동일하게 설정하여 모델을 구성합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">inputs</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">layers</span><span class="p">.</span><span class="n">Conv2D</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">padding</span> <span class="o">=</span> <span class="s">'same'</span><span class="p">,</span> <span class="n">activation</span> <span class="o">=</span> <span class="s">'relu'</span><span class="p">)(</span><span class="n">inputs</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">layers</span><span class="p">.</span><span class="n">MaxPooling2D</span><span class="p">(</span><span class="mi">2</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">layers</span><span class="p">.</span><span class="n">Conv2D</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">padding</span> <span class="o">=</span> <span class="s">'same'</span><span class="p">,</span> <span class="n">activation</span> <span class="o">=</span> <span class="s">'relu'</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">layers</span><span class="p">.</span><span class="n">MaxPooling2D</span><span class="p">(</span><span class="mi">2</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">layers</span><span class="p">.</span><span class="n">Flatten</span><span class="p">()(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">activation</span> <span class="o">=</span> <span class="s">'relu'</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">layers</span><span class="p">.</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.4</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">activation</span> <span class="o">=</span> <span class="s">'softmax'</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">Model</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">model</span><span class="p">.</span><span class="n">summary</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG8/HG8-4-2.png?raw=true" alt="HG8-4-2" /></p>
+
+<p>두 모델이 동일하게 만들어진 것을 확인할 수 있습니다.</p>
+
+<p>두 모델의 구성을 출력해보면 다음과 같습니다.<br />
+<br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG8/HG8-4-4.png?raw=true" alt="HG8-4-4" />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG8/HG8-4-3.png?raw=true" alt="HG8-4-3" /></p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG8/HG8-4-5.png?raw=true" alt="HG8-4-5" width="300" height="300" />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG8/HG8-4-6.png?raw=true" alt="HG8-4-6" width="300" height="300" /><br />
+<br />
+이렇게 Sequential class로 만든 모델을 함수형 API를 사용하여 동일하게 만들어보았습니다. 여기까지 생각했을 때 함수형 API의 용도에 의문이 생길 수 있습니다. 이런 단순한 모델의 경우에는 Sequential API만을 사용하여 무리없이 구현할 수 있기 때문입니다. 그러나 모델이 복잡해지고 입력층과 출력층이 여러개일 경우, Sequential API만을 사용하여 만들 수 없습니다.<br />
+<br />
+함수형 API의 장점은 모든 레이어를 개별적이고 독립적으로 정의할 수 있기 때문에 다중 입력 및 출력이 가능하다는 것입니다. 다시 말해 모든 레이어에서 원하는 만큼의 다른 레이어를 추가할 수 있습니다.</p>
+
+<p><img src="https://editor.analyticsvidhya.com/uploads/48655toy%20network.png" alt="HG8-4-7" /><br />
+다음과 같이 3개의 입력, 각 4개의 뉴런을 가진 hidden layer 2개와 하나의 output이 있는 신경망일 경우에는 Sequential API로도 모델을 생성할 수 있습니다.</p>
+
+<p><img src="https://editor.analyticsvidhya.com/uploads/41982branched%20network.png" alt="HG8-4-8" /><br />
+그러나 다음과 같이 2번째 hidden layer 다음에 하나의 레이어가 더 추가해서 원래의 출력값인 y1과 추가된 레이어를 통과한 출력값인 y2를 동시에 얻고싶을 때 함수형 API를 사용할 수 있습니다.</p>
+
+<p>위 그림을 토대로 모델을 만들어보면 다음과 같이 표현할 수 있습니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">##입력 레이어
+</span><span class="n">input_layer</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,),</span><span class="n">name</span><span class="o">=</span><span class="s">'input_layer'</span><span class="p">)</span> 
+
+<span class="c1">##2개의 히든 레이어
+</span><span class="n">Layer_1</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">"relu"</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s">'Layer_1'</span><span class="p">)(</span><span class="n">input_layer</span><span class="p">)</span> 
+<span class="n">Layer_2</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">"relu"</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s">'Layer_2'</span><span class="p">)(</span><span class="n">Layer_1</span><span class="p">)</span> 
+
+<span class="c1">##출력 레이어 y1
+</span><span class="n">y1_output</span><span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">"linear"</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s">'y1_output'</span><span class="p">)(</span><span class="n">Layer_2</span><span class="p">)</span> 
+
+<span class="c1">##정의 Branched layer 
+</span><span class="n">Branched_layer</span><span class="o">=</span><span class="n">Dense</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">"relu"</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s">'Branched_layer'</span><span class="p">)(</span><span class="n">Layer_2</span><span class="p">)</span> 
+
+<span class="c1">##두 번째 출력 레이어 y2
+</span><span class="n">y2_output</span><span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">"linear"</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s">'y2_output'</span><span class="p">)(</span><span class="n">Branched_layer</span><span class="p">)</span> 
+
+<span class="c1">##입력 및 출력 레이어 지정
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">input_layer</span><span class="p">,</span><span class="n">outputs</span><span class="o">=</span><span class="p">[</span><span class="n">y1_output</span><span class="p">,</span><span class="n">y2_output</span><span class="p">])</span>
+</code></pre></div></div>
+<p align="center">
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/HG8/HG8-4-9.png?raw=true" /> 
+</p>
+<p><br />
+그림과 동일한 구조의 모델을 만들었습니다. 두 번째 hidden layer 다음에 하나의 레이어가 더 추가되었고, 두번째 hidden layer의 출력은 y1을 예측하는데에 사용되며 동시에 Branched layer에 전달됩니다. 또한 두 번째 출력을 예측하기 위해 더 많은 레이어를 추가할 수 있습니다. 이러한 방법을 사용하여 동시에 여러 출력층을 만들 수 있습니다.</p>
+
+<p>결론적으로 Sequential API를 사용하여 출력층 y1 및 y2를 예측하기 위해 2개의 다른 신경망을 구축해야 하지만, 함수형 API를 사용하면 단일 네트워크에서 두 개의 출력을 만들 수 있습니다.</p>]]></content><author><name>Younghyun Park</name></author><category term="DL" /><category term="Blog" /><category term="Deep learning" /><category term="Data mining" /><category term="혼공머신러닝" /><summary type="html"><![CDATA[함수형 API]]></summary></entry><entry><title type="html">[혼공머신러닝] Ch 5. 트리 알고리즘(2)</title><link href="http://localhost:4000/ml/HG5-2/" rel="alternate" type="text/html" title="[혼공머신러닝] Ch 5. 트리 알고리즘(2)" /><published>2022-05-28T00:00:00+09:00</published><updated>2022-05-28T00:00:00+09:00</updated><id>http://localhost:4000/ml/HG5-2</id><content type="html" xml:base="http://localhost:4000/ml/HG5-2/"><![CDATA[<h1 id="교차-검증과-그리드-서치">교차 검증과 그리드 서치</h1>
 
 <p>테스트 세트 성능을 올바르게 판단하기 위해서는 모델을 전부 만든 뒤에 마지막에 한 번만 사용하는 것이 좋습니다. 그렇다면 테스트 세트를 사용하지 않고 어떻게 하이퍼 파라미터 튜닝을 할 수 있을지 알아보도록 하겠습니다.</p>
 
@@ -1604,55 +1699,4 @@ giscus를 다운받은 repo의 settings로 들어갑니다.<br />
 <br />
 <img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/giscus/gis3.png?raw=true" alt="gis3" /><br />
 <br />
-그리고 다시 확인해보면 위와 같이 comments 창이 제대로 뜨는 것을 확인할 수 있습니다.</p>]]></content><author><name>Younghyun Park</name></author><category term="Blog" /><category term="Blog" /><category term="giscus" /><category term="Github blog" /><category term="blog custom" /><summary type="html"><![CDATA[깃허브 블로그에 giscus를 이용하여 댓글 사용하기]]></summary></entry><entry><title type="html">[Github Blog] google analytics 적용하기</title><link href="http://localhost:4000/blog/GA-post/" rel="alternate" type="text/html" title="[Github Blog] google analytics 적용하기" /><published>2022-04-27T00:00:00+09:00</published><updated>2022-04-27T00:00:00+09:00</updated><id>http://localhost:4000/blog/GA%20post</id><content type="html" xml:base="http://localhost:4000/blog/GA-post/"><![CDATA[<p>github blog에 google analytics를 적용해보겠습니다.<br />
-저는 github blog에 jekyll minimal-mistakes 테마를 적용하고 있습니다.</p>
-
-<h3 id="1-google-analytics-계정-생성하기">1. google analytics 계정 생성하기</h3>
-<p>우선 <a href="https://analytics.google.com/analytics/web/provision/?hl=ko&amp;pli=1#/provision">google analytics</a> 페이지에 접속해서 계정을 생성합니다.<br />
-  <br />
-  <img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA1.png?raw=true" alt="GA1" /><br />
-  <br />
-  google analytics 페이지에서 측정 시작을 눌러줍니다.<br />
-  <br />
-  <img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA2.png?raw=true" alt="GA2" /><br />
-  <br />
-  계정 이름을 입력하고 다음으로 넘어갑니다.<br />
-  <br />
-  <img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA3.png?raw=true" alt="GA3" /><br />
-  <br />
-  속성 이름을 입력하고, 보고 시간대와 통화를 지정해줍니다.<br />
-  저는 속성 이름에 Github blog를, 시간대와 통화를 모두 대한민국으로 지정했습니다.<br />
-  <br />
-  <img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA4.png?raw=true" alt="GA4" /> <br />
-  <br />
-  비즈니스 정보를 입력합니다. 업종은 지정하지 않아도 됩니다.<br />
-  비즈니스 규모와 사용 계획은 본인의 사이트와 맞게 입력해줍니다.<br />
-  <br />
-  <img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA5.png?raw=true" alt="GA5" /><br />
-  <br />
-  마지막으로 만들기를 누르고, 약관에 동의하면 계정 만들기가 완료 되었습니다.</p>
-
-<h3 id="2-데이터-스트림-설정하기">2. 데이터 스트림 설정하기</h3>
-<p>이제 생성한 GA 계정을 이용하여 데이터 스트림을 설정하겠습니다.<br />
-<br />
-<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA6.png?raw=true" alt="GA6" /><br />
-<br />
-다음 화면에서 우리는 github blog에 만들 것이기 때문에 웹을 선택해줍니다.<br />
-<br />
-<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA7.png?raw=true" alt="GA7" />
-<br />
-데이터 스트림 설정 창이 뜨면, <code class="language-plaintext highlighter-rouge">http://</code> 를 제외한 깃헙 url을 입력한 후, 스트림 이름을 지정해줍니다.<br />
-저는 github blog로 지정하였습니다.<br />
-그리고 만들기를 눌러 생성합니다. 
-<br />
-<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA8.png?raw=true" alt="GA8" /><br />
-<br />
-스트림을 만든 후, 웹 스트림 세부정보에서 측정 ID를 복사합니다.<br />
-이렇게 복사한 측정 ID는 github blog 로컬에 위치해있는 <code class="language-plaintext highlighter-rouge">_config.yml</code> 파일 속 google tracking id 적는 란에 다음과 같이 추가해줍니다.<br />
-<br />
-<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/GA/GA9.png?raw=true" alt="GA9" /></p>
-
-<blockquote>
-  <p>참고한 포스트
-<a href="https://ynkim0.github.io/posts/Jekyll-Chripy-Google-Analytics-%EC%97%B0%EB%8F%99%ED%95%98%EA%B8%B0/">Jekyll Chripy Google Analytics 연동하기</a></p>
-</blockquote>]]></content><author><name>Younghyun Park</name></author><category term="Blog" /><category term="Blog" /><category term="google analytics" /><category term="Github blog" /><category term="blog custom" /><summary type="html"><![CDATA[깃허브 블로그에 GA를 설정하여 사용자 통계 확인하기]]></summary></entry></feed>
+그리고 다시 확인해보면 위와 같이 comments 창이 제대로 뜨는 것을 확인할 수 있습니다.</p>]]></content><author><name>Younghyun Park</name></author><category term="Blog" /><category term="Blog" /><category term="giscus" /><category term="Github blog" /><category term="blog custom" /><summary type="html"><![CDATA[깃허브 블로그에 giscus를 이용하여 댓글 사용하기]]></summary></entry></feed>
