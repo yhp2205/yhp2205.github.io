@@ -1,0 +1,94 @@
+I"�E<p>이 글은 Kaggle의 Google AI4Code 대회의 <a href="https://www.kaggle.com/code/andreaspalmgren/ai4code-comprehensive-eda">AI4Code - Comprehensive EDA</a>를 리뷰하기 위해 작성되었습니다.</p>
+
+<h3 id="data-전처리-과정">data 전처리 과정</h3>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">read_notebook</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">pd</span><span class="p">.</span><span class="n">read_json</span><span class="p">(</span>
+            <span class="n">path</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="p">{</span><span class="s">'cell_type'</span><span class="p">:</span> <span class="s">'category'</span><span class="p">,</span> <span class="s">'source'</span><span class="p">:</span> <span class="s">'str'</span><span class="p">})</span>
+        <span class="p">.</span><span class="n">assign</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">path</span><span class="p">.</span><span class="n">stem</span><span class="p">)</span>
+        <span class="p">.</span><span class="n">rename_axis</span><span class="p">(</span><span class="s">'cell_id'</span><span class="p">)</span>
+    <span class="p">)</span>
+
+<span class="c1"># Subset of training due to its large size
+</span><span class="n">NUM_TRAIN</span> <span class="o">=</span> <span class="mi">20000</span>
+<span class="n">paths_train</span> <span class="o">=</span> <span class="nb">list</span><span class="p">((</span><span class="n">data_dir</span> <span class="o">/</span> <span class="s">'train'</span><span class="p">).</span><span class="n">glob</span><span class="p">(</span><span class="s">'*.json'</span><span class="p">))[:</span><span class="n">NUM_TRAIN</span><span class="p">]</span>
+<span class="c1">#paths_train = list((data_dir / 'train').glob('*.json'))
+</span>
+<span class="n">notebooks_train</span> <span class="o">=</span> <span class="p">[</span><span class="n">read_notebook</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">paths_train</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s">'Train NBs'</span><span class="p">)]</span>
+
+<span class="c1"># Get notebooks
+</span><span class="n">df_notebooks</span> <span class="o">=</span> <span class="p">(</span><span class="n">pd</span><span class="p">.</span><span class="n">concat</span><span class="p">(</span><span class="n">notebooks_train</span><span class="p">).</span><span class="n">set_index</span><span class="p">(</span><span class="s">'id'</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="bp">True</span><span class="p">).</span><span class="n">swaplevel</span><span class="p">().</span><span class="n">sort_index</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="s">'id'</span><span class="p">,</span> 
+                                                                                               <span class="n">sort_remaining</span><span class="o">=</span><span class="bp">False</span><span class="p">))</span> 
+
+<span class="c1"># Get correct order of cells in notebooks                                                                                          
+</span><span class="n">df_orders</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">data_dir</span><span class="o">/</span><span class="s">'train_orders.csv'</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="s">'id'</span><span class="p">)</span>
+<span class="n">df_orders</span> <span class="o">=</span> <span class="n">df_orders</span><span class="p">.</span><span class="n">squeeze</span><span class="p">().</span><span class="nb">str</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">" "</span><span class="p">).</span><span class="n">explode</span><span class="p">().</span><span class="n">to_frame</span><span class="p">()</span>
+<span class="n">df_orders</span><span class="p">[</span><span class="s">"rank"</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">Series</span><span class="p">([</span><span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df_orders</span><span class="p">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">"id"</span><span class="p">).</span><span class="n">count</span><span class="p">()[</span><span class="s">"cell_order"</span><span class="p">]]).</span><span class="n">explode</span><span class="p">().</span><span class="n">to_numpy</span><span class="p">()</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">df_notebooks</span><span class="p">.</span><span class="n">reset_index</span><span class="p">().</span><span class="n">merge</span><span class="p">(</span><span class="n">df_orders</span><span class="p">.</span><span class="n">reset_index</span><span class="p">().</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">{</span><span class="s">'cell_order'</span><span class="p">:</span><span class="s">'cell_id'</span><span class="p">}),</span> 
+                       <span class="n">how</span><span class="o">=</span><span class="s">'inner'</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s">'id'</span><span class="p">,</span><span class="s">'cell_id'</span><span class="p">])</span>
+
+<span class="c1"># Get ancestors for notebooks
+</span><span class="n">df_ancestors</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">data_dir</span> <span class="o">/</span> <span class="s">'train_ancestors.csv'</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="s">'id'</span><span class="p">)</span>
+
+<span class="c1"># Final combined dataframe
+</span><span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df_ancestors</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s">"id"</span><span class="p">).</span><span class="n">sort_values</span><span class="p">([</span><span class="s">"id"</span><span class="p">,</span> <span class="s">"rank"</span><span class="p">]).</span><span class="n">set_index</span><span class="p">([</span><span class="s">"id"</span><span class="p">,</span> <span class="s">"cell_id"</span><span class="p">])</span>
+
+
+<span class="c1"># Dataframe for count information - Used in EDA
+</span><span class="n">mkd</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s">"cell_type"</span><span class="p">]</span> <span class="o">==</span> <span class="s">"markdown"</span><span class="p">].</span><span class="n">groupby</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s">"id"</span><span class="p">]).</span><span class="n">count</span><span class="p">().</span><span class="n">source</span>
+<span class="n">code</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s">"cell_type"</span><span class="p">]</span> <span class="o">==</span> <span class="s">"code"</span><span class="p">].</span><span class="n">groupby</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s">"id"</span><span class="p">]).</span><span class="n">count</span><span class="p">().</span><span class="n">source</span>
+<span class="n">df_counts</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">concat</span><span class="p">([</span><span class="n">mkd</span><span class="p">,</span> <span class="n">code</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">df_counts</span><span class="p">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s">'markdown_count'</span><span class="p">,</span> <span class="s">'code_count'</span><span class="p">]</span>
+<span class="n">df_counts</span><span class="p">[</span><span class="s">"tot"</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_counts</span><span class="p">.</span><span class="n">markdown_count</span><span class="o">+</span><span class="n">df_counts</span><span class="p">.</span><span class="n">code_count</span>
+<span class="n">df_counts</span><span class="p">[</span><span class="s">"ratio"</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_counts</span><span class="p">.</span><span class="n">code_count</span> <span class="o">/</span> <span class="n">df_counts</span><span class="p">.</span><span class="n">tot</span>
+</code></pre></div></div>
+<p>이 포스트에서는 전체적인 데이터의 형태를 파악하기 위해 위와 같은 코드를 사용하여 변수를 추가했습니다. 변수에 대한 설명은 다음과 같습니다.<br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/AIEDA/1-1.png?raw=true" alt="1-1" /></p>
+
+<p>cell이 mk인지 code인지에 대한 값을 cell_type이라는 변수에 지정하였습니다.</p>
+
+<h3 id="data-analysis">DATA Analysis</h3>
+<p>코드와 마크다운간의 관계를 알아내는 것이 중요한 포인트이기 때문에 cell_type의 비율을 먼저 출력합니다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fig1</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">wedges</span><span class="p">,</span> <span class="n">texts</span><span class="p">,</span> <span class="n">autotexts</span> <span class="o">=</span> <span class="n">ax</span><span class="p">.</span><span class="n">pie</span><span class="p">([</span><span class="n">df_counts</span><span class="p">.</span><span class="n">code_count</span><span class="p">.</span><span class="nb">sum</span><span class="p">(),</span> <span class="n">df_counts</span><span class="p">.</span><span class="n">markdown_count</span><span class="p">.</span><span class="nb">sum</span><span class="p">()],</span> <span class="n">shadow</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> 
+                                  <span class="n">explode</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">),</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s">"Code"</span><span class="p">,</span> <span class="s">"Markdown"</span><span class="p">],</span> 
+                                  <span class="n">autopct</span><span class="o">=</span><span class="s">'%1.1f%%'</span><span class="p">,</span> <span class="n">textprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s">"w"</span><span class="p">),</span> <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s">"#008b8b"</span><span class="p">,</span> <span class="s">"#8b0000"</span><span class="p">])</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">setp</span><span class="p">(</span><span class="n">autotexts</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s">"bold"</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">legend</span><span class="p">(</span><span class="n">wedges</span><span class="p">,</span> <span class="p">[</span><span class="s">"Code"</span><span class="p">,</span> <span class="s">"Markdown"</span><span class="p">],</span>
+          <span class="n">loc</span><span class="o">=</span><span class="s">"center left"</span><span class="p">,</span>
+          <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">prop</span><span class="o">=</span><span class="p">{</span><span class="s">'size'</span><span class="p">:</span> <span class="mi">13</span><span class="p">})</span>
+
+<span class="n">ax</span><span class="p">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">"Proportion of Code vs Markdown"</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">20</span><span class="p">);</span>
+</code></pre></div></div>
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/AIEDA/1-2.png?raw=true" alt="1-2" /><br />
+mk에 비해 코드의 비율이 높습니다.</p>
+
+<p>다음으로는 노트북의 셀 수의 길이를 cell의 갯수에 따른 빈도로 히스토그램을 그려 나타내었습니다.<br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/AIEDA/1-3.png?raw=true" alt="1-3" /><br />
+일반적으로 50개 이하의 셀을 지닌 것을 확인할 수 있습니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/AIEDA/1-4.png?raw=true" alt="1-4" /><br />
+코드와 마크다운 셀의 분포를 다시 비교한 것입니다. 이 분포를 보면 코드와 마크다운의 빈도가 비례하는 관계를 지니고 있다고 추측할 수 있습니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/AIEDA/1-5.png?raw=true" alt="1-5" /><br />
+가장 짧은 노트북과 긴 노트북에 존재하는 cell들의 갯수를 출력하였습니다. 가장 짧은 노트북에도 최소한 2개의 셀이 존재한다고 생각할 수 있겠습니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/AIEDA/1-6.png?raw=true" alt="1-6" /><br />
+2개의 셀을 가진 노트북에서 첫번째 셀과 두번째 셀의 형식을 3차원 막대로 출력한 그림과 첫 번째로 어떤 셀이 주로 오는지에 대한 파이차트를 출력한 결과입니다. 해석해보면, 2개의 cell을 가진 노트북들은 대부분 code보다 mk로 먼저 시작하는 것으로 볼 수 있습니다. 그렇다면 일반적으로 mk가 code 셀보다 앞에 오는지에 대한 의문이 있을 수 있는데, 2번째 파이차트를 확인해보면 대부분의 노트북이 마크다운 셀로 시작하는 것을 알 수 있습니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/AIEDA/1-7.png?raw=true" alt="1-7" /></p>
+
+<p>2개의 셀을 지닌 노트북은 3차원 plot으로 확인할 수 있었지만, 더 많은 셀을 가진 것들을 3차원으로 그리는 것은 어렵기 때문에 노트북의 길이에 따라 code 셀과 markdown 셀의 분포를 나타내어 보았습니다. 이를 보면 첫 번째 셀에서는 마크다운이 더 많지만 그를 제외한 모든 노트북에서는 code가 더 많은 부분을 차지합니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/AIEDA/1-8.png?raw=true" alt="1-8" /><br />
+앞선 결과에 이어 code 셀이 각 노트북에서 어느정도의 비중을 차지하는지에 대한 히스토그램을 그려보았습니다. 많은 노트북에서 code 셀이 절반 이상의 비율을 차지하고 있습니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/AIEDA/1-9.png?raw=true" alt="1-9" /><br />
+<img src="https://github.com/yhp2205/yhp2205.github.io/blob/main/assets/images/AIEDA/1-10.png?raw=true" alt="1-10" /><br />
+code 셀과 markdown 셀의 길이를 나타내었습니다. 일반적으로 코드셀보다 마크다운 셀이 길이가 더 짧은 것으로 알 수 있습니다.</p>
+
+<p>이러한 코드를 통해 마크다운과 코드 셀간의 관계를 조금이나마 파악해보았습니다. 마크다운 셀과 코드 사이의 유의미한 관계를 알아내기 위해서 다른 공부들이 더 필요할 것 같습니다. 더 알아본 후에 다음 포스트로 작성해보도록 하겠습니다.</p>
+:ET
