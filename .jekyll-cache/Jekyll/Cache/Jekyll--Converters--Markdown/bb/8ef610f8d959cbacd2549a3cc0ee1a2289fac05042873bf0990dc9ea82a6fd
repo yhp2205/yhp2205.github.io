@@ -1,0 +1,13 @@
+I"E<p>거북이 그래픽으로 도형을 그리는 간단한 프로그램을 만들어보겠습니다.
+우선 맥에서 terminal을 열고 거북이 그래픽을 띄워줍니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">turtle</span> <span class="k">as</span> <span class="n">t</span>
+<span class="n">t</span><span class="p">.</span><span class="n">shape</span><span class="p">(</span><span class="s">"turtle"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>다음 코드를 실행하면 아래 이미지와 같은 거북이 그래픽 창이 생깁니다.</p>
+
+<p><img src="https://github.com/yhp2205/yhp2205.github.io/assets/images/APY/01/1.jpg" alt="APY-1-1" /> 
+yhp2205.github.io/assets/images/APY/01/1.jpg</p>
+
+:ET
