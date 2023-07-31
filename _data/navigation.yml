@@ -24,6 +24,9 @@ docs:
       - title: "Deep Learning"
         url: DL/
         category: "DL"
+      - title: "Python"
+        url: Python/
+        category: "Python"
   - title: Git
     children:
       - title: "Blog"
