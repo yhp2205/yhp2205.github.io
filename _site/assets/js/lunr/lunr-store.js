@@ -100,4 +100,10 @@ var store = [{
         "tags": ["Blog","Machine learning","Data mining","google AI4Code"],
         "url": "/ml/googAIeda/",
         "teaser": "/assets/images/main.jpg"
+      },{
+        "title": "[모두의파이썬X알고리즘] Unit 2. 간단한 프로그램 만들기",
+        "excerpt":"거북이 그래픽으로 도형을 그리는 간단한 프로그램을 만들어보겠습니다. 우선 맥에서 terminal을 열고 거북이 그래픽을 띄워줍니다.   import turtle as t t.shape(\"turtle\")   다음 코드를 실행하면 아래 이미지와 같은 거북이 그래픽 창이 생깁니다.   ","categories": ["Python"],
+        "tags": ["Python","모두의파이썬"],
+        "url": "/python/APY-1/",
+        "teaser": "/assets/images/main.jpg"
       }]
